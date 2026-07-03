@@ -57,7 +57,7 @@ export const metadata: Metadata = {
       "The most awaited college cultural and technical festival of MACFAST, Tiruvalla. 26+ events, gaming, coding, cultural performances, and more!",
     images: [
       {
-        url: "https://macfiesta.macfast.org/logo.png",
+        url: "/logo.png",
         width: 1200,
         height: 630,
         alt: "MacFiesta 2K26 Logo",
@@ -69,7 +69,7 @@ export const metadata: Metadata = {
     title: "MacFiesta 2K26 — Where Legends Rise",
     description:
       "Join the most exciting college fest at MACFAST Tiruvalla! 26+ events await.",
-    images: ["https://macfiesta.macfast.org/logo.png"],
+    images: ["/logo.png"],
   },
   robots: {
     index: true,
