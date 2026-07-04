@@ -264,13 +264,13 @@ export function Footer() {
 
           <div className="flex gap-6 justify-center text-xs text-white/40">
             <Link 
-              href="/privacy" 
+              href="/privacy-policy" 
               className="hover:text-festival-gold-light transition-colors focus:outline-none focus:underline"
             >
               Privacy Policy
             </Link>
             <Link 
-              href="/terms" 
+              href="/terms-and-conditions" 
               className="hover:text-festival-gold-light transition-colors focus:outline-none focus:underline"
             >
               Terms of Service
