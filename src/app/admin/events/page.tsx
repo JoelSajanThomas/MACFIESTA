@@ -57,12 +57,12 @@ export default function AdminEventsCRUDPage() {
     const token = localStorage.getItem("macfiesta_token");
     const localUser = localStorage.getItem("macfiesta_user");
     if (!token || !localUser) {
-      router.push("/signin");
+      router.push("/admin/login");
       return;
     }
     const u = JSON.parse(localUser);
     if (u.role !== "admin") {
-      router.push("/signin");
+      router.push("/admin/login");
       return;
     }
     loadEvents();

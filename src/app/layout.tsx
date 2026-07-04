@@ -27,6 +27,7 @@ const orbitron = Orbitron({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://macfiesta.macfast.org"),
   title: {
     default: "MacFiesta 2K26 — Where Legends Rise | MACFAST Tiruvalla",
     template: "%s | MacFiesta 2K26",

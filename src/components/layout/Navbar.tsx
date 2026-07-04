@@ -119,6 +119,8 @@ export function Navbar() {
             {/* Premium More Dropdown (Pure CSS Hover - Tailwind v4 compatible) */}
             <div className="relative group py-2">
               <button
+                type="button"
+                suppressHydrationWarning={true}
                 className="px-3.5 py-2 text-xs font-semibold text-white/80 hover:text-white transition-colors duration-300 tracking-widest uppercase flex items-center gap-1 cursor-default"
                 style={{ fontFamily: "var(--font-heading)" }}
               >

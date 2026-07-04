@@ -36,9 +36,14 @@ api.interceptors.response.use(
         if (
           window.location.pathname !== "/signin" &&
           window.location.pathname !== "/signup" &&
+          window.location.pathname !== "/admin/login" &&
           window.location.pathname !== "/"
         ) {
-          window.location.href = "/signin";
+          if (window.location.pathname.startsWith("/admin")) {
+            window.location.href = "/admin/login";
+          } else {
+            window.location.href = "/signin";
+          }
         }
       }
     }

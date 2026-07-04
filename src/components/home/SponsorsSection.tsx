@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FESTIVAL_CONFIG } from "@/lib/constants";
 
 const partners = [
   { name: "Partner One", tier: "platinum", logo: "🤝" },

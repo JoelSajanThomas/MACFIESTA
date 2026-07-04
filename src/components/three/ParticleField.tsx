@@ -16,6 +16,13 @@ export function ParticleField({ count = 3000 }: { count?: number }) {
     const colors = new Float32Array(count * 3);
     const sizes = new Float32Array(count);
 
+    // Pure seeded PRNG to satisfy React purity rules during render
+    let seed = 42;
+    const nextRandom = () => {
+      seed = (seed * 16807) % 2147483647;
+      return (seed - 1) / 2147483646;
+    };
+
     const palette = [
       new THREE.Color("#EAB308"), // gold
       new THREE.Color("#7C3AED"), // purple
@@ -28,20 +35,20 @@ export function ParticleField({ count = 3000 }: { count?: number }) {
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
       // Spread particles in a large sphere
-      const radius = 15 + Math.random() * 35;
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
+      const radius = 15 + nextRandom() * 35;
+      const theta = nextRandom() * Math.PI * 2;
+      const phi = Math.acos(2 * nextRandom() - 1);
 
       positions[i3] = radius * Math.sin(phi) * Math.cos(theta);
       positions[i3 + 1] = radius * Math.sin(phi) * Math.sin(theta) - 5;
       positions[i3 + 2] = radius * Math.cos(phi);
 
-      const color = palette[Math.floor(Math.random() * palette.length)];
+      const color = palette[Math.floor(nextRandom() * palette.length)];
       colors[i3] = color.r;
       colors[i3 + 1] = color.g;
       colors[i3 + 2] = color.b;
 
-      sizes[i] = Math.random() * 3 + 0.5;
+      sizes[i] = nextRandom() * 3 + 0.5;
     }
 
     return { positions, colors, sizes };

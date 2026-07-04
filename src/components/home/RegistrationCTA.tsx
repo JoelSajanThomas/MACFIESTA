@@ -43,7 +43,7 @@ export function RegistrationCTA() {
             viewport={{ once: true }}
             className="text-white/60 text-sm md:text-base max-w-2xl mx-auto"
           >
-            Don't miss the chance to represent your college in technical challenges, gaming leagues, and cultural pro shows. Get your unified festival entry pass now.
+            {"Don't miss the chance to represent your college in technical challenges, gaming leagues, and cultural pro shows. Get your unified festival entry pass now."}
           </motion.p>
         </div>
 

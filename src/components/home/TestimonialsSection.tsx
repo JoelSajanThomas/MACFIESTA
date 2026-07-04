@@ -70,7 +70,7 @@ export function TestimonialsSection() {
                   ))}
                 </div>
                 <p className="text-white/70 leading-relaxed text-sm italic">
-                  "{t.quote}"
+                  &ldquo;{t.quote}&rdquo;
                 </p>
               </div>
 

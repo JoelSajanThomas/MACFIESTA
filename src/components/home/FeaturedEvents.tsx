@@ -40,7 +40,7 @@ const featured = [
 
 export function FeaturedEvents() {
   return (
-    <section className="relative bg-festival-dark section-padding border-t border-white/5">
+    <section className="relative bg-festival-dark section-padding border-t border-white/5 overflow-hidden">
       {/* Background neon blur */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[300px] rounded-full bg-festival-gold/5 blur-[120px] pointer-events-none" />
 

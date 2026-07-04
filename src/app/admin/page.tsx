@@ -42,10 +42,10 @@ export default function AdminDashboardPage() {
       if (localUser) {
         const u = JSON.parse(localUser);
         if (u.role !== "admin") {
-          router.push("/signin");
+          router.push("/admin/login");
         }
       } else {
-        router.push("/signin");
+        router.push("/admin/login");
       }
     }
   }, [user, isLoading, router]);
@@ -171,7 +171,7 @@ export default function AdminDashboardPage() {
               onClick={() => {
                 localStorage.removeItem("macfiesta_token");
                 localStorage.removeItem("macfiesta_user");
-                router.push("/signin");
+                router.push("/admin/login");
               }}
               className="px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white/50 hover:text-white flex items-center gap-1.5 cursor-pointer"
               style={{ fontFamily: "var(--font-heading)" }}

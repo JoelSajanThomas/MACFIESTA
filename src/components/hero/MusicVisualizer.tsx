@@ -5,7 +5,7 @@
  * Purely decorative — creates an animated equalizer effect.
  */
 export function MusicVisualizer({ isPlaying = false }: { isPlaying?: boolean }) {
-  const bars = 24;
+  const bars = 12;
 
   return (
     <div className="flex items-end gap-[3px] h-8 md:h-12" aria-hidden="true">

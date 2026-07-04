@@ -11,7 +11,7 @@ interface AuthState {
   
   initialize: () => void;
   login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
-  registerUser: (fields: any) => Promise<{ success: boolean; message?: string }>;
+  registerUser: (fields: Record<string, unknown>) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
   fetchProfile: () => Promise<void>;
   fetchRegistrations: () => Promise<void>;
@@ -58,8 +58,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       await get().fetchRegistrations();
       
       return { success: true };
-    } catch (err: any) {
-      const message = err.response?.data?.message || "Failed to log in. Check credentials.";
+    } catch (err) {
+      const apiError = err as { response?: { data?: { message?: string } } };
+      const message = apiError.response?.data?.message || "Failed to log in. Check credentials.";
       set({ error: message, isLoading: false });
       return { success: false, message };
     }
@@ -78,8 +79,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       set({ token, user, isLoading: false });
       return { success: true };
-    } catch (err: any) {
-      const message = err.response?.data?.message || "Registration failed. Try again.";
+    } catch (err) {
+      const apiError = err as { response?: { data?: { message?: string } } };
+      const message = apiError.response?.data?.message || "Registration failed. Try again.";
       set({ error: message, isLoading: false });
       return { success: false, message };
     }
@@ -124,8 +126,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         return { success: true };
       }
       return { success: false, message: response.data.message || "Failed to register" };
-    } catch (err: any) {
-      const message = err.response?.data?.message || "Registration error. Try again.";
+    } catch (err) {
+      const apiError = err as { response?: { data?: { message?: string } } };
+      const message = apiError.response?.data?.message || "Registration error. Try again.";
       return { success: false, message };
     }
   },

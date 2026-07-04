@@ -17,9 +17,13 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  allowedDevOrigins: ["192.168.0.100"],
   // Enable experimental features for better performance
   experimental: {
-    optimizeCss: true,
+    optimizeCss: false,
+    serverActions: {
+      allowedOrigins: ["192.168.0.100:3000", "localhost:3000"],
+    },
   },
 };
 

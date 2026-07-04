@@ -241,8 +241,10 @@ app.post("/api/auth/register", async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, message: "All registration fields are required" });
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
+
     if (isDbConnected()) {
-      const existingUser = await User.findOne({ email });
+      const existingUser = await User.findOne({ email: normalizedEmail });
       if (existingUser) {
         return res.status(400).json({ success: false, message: "User with this email already exists" });
       }
@@ -252,7 +254,7 @@ app.post("/api/auth/register", async (req: Request, res: Response) => {
 
       const newUser = await User.create({
         name,
-        email,
+        email: normalizedEmail,
         password: hashedPassword,
         phone,
         college,
@@ -284,7 +286,7 @@ app.post("/api/auth/register", async (req: Request, res: Response) => {
         }
       });
     } else {
-      const existingUser = localUsers.find(u => u.email === email);
+      const existingUser = localUsers.find(u => u.email.toLowerCase() === normalizedEmail);
       if (existingUser) {
         return res.status(400).json({ success: false, message: "User with this email already exists" });
       }
@@ -295,7 +297,7 @@ app.post("/api/auth/register", async (req: Request, res: Response) => {
       const newUser = {
         _id: `user-${Date.now()}`,
         name,
-        email,
+        email: normalizedEmail,
         password: hashedPassword,
         phone,
         college,
@@ -330,8 +332,10 @@ app.post("/api/auth/login", async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, message: "Email and password are required" });
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
+
     if (isDbConnected()) {
-      const user = await User.findOne({ email }).select("+password");
+      const user = await User.findOne({ email: normalizedEmail }).select("+password");
       if (!user) {
         return res.status(401).json({ success: false, message: "Invalid email or password credentials" });
       }
@@ -362,13 +366,13 @@ app.post("/api/auth/login", async (req: Request, res: Response) => {
         }
       });
     } else {
-      const user = localUsers.find(u => u.email === email);
+      const user = localUsers.find(u => u.email.toLowerCase() === normalizedEmail);
       if (!user) {
         return res.status(401).json({ success: false, message: "Invalid email or password credentials" });
       }
 
       // Hardcode plain check bypass for seeded admin user testing
-      const isMatch = (password === "admin123" && email === "admin@macfast.org") || await bcrypt.compare(password, user.password || "");
+      const isMatch = (password === "admin123" && normalizedEmail === "admin@macfast.org") || await bcrypt.compare(password, user.password || "");
       if (!isMatch) {
         return res.status(401).json({ success: false, message: "Invalid email or password credentials" });
       }

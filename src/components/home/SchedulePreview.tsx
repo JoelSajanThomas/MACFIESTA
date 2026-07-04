@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { RiCalendarLine, RiMapPinLine, RiTimeLine, RiArrowRightLine } from "react-icons/ri";
+import { RiMapPinLine, RiTimeLine, RiArrowRightLine } from "react-icons/ri";
 
 const scheduleData = {
   day1: [

@@ -33,7 +33,7 @@ export function HeroSection() {
         setPlayState(true);
       }).catch(() => {
         console.log("Autoplay blocked by browser. Awaiting user interaction to play.");
-        
+
         const handleInteraction = () => {
           audio.play().then(() => {
             setPlayState(true);
@@ -41,15 +41,17 @@ export function HeroSection() {
 
           window.removeEventListener("click", handleInteraction);
           window.removeEventListener("keydown", handleInteraction);
+          window.removeEventListener("touchstart", handleInteraction);
         };
 
         window.addEventListener("click", handleInteraction);
         window.addEventListener("keydown", handleInteraction);
+        window.addEventListener("touchstart", handleInteraction);
       });
     };
 
     const handleScroll = () => {
-      const scrollThreshold = 400;
+      const scrollThreshold = 80;
       if (window.scrollY > scrollThreshold) {
         if (isPlayingRef.current) {
           audio.pause();
@@ -111,11 +113,11 @@ export function HeroSection() {
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-festival-dark to-transparent z-[1] pointer-events-none" />
 
       {/* Main Content Area */}
-      <div className="relative z-10 flex-grow flex flex-col justify-center max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12 md:py-20">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          
+      <div className="relative z-10 flex-grow flex flex-col justify-center max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 md:py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+
           {/* Hero text content */}
-          <div className="lg:col-span-7 space-y-6 text-left">
+          <div className="lg:col-span-8 space-y-6 text-center lg:text-left flex flex-col items-center lg:items-start">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
@@ -127,16 +129,16 @@ export function HeroSection() {
               <span>MACFAST College Festival</span>
             </motion.div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 w-full">
               <motion.h1
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
                 className="text-hero tracking-tighter"
-                style={{ fontFamily: "var(--font-heading)" }}
+                style={{ fontFamily: "var(--font-heading)", transform: "translateZ(0)", backfaceVisibility: "hidden" }}
               >
-                <span className="block gradient-text-gold neon-gold uppercase">
-                  {FESTIVAL_CONFIG.name}
+                <span className="block gradient-text-gold neon-gold uppercase pr-4">
+                  MACFIESTA
                 </span>
                 <span className="block text-white text-5xl md:text-8xl font-black mt-2">
                   {FESTIVAL_CONFIG.year}
@@ -147,7 +149,7 @@ export function HeroSection() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.3 }}
-                className="text-subtitle font-medium text-white/80 max-w-xl"
+                className="text-subtitle font-medium text-white/80 max-w-xl mx-auto lg:mx-0"
               >
                 {FESTIVAL_CONFIG.subtitle} — {FESTIVAL_CONFIG.tagline}. Prepare to compete, excel, and witness the ultimate celebration of talent.
               </motion.p>
@@ -158,7 +160,7 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="flex flex-wrap gap-4 pt-4"
+              className="flex flex-wrap justify-center lg:justify-start gap-4 pt-4 w-full"
             >
               <Link href="/signup" className="btn-primary group">
                 <span>Register Now</span>
@@ -171,20 +173,20 @@ export function HeroSection() {
           </div>
 
           {/* Countdown & Music Visualizer Panel */}
-          <div className="lg:col-span-5 flex flex-col items-center lg:items-end justify-center">
+          <div className="lg:col-span-4 flex flex-col items-center lg:items-end justify-center">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="glass p-6 md:p-8 rounded-2xl border border-white/10 w-full max-w-md space-y-6 md:space-y-8 flex flex-col items-center lg:items-end shadow-2xl relative"
+              className="glass p-4 md:p-5 rounded-2xl border border-white/10 w-[92%] sm:w-full max-w-[320px] lg:max-w-[300px] xl:max-w-[320px] space-y-4 md:space-y-5 flex flex-col items-center justify-center shadow-2xl relative lg:translate-x-6 xl:translate-x-12"
             >
               {/* Corner neon decorations */}
               <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-festival-gold/50 rounded-tl" />
               <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-festival-gold/50 rounded-br" />
 
-              <div className="w-full text-center lg:text-right space-y-1">
+              <div className="w-full text-center space-y-1">
                 <h3
-                  className="text-xs font-bold text-white/50 tracking-[0.2em] uppercase"
+                  className="text-xs font-bold text-white/50 tracking-[0.2em] mr-[-0.2em] uppercase"
                   style={{ fontFamily: "var(--font-heading)" }}
                 >
                   FESTIVAL COUNTDOWN
@@ -198,16 +200,15 @@ export function HeroSection() {
                 <CountdownTimer />
               </div>
 
-              <div className="w-full pt-4 border-t border-white/5 flex items-center justify-between gap-4">
+              <div className="w-full pt-3 border-t border-white/5 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-3">
                   {/* Play/Pause music button */}
                   <button
                     onClick={togglePlay}
-                    className={`p-2.5 rounded-full border transition-all duration-300 cursor-pointer shadow-lg flex items-center justify-center ${
-                      isPlaying 
-                        ? "bg-festival-gold border-festival-gold text-festival-dark shadow-[0_0_15px_rgba(234,179,8,0.3)] hover:scale-105" 
-                        : "bg-white/5 border-white/10 text-white hover:bg-white/10 hover:border-white/20 hover:scale-105"
-                    }`}
+                    className={`p-2.5 rounded-full border transition-all duration-300 cursor-pointer shadow-lg flex items-center justify-center ${isPlaying
+                      ? "bg-festival-gold border-festival-gold text-festival-dark shadow-[0_0_15px_rgba(234,179,8,0.3)] hover:scale-105"
+                      : "bg-white/5 border-white/10 text-white hover:bg-white/10 hover:border-white/20 hover:scale-105"
+                      }`}
                     aria-label={isPlaying ? "Pause music" : "Play music"}
                   >
                     {isPlaying ? (
