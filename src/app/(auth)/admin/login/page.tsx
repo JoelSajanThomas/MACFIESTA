@@ -8,9 +8,9 @@ import { useAuthStore } from "@/lib/authStore";
 export default function AdminLoginPage() {
   const router = useRouter();
   const adminLogin = useAuthStore((state) => state.adminLogin);
-  const [user, setUser] = useState("admin@macfast.org");
-  const [pwd, setPwd] = useState("admin123");
-  const [otp, setOtp] = useState("123456");
+  const [user, setUser] = useState("");
+  const [pwd, setPwd] = useState("");
+  const [otp, setOtp] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [mounted, setMounted] = useState(false);
