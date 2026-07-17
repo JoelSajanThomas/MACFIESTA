@@ -68,7 +68,7 @@ export default function CertificatesPage() {
       doc.setFontSize(11);
       doc.text("This is proudly presented to", pageWidth / 2, 76, { align: "center" });
 
-      const localUser = typeof window !== "undefined" ? localStorage.getItem("macfiesta_user") : null;
+      const localUser = typeof window !== "undefined" ? sessionStorage.getItem("macfiesta_user") : null;
       const studentName = localUser ? JSON.parse(localUser).name : "Joel Shaji";
 
       doc.setTextColor(234, 179, 8);

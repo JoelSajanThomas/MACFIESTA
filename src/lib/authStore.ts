@@ -32,7 +32,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   initialize: () => {
     if (typeof window !== "undefined") {
-      // Sync logout across tabs
+      // Sync logout across tabs (only works for same storage key type)
       const syncLogout = (event: StorageEvent) => {
         if (event.key === "macfiesta_token" && !event.newValue) {
           get().logout();
@@ -41,8 +41,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       window.removeEventListener("storage", syncLogout);
       window.addEventListener("storage", syncLogout);
 
-      const storedToken = localStorage.getItem("macfiesta_token");
-      const storedUser = localStorage.getItem("macfiesta_user");
+      const storedToken = sessionStorage.getItem("macfiesta_token");
+      const storedUser = sessionStorage.getItem("macfiesta_user");
       if (storedToken && storedUser) {
         try {
           const parsedUser = JSON.parse(storedUser);
@@ -55,9 +55,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           get().fetchProfile();
           get().fetchRegistrations();
         } catch (e) {
-          console.error("Error parsing stored user data from localStorage", e);
-          localStorage.removeItem("macfiesta_token");
-          localStorage.removeItem("macfiesta_user");
+          console.error("Error parsing stored user data from sessionStorage", e);
+          sessionStorage.removeItem("macfiesta_token");
+          sessionStorage.removeItem("macfiesta_user");
           set({ token: null, user: null, isInitialized: true });
         }
       } else {
@@ -73,8 +73,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const { token, user } = response.data;
 
       if (typeof window !== "undefined") {
-        localStorage.setItem("macfiesta_token", token);
-        localStorage.setItem("macfiesta_user", JSON.stringify(user));
+        sessionStorage.setItem("macfiesta_token", token);
+        sessionStorage.setItem("macfiesta_user", JSON.stringify(user));
       }
 
       set({ token, user, isLoading: false });
@@ -98,8 +98,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const { token, user } = response.data;
 
       if (typeof window !== "undefined") {
-        localStorage.setItem("macfiesta_token", token);
-        localStorage.setItem("macfiesta_user", JSON.stringify(user));
+        sessionStorage.setItem("macfiesta_token", token);
+        sessionStorage.setItem("macfiesta_user", JSON.stringify(user));
       }
 
       set({ token, user, isLoading: false });
@@ -120,8 +120,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const { token, user } = response.data;
 
       if (typeof window !== "undefined") {
-        localStorage.setItem("macfiesta_token", token);
-        localStorage.setItem("macfiesta_user", JSON.stringify(user));
+        sessionStorage.setItem("macfiesta_token", token);
+        sessionStorage.setItem("macfiesta_user", JSON.stringify(user));
       }
 
       set({ token, user, isLoading: false });
@@ -136,8 +136,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   logout: () => {
     if (typeof window !== "undefined") {
-      localStorage.removeItem("macfiesta_token");
-      localStorage.removeItem("macfiesta_user");
+      sessionStorage.removeItem("macfiesta_token");
+      sessionStorage.removeItem("macfiesta_user");
       sessionStorage.clear();
       document.cookie = "macfiesta_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       document.cookie = "macfiesta_user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
@@ -150,7 +150,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const response = await api.get("/auth/me");
       const { user } = response.data;
       if (typeof window !== "undefined") {
-        localStorage.setItem("macfiesta_user", JSON.stringify(user));
+        sessionStorage.setItem("macfiesta_user", JSON.stringify(user));
       }
       set({ user });
     } catch (err) {

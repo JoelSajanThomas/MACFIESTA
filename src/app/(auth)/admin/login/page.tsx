@@ -64,7 +64,7 @@ router.push("/admin/console");
     <div className="bg-festival-dark min-h-screen pt-28 pb-16 flex items-center justify-center">
       <div className="max-w-md w-full mx-auto px-4">
 
-        <form onSubmit={handleAdminLogin} className="glass p-8 rounded-3xl border border-festival-pink/30 space-y-6 shadow-2xl relative">
+        <form onSubmit={handleAdminLogin} autoComplete="off" className="glass p-8 rounded-3xl border border-festival-pink/30 space-y-6 shadow-2xl relative">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-festival-purple to-festival-pink" />
 
           <div className="text-center space-y-2">
@@ -96,6 +96,7 @@ router.push("/admin/console");
                 value={user}
                 onChange={(e) => setUser(e.target.value)}
                 placeholder="admin@macfast.org"
+                autoComplete="off"
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-festival-pink/50 focus:outline-none text-white text-sm"
               />
             </div>
@@ -112,6 +113,7 @@ router.push("/admin/console");
                   value={pwd}
                   onChange={(e) => setPwd(e.target.value)}
                   placeholder="••••••••"
+                  autoComplete="new-password"
                   className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-festival-pink/50 focus:outline-none text-white text-sm"
                 />
               </div>
@@ -128,6 +130,7 @@ router.push("/admin/console");
                 onChange={(e) => setOtp(e.target.value)}
                 placeholder="000000"
                 maxLength={6}
+                autoComplete="one-time-code"
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-festival-pink/50 focus:outline-none text-white text-sm text-center font-bold tracking-widest"
               />
             </div>

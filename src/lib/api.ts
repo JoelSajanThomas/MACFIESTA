@@ -13,7 +13,7 @@ export const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     if (typeof window !== "undefined") {
-      const token = localStorage.getItem("macfiesta_token");
+      const token = sessionStorage.getItem("macfiesta_token");
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -31,8 +31,8 @@ api.interceptors.response.use(
   (error) => {
     if (error.response && (error.response.status === 401 || error.response.status === 403)) {
       if (typeof window !== "undefined") {
-        localStorage.removeItem("macfiesta_token");
-        localStorage.removeItem("macfiesta_user");
+        sessionStorage.removeItem("macfiesta_token");
+        sessionStorage.removeItem("macfiesta_user");
         useAuthStore.setState({ token: null, user: null, registrations: [] });
         // Optional: redirect to sign-in page if not on a public path
         if (
