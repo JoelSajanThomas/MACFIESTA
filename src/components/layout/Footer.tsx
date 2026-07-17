@@ -15,6 +15,7 @@ import {
   RiShieldCheckLine,
 } from "react-icons/ri";
 import { FESTIVAL_CONFIG, SOCIAL_LINKS } from "@/lib/constants";
+import { useAuthStore } from "@/lib/authStore";
 
 const quickLinks = [
   { label: "Home", href: "/" },
@@ -49,6 +50,7 @@ const socialIcons: Record<string, React.ComponentType<{ size?: number }>> = {
 };
 
 export function Footer() {
+  const { user } = useAuthStore();
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -197,16 +199,21 @@ export function Footer() {
               <div className="space-y-3 text-left">
                 <p className="text-[10px] text-white/40 uppercase font-black tracking-wider">Resources</p>
                 <ul className="space-y-2" aria-label="Resource Links">
-                  {resources.map((link) => (
-                    <li key={link.href}>
-                      <Link
-                        href={link.href}
-                        className="inline-block text-xs text-white/60 hover:text-festival-gold-light transition-all duration-300 relative pb-0.5 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-festival-gold after:transition-all after:duration-300 hover:after:w-full focus:outline-none focus:text-festival-gold-light"
-                      >
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
+                  {resources.map((link) => {
+                    const href = (link.label === "AR Wayfinder" && !user) 
+                      ? "/signin?redirect=/navigator" 
+                      : link.href;
+                    return (
+                      <li key={link.href}>
+                        <Link
+                          href={href}
+                          className="inline-block text-xs text-white/60 hover:text-festival-gold-light transition-all duration-300 relative pb-0.5 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-festival-gold after:transition-all after:duration-300 hover:after:w-full focus:outline-none focus:text-festival-gold-light"
+                        >
+                          {link.label}
+                        </Link>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             </div>

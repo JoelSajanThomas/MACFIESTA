@@ -21,6 +21,7 @@ const mainNavItems = [
   { label: "Events", href: "/events" },
   { label: "Schedule", href: "/schedule" },
   { label: "Scoreboard", href: "/scoreboard" },
+  { label: "Campus Map", href: "/navigator" },
   { label: "Contact", href: "/contact" },
 ];
 
@@ -28,7 +29,6 @@ const dropdownNavItems = [
   { label: "About", href: "/about" },
   { label: "Gallery", href: "/gallery" },
   { label: "Results", href: "/results" },
-  { label: "Campus Map", href: "/navigator" },
 ];
 
 export function Navbar() {
@@ -81,40 +81,45 @@ export function Navbar() {
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
       >
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+        <nav className="max-w-[1440px] mx-auto px-6 md:px-12 flex items-center justify-between">
           {/* Logo container (No nested interactive anchors) */}
-          <Link href="/" className="flex items-center gap-3 group" aria-label="MacFiesta Home">
-            <div className="relative w-10 h-10 md:w-11 md:h-11">
-              <Image
-                src={FESTIVAL_CONFIG.logoUrl}
-                alt={`${FESTIVAL_CONFIG.name} ${FESTIVAL_CONFIG.year} Logo`}
-                fill
-                sizes="(max-width: 768px) 40px, 44px"
-                className="object-contain drop-shadow-[0_0_8px_rgba(234,179,8,0.4)] group-hover:drop-shadow-[0_0_16px_rgba(234,179,8,0.6)] transition-all duration-300"
-                priority
-              />
-            </div>
-            <span 
-              className="text-white font-black tracking-widest text-base md:text-lg uppercase group-hover:text-festival-gold transition-colors duration-300"
-              style={{ fontFamily: "var(--font-heading)" }}
-            >
-              MAC<span className="gradient-text-gold neon-gold">FIESTA</span>
-            </span>
-          </Link>
-
-          {/* Desktop navigation (xl Breakpoint) */}
-          <div className="hidden xl:flex items-center gap-1.5">
-            {mainNavItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="relative px-3.5 py-2 text-xs font-semibold text-white/80 hover:text-white transition-colors duration-300 tracking-widest uppercase group"
+          <div className="flex-1 flex justify-start">
+            <Link href="/" className="flex items-center gap-3 group" aria-label="MacFiesta Home">
+              <div className="relative w-10 h-10 md:w-11 md:h-11">
+                <Image
+                  src={FESTIVAL_CONFIG.logoUrl}
+                  alt={`${FESTIVAL_CONFIG.name} ${FESTIVAL_CONFIG.year} Logo`}
+                  fill
+                  sizes="(max-width: 768px) 40px, 44px"
+                  className="object-contain drop-shadow-[0_0_8px_rgba(234,179,8,0.4)] group-hover:drop-shadow-[0_0_16px_rgba(234,179,8,0.6)] transition-all duration-300"
+                  priority
+                />
+              </div>
+              <span 
+                className="text-white font-black tracking-widest text-base md:text-lg uppercase group-hover:text-festival-gold transition-colors duration-300"
                 style={{ fontFamily: "var(--font-heading)" }}
               >
-                {item.label}
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-festival-gold group-hover:w-3/4 transition-all duration-300" />
-              </Link>
-            ))}
+                MAC<span className="gradient-text-gold neon-gold">FIESTA</span>
+              </span>
+            </Link>
+          </div>
+
+          {/* Desktop navigation (xl Breakpoint) */}
+          <div className="hidden xl:flex justify-center items-center gap-1.5 flex-initial">
+            {mainNavItems.map((item) => {
+              const href = item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={href}
+                  className="relative px-3.5 py-2 text-xs font-semibold text-white/80 hover:text-white transition-colors duration-300 tracking-widest uppercase group"
+                  style={{ fontFamily: "var(--font-heading)" }}
+                >
+                  {item.label}
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-festival-gold group-hover:w-3/4 transition-all duration-300" />
+                </Link>
+              );
+            })}
 
             {/* Premium More Dropdown (Pure CSS Hover - Tailwind v4 compatible) */}
             <div className="relative group py-2">
@@ -146,7 +151,7 @@ export function Navbar() {
           </div>
 
           {/* Right Header Actions */}
-          <div className="hidden xl:flex items-center gap-4">
+          <div className="hidden xl:flex justify-end items-center gap-4 flex-1">
             <a
               href={SOCIAL_LINKS[0].url}
               target="_blank"
@@ -226,24 +231,28 @@ export function Navbar() {
                 </Link>
               </motion.div>
 
-              {NAV_ITEMS.filter(item => item.href !== "/").map((item, i) => (
-                <motion.div
-                  key={item.href}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ delay: (i + 1) * 0.04, duration: 0.25 }}
-                >
-                  <Link
-                    href={item.href}
-                    onClick={closeMobile}
-                    className="text-xl font-extrabold text-white/80 hover:text-festival-gold transition-colors tracking-widest uppercase"
-                    style={{ fontFamily: "var(--font-heading)" }}
+              {NAV_ITEMS.filter(item => item.href !== "/").map((item, i) => {
+                const label = item.label === "Navigator" ? "Campus Map" : item.label;
+                const href = item.href;
+                return (
+                  <motion.div
+                    key={item.href}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ delay: (i + 1) * 0.04, duration: 0.25 }}
                   >
-                    {item.label}
-                  </Link>
-                </motion.div>
-              ))}
+                    <Link
+                      href={href}
+                      onClick={closeMobile}
+                      className="text-xl font-extrabold text-white/80 hover:text-festival-gold transition-colors tracking-widest uppercase"
+                      style={{ fontFamily: "var(--font-heading)" }}
+                    >
+                      {label}
+                    </Link>
+                  </motion.div>
+                );
+              })}
 
               {user ? (
                 <>

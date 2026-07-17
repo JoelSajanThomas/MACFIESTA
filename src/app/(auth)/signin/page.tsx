@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -15,6 +15,21 @@ export default function SignInPage() {
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="bg-festival-dark min-h-screen pt-28 pb-16 flex items-center justify-center">
+        <div className="max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+          <div className="md:col-span-12 text-center text-white/40 text-xs font-bold uppercase tracking-widest animate-pulse">Loading Portal...</div>
+        </div>
+      </div>
+    );
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +55,7 @@ export default function SignInPage() {
   return (
     <div className="bg-festival-dark min-h-screen pt-28 pb-16 flex items-center justify-center">
       <div className="max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-        
+
         {/* Left wing - branding and logo panel */}
         <div className="md:col-span-6 text-center md:text-left space-y-6 hidden md:block">
           <div className="relative w-36 h-36 mx-auto md:mx-0">
@@ -119,10 +134,15 @@ export default function SignInPage() {
               </div>
             </div>
 
-            <div className="flex justify-between items-center text-xs">
-              <span className="text-white/40">Not registered?</span>
-              <Link href="/signup" className="text-festival-gold hover:text-white transition-colors font-bold uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
-                Create Account
+            <div className="flex justify-between items-center text-xs flex-wrap gap-2">
+              <div className="flex items-center gap-1">
+                <span className="text-white/40">Not registered?</span>
+                <Link href="/signup" className="text-festival-gold hover:text-white transition-colors font-bold uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
+                  Create Account
+                </Link>
+              </div>
+              <Link href="/forgot-password" className="text-white/50 hover:text-white transition-colors uppercase font-bold tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
+                Forgot Password?
               </Link>
             </div>
 

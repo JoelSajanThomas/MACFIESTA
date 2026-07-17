@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { SPONSOR_TIERS } from "@/lib/constants";
-import { RiHandHeartLine, RiShakeHandsLine } from "react-icons/ri";
+import { RiShakeHandsLine } from "react-icons/ri";
 
 const sponsorsList = [
   { name: "Apex Tech Labs", tier: "platinum", logo: "🤝", desc: "Digital Infrastructure Partner providing global esports servers." },

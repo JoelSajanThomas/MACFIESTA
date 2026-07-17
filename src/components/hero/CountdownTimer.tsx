@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { getTimeRemaining } from "@/lib/utils";
 import { FESTIVAL_CONFIG } from "@/lib/constants";
 
@@ -27,6 +27,14 @@ export function CountdownTimer() {
       if (timer) clearInterval(timer);
     };
   }, []);
+
+  if (!mounted) {
+    return (
+      <div className="flex items-center gap-1 sm:gap-1.5 md:gap-2 opacity-0">
+        <span className="text-xs uppercase font-bold text-white/40 tracking-widest">Loading Timer...</span>
+      </div>
+    );
+  }
 
   const units = [
     { label: "Days", value: timeLeft.days },

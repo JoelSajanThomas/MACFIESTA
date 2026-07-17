@@ -56,6 +56,7 @@ export default function ContactPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="name@college.edu"
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-festival-gold/50 focus:outline-none text-white text-sm"
+                    suppressHydrationWarning
                   />
                 </div>
                 <div>
@@ -69,11 +70,12 @@ export default function ContactPage() {
                     onChange={(e) => setMsg(e.target.value)}
                     placeholder="Write your query here..."
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-festival-gold/50 focus:outline-none text-white text-sm"
+                    suppressHydrationWarning
                   />
                 </div>
               </div>
 
-              <button type="submit" className="btn-primary w-full justify-center flex py-3.5 gap-2">
+              <button type="submit" className="btn-primary w-full justify-center flex py-3.5 gap-2" suppressHydrationWarning>
                 <RiMailSendLine />
                 <span>Send Query</span>
               </button>

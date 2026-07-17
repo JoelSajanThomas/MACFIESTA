@@ -9,6 +9,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import QRCode from "qrcode";
 import mongoose from "mongoose";
+import nodemailer from "nodemailer";
 import { connectDB } from "./db";
 import { User } from "./models/User";
 import { Event } from "./models/Event";
@@ -31,7 +32,9 @@ const io = new Server(server, {
 
 // Middleware chains
 app.use(cors());
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 app.use(express.json());
 
 const limiter = rateLimit({
@@ -41,190 +44,24 @@ const limiter = rateLimit({
 });
 app.use("/api/", limiter);
 
-// Helper constants
-const JWT_SECRET = process.env.JWT_SECRET || "supersecretkeymacfiesta2026";
-
-// Authentication Middleware
-interface AuthRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-    role: string;
-  };
-}
-
-const authenticateToken = (req: AuthRequest, res: Response, next: NextFunction) => {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-
-  if (!token) {
-    return res.status(401).json({ success: false, message: "Access token missing" });
-  }
-
-  jwt.verify(token, JWT_SECRET, (err: any, decoded: any) => {
-    if (err) {
-      return res.status(403).json({ success: false, message: "Invalid or expired token" });
-    }
-    req.user = {
-      id: decoded.id,
-      email: decoded.email,
-      role: decoded.role
-    };
-    next();
-  });
-};
-
-// Admin authorization middleware
-const authorizeAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
-  if (!req.user || req.user.role !== "admin") {
-    return res.status(403).json({ success: false, message: "Forbidden: Admin access level required" });
-  }
-  next();
-};
-
-// Check if database is active
-const isDbConnected = () => mongoose.connection.readyState === 1;
-
-// --- Local In-Memory Fallback Database ---
-let localUsers: any[] = [
-  {
-    _id: "admin-id-default",
-    name: "Admin User",
-    email: "admin@macfast.org",
-    password: bcrypt.hashSync("admin123", 10),
-    phone: "+91 99999 99999",
-    college: "MACFAST Tiruvalla",
-    department: "Management",
-    year: "Faculty",
-    role: "admin",
-    xpPoints: 1000,
-    badges: [{ id: "god-mode", name: "Grand Organizer" }]
-  },
-  {
-    _id: "student-id-default",
-    name: "Joel Shaji",
-    email: "student@macfast.org",
-    password: bcrypt.hashSync("student123", 10),
-    phone: "+91 94470 99999",
-    college: "MACFAST Tiruvalla",
-    department: "Computer Applications",
-    year: "MCA 2nd Year",
-    role: "student",
-    xpPoints: 120,
-    badges: [{ id: "newcomer", name: "Festival Pioneer" }]
-  }
-];
-
-let localEvents: any[] = [
-  {
-    _id: "event-gaming-id",
-    title: "Urumi Gaming Arena",
-    slug: "urumi-gaming",
-    description: "Prepare your triggers and coordination as we host the ultimate esports arena showdown. Featuring competitive lobbies in Valorant, BGMI and FIFA formats.",
-    rules: [
-      "All squad members must belong to the same college/institution.",
-      "Players must bring their own mobile devices, charging adapters, and headsets.",
-      "Emulators are strictly prohibited for BGMI battles.",
-      "Decisions of the gaming coordinators are final and binding."
-    ],
-    coverImage: "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=800&auto=format&fit=crop",
-    date: "13 Nov 2026",
-    time: "Day 1, 11:00 AM onwards",
-    venue: "MACFAST Esports Lounge",
-    category: "gaming",
-    type: "squad",
-    prizePool: 30000,
-    maxSeats: 8,
-    registeredCount: 0,
-    isLive: true,
-    coordinator: {
-      name: "Abhijith R.",
-      phone: "+91 94470 12345",
-      email: "abhijith@macfast.org"
-    }
-  },
-  {
-    _id: "event-cultural-id",
-    title: "Dusk 'N Dawn Concert",
-    slug: "dusk-n-dawn",
-    description: "MacFiesta's signature ending performance featuring national music tracks, DJ battles, and EDM showcase from guest artists.",
-    rules: [
-      "Gates open at 05:30 PM. Unified entry pass / QR badge is mandatory.",
-      "Alcohol, smoking, and narcotic substances are strictly prohibited inside the grounds.",
-      "Outside food or metal items are not allowed.",
-      "Re-entry is allowed only under coordinator authorization."
-    ],
-    coverImage: "https://images.unsplash.com/photo-1506157786151-b8491531f063?q=80&w=800&auto=format&fit=crop",
-    date: "14 Nov 2026",
-    time: "Day 2, 06:00 PM - 10:00 PM",
-    venue: "Main Campus Athletic Grounds",
-    category: "cultural",
-    type: "group",
-    prizePool: 50000,
-    maxSeats: 120,
-    registeredCount: 0,
-    isLive: false,
-    coordinator: {
-      name: "Suresh Pillai",
-      phone: "+91 94470 54321",
-      email: "suresh@macfast.org"
-    }
-  },
-  {
-    _id: "event-technical-id",
-    title: "Byte & Code Hackathon",
-    slug: "byte-and-code",
-    description: "24-hour design and code sprint where developers form teams to construct digital solutions addressing real-world problem statements.",
-    rules: [
-      "Work must be started from scratch. Pre-built templates are disqualified.",
-      "All code must be committed to a public GitHub repository.",
-      "Teams must present their live demonstration before the panel.",
-      "Use of open source libraries is encouraged with attribution."
-    ],
-    coverImage: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=800&auto=format&fit=crop",
-    date: "13 Nov 2026",
-    time: "Day 1, 10:00 AM onwards",
-    venue: "MACFAST Computer Labs",
-    category: "technical",
-    type: "duo",
-    prizePool: 25000,
-    maxSeats: 12,
-    registeredCount: 0,
-    isLive: true,
-    coordinator: {
-      name: "Anjali Mathew",
-      phone: "+91 94470 98765",
-      email: "anjali@macfast.org"
-    }
-  }
-];
-
-let localRegistrations: any[] = [];
-
-let localScores: any[] = [
-  {
-    _id: "score-gaming-id",
-    eventId: "event-gaming-id",
-    teams: [
-      { rank: 1, name: "Apex Overlords", college: "CET Trivandrum", score: 95 },
-      { rank: 2, name: "Silent Killers", college: "MACFAST Tiruvalla", score: 80 },
-      { rank: 3, name: "Hyper Void", college: "TKM Kollam", score: 78 },
-      { rank: 4, name: "Nexus Knights", college: "SJCET Pala", score: 60 }
-    ],
-    isLive: true
-  },
-  {
-    _id: "score-technical-id",
-    eventId: "event-technical-id",
-    teams: [
-      { rank: 1, name: "Byte Busters", college: "MACFAST Tiruvalla", score: 400 },
-      { rank: 2, name: "Syntax Sorcerers", college: "AJCE Kanjirappally", score: 380 },
-      { rank: 3, name: "Null Pointers", college: "MITS Kochi", score: 320 },
-      { rank: 4, name: "Stack Overflowers", college: "CET Trivandrum", score: 250 }
-    ],
-    isLive: true
-  }
-];
+// Shared configurations, database collections, and auth middlewares
+import { adminRouter } from "./admin";
+import {
+  JWT_SECRET,
+  AuthRequest,
+  authenticateToken,
+  authorizeAdmin,
+  isDbConnected,
+  localUsers,
+  localEvents,
+  localRegistrations,
+  localScores,
+  localARLocations,
+  localVolunteers,
+  localPayments,
+  localAnnouncements,
+  localAuditLogs
+} from "./shared";
 
 // Health check
 app.get("/api/health", (req: Request, res: Response) => {
@@ -242,6 +79,21 @@ app.post("/api/auth/register", async (req: Request, res: Response) => {
     }
 
     const normalizedEmail = email.trim().toLowerCase();
+
+    // Validation rules
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(normalizedEmail)) {
+      return res.status(400).json({ success: false, message: "Please provide a valid email address" });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ success: false, message: "Password must be at least 6 characters long" });
+    }
+
+    const phoneRegex = /^\+?[0-9\s\-()]{7,15}$/;
+    if (!phoneRegex.test(phone.replace(/\s+/g, ""))) {
+      return res.status(400).json({ success: false, message: "Please provide a valid phone number" });
+    }
 
     if (isDbConnected()) {
       const existingUser = await User.findOne({ email: normalizedEmail });
@@ -423,6 +275,102 @@ app.get("/api/auth/me", authenticateToken as any, async (req: AuthRequest, res: 
   }
 });
 
+app.post("/api/auth/forgot-password", async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Email is required" });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+    let userExists = false;
+
+    if (isDbConnected()) {
+      const user = await User.findOne({ email: normalizedEmail });
+      userExists = !!user;
+    } else {
+      userExists = localUsers.some(u => u.email.toLowerCase() === normalizedEmail);
+    }
+
+    if (!userExists) {
+      return res.json({ success: true, message: "If the email is registered, a password recovery link has been generated." });
+    }
+
+    const resetToken = jwt.sign({ email: normalizedEmail }, JWT_SECRET, { expiresIn: "1h" });
+    const resetLink = `${process.env.NEXT_PUBLIC_CLIENT_URL || "http://localhost:3000"}/reset-password?token=${resetToken}`;
+
+    console.log(`[PASSWORD RECOVERY] Reset Link for ${normalizedEmail}: ${resetLink}`);
+
+    try {
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST || "localhost",
+        port: Number(process.env.SMTP_PORT) || 1025,
+        ignoreTLS: true,
+        auth: process.env.SMTP_USER ? {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS || ""
+        } : undefined
+      });
+
+      await transporter.sendMail({
+        from: '"MacFiesta Support" <no-reply@macfast.org>',
+        to: normalizedEmail,
+        subject: "Password Reset Request - MacFiesta",
+        text: `You requested a password reset. Click the following link to reset your password: ${resetLink}. This link is valid for 1 hour.`,
+        html: `<p>You requested a password reset. Click the link below to reset your password:</p><p><a href="${resetLink}">${resetLink}</a></p><p>This link is valid for 1 hour.</p>`
+      });
+      console.log(`[PASSWORD RECOVERY] Reset email sent to ${normalizedEmail}`);
+    } catch (mailErr) {
+      console.warn("[PASSWORD RECOVERY] Nodemailer not configured or failed to send mail. Fallback to console log.");
+    }
+
+    res.json({ success: true, message: "Password recovery link has been generated. Check console logs / inbox." });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+app.post("/api/auth/reset-password", async (req: Request, res: Response) => {
+  try {
+    const { token, password } = req.body;
+    if (!token || !password) {
+      return res.status(400).json({ success: false, message: "Reset token and new password are required" });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ success: false, message: "Password must be at least 6 characters long" });
+    }
+
+    let decoded: any;
+    try {
+      decoded = jwt.verify(token, JWT_SECRET);
+    } catch (err) {
+      return res.status(400).json({ success: false, message: "Invalid or expired reset token" });
+    }
+
+    const email = decoded.email;
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    if (isDbConnected()) {
+      const user = await User.findOneAndUpdate({ email }, { password: hashedPassword }, { new: true });
+      if (!user) {
+        return res.status(404).json({ success: false, message: "User not found" });
+      }
+    } else {
+      const userIdx = localUsers.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
+      if (userIdx === -1) {
+        return res.status(404).json({ success: false, message: "User not found" });
+      }
+      localUsers[userIdx].password = hashedPassword;
+    }
+
+    res.json({ success: true, message: "Password has been reset successfully. You can now log in." });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 // --- Events Endpoints ---
 
 app.get("/api/events", async (req: Request, res: Response) => {
@@ -571,8 +519,8 @@ app.delete("/api/events/:slug", [authenticateToken, authorizeAdmin] as any, asyn
       }
       const eventId = localEvents[idx]._id;
       localEvents.splice(idx, 1);
-      localScores = localScores.filter(s => s.eventId !== eventId);
-      localRegistrations = localRegistrations.filter(r => r.eventId !== eventId);
+      localScores.splice(0, localScores.length, ...localScores.filter(s => s.eventId !== eventId));
+      localRegistrations.splice(0, localRegistrations.length, ...localRegistrations.filter(r => r.eventId !== eventId));
       res.json({ success: true, message: "Event and associated records deleted successfully in fallback" });
     }
   } catch (error: any) {
@@ -832,6 +780,8 @@ io.on("connection", (socket: Socket) => {
     console.log("Client disconnected:", socket.id);
   });
 });
+
+app.use("/api/admin", adminRouter);
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {

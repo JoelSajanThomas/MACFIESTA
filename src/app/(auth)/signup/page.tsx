@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -20,10 +20,49 @@ export default function SignUpPage() {
   const [year, setYear] = useState("1");
   const [errorMsg, setErrorMsg] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="bg-festival-dark min-h-screen pt-28 pb-16 flex items-center justify-center">
+        <div className="max-w-md w-full mx-auto px-4">
+          <div className="glass p-8 rounded-3xl border border-white/5 space-y-6 shadow-2xl relative h-[480px] flex items-center justify-center">
+            <div className="text-white/40 text-xs font-bold uppercase tracking-widest animate-pulse">Loading Portal...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleNext = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMsg("");
+
     if (step === 1) {
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        setErrorMsg("Please enter a valid email address.");
+        return;
+      }
+
+      // Validate password length
+      if (password.length < 6) {
+        setErrorMsg("Password must be at least 6 characters long.");
+        return;
+      }
+
+      // Validate phone format
+      const phoneRegex = /^\+?[0-9\s\-()]{7,15}$/;
+      if (!phoneRegex.test(phone.replace(/\s+/g, ""))) {
+        setErrorMsg("Please enter a valid phone number.");
+        return;
+      }
+
       setStep(2);
     } else {
       setErrorMsg("");
@@ -49,7 +88,7 @@ export default function SignUpPage() {
   return (
     <div className="bg-festival-dark min-h-screen pt-28 pb-16 flex items-center justify-center">
       <div className="max-w-md w-full mx-auto px-4">
-        
+
         <form onSubmit={handleNext} className="glass p-8 rounded-3xl border border-white/5 space-y-6 shadow-2xl relative">
           {/* Step indicator */}
           <div className="absolute top-6 right-8 text-[10px] font-bold text-festival-gold uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>

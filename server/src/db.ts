@@ -8,7 +8,7 @@ const MONGODB_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/macfiest
 
 export async function connectDB() {
   try {
-    await mongoose.connect(MONGODB_URI);
+    await mongoose.connect(MONGODB_URI, { serverSelectionTimeoutMS: 3000 });
     console.log("Connected to MongoDB database successfully.");
     await seedDatabase();
   } catch (error) {

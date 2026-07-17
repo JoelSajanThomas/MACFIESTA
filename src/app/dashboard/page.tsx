@@ -10,25 +10,27 @@ import { useAuthStore } from "@/lib/authStore";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user, registrations, fetchProfile, fetchRegistrations, logout, isLoading } = useAuthStore();
+  const { user, token, registrations, fetchProfile, fetchRegistrations, logout, isInitialized } = useAuthStore();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    // Fetch fresh profile and registrations
-    if (localStorage.getItem("macfiesta_token")) {
+  }, []);
+
+  useEffect(() => {
+    if (token) {
       fetchProfile();
       fetchRegistrations();
     }
-  }, [fetchProfile, fetchRegistrations]);
+  }, [token, fetchProfile, fetchRegistrations]);
 
   useEffect(() => {
-    if (mounted && !isLoading && !localStorage.getItem("macfiesta_token")) {
-      router.push("/signin");
+    if (mounted && isInitialized && !token) {
+      router.replace("/signin");
     }
-  }, [mounted, isLoading, router]);
+  }, [mounted, isInitialized, token, router]);
 
-  if (!mounted || isLoading || !user) {
+  if (!mounted || !isInitialized || !user) {
     return (
       <div className="bg-festival-dark min-h-screen pt-28 flex items-center justify-center">
         <div className="text-white text-sm font-bold uppercase tracking-widest animate-pulse">Loading Dashboard...</div>
@@ -39,7 +41,7 @@ export default function DashboardPage() {
   return (
     <div className="bg-festival-dark min-h-screen pt-28 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-        
+
         {/* Header greeting */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-1">
@@ -71,7 +73,7 @@ export default function DashboardPage() {
 
         {/* Dashboard Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          
+
           {/* Left - main content widgets */}
           <div className="lg:col-span-8 space-y-8">
             {/* Registered events list */}
@@ -154,7 +156,7 @@ export default function DashboardPage() {
             {registrations.length > 0 ? (
               <div className="glass p-6 md:p-8 rounded-2xl border border-white/5 text-center space-y-6 shadow-xl relative">
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-festival-gold to-festival-orange" />
-                
+
                 <div className="space-y-1">
                   <h3 className="text-lg font-bold text-white uppercase tracking-wider flex items-center justify-center gap-2" style={{ fontFamily: "var(--font-heading)" }}>
                     <RiQrCodeLine />

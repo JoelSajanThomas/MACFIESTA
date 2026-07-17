@@ -13,9 +13,11 @@ import {
 } from "react-icons/ri";
 import { api } from "@/lib/api";
 import { Event } from "@/types";
+import { useAuthStore } from "@/lib/authStore";
 
 export default function AdminEventsCRUDPage() {
   const router = useRouter();
+  const { user, token, isInitialized } = useAuthStore();
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -53,20 +55,14 @@ export default function AdminEventsCRUDPage() {
   };
 
   useEffect(() => {
-    // Redirect if not admin
-    const token = localStorage.getItem("macfiesta_token");
-    const localUser = localStorage.getItem("macfiesta_user");
-    if (!token || !localUser) {
-      router.push("/admin/login");
-      return;
+    if (isInitialized) {
+      if (!token || !user || user.role !== "admin") {
+        router.push("/admin/login");
+      } else {
+        loadEvents();
+      }
     }
-    const u = JSON.parse(localUser);
-    if (u.role !== "admin") {
-      router.push("/admin/login");
-      return;
-    }
-    loadEvents();
-  }, [router]);
+  }, [isInitialized, token, user, router]);
 
   const handleDelete = async (eventSlug: string, eventTitle: string) => {
     if (confirm(`Are you sure you want to delete "${eventTitle}"? This will erase all registrations and scores.`)) {

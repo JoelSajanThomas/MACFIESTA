@@ -12,7 +12,7 @@ const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const MONGODB_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/macfiesta";
 async function connectDB() {
     try {
-        await mongoose_1.default.connect(MONGODB_URI);
+        await mongoose_1.default.connect(MONGODB_URI, { serverSelectionTimeoutMS: 3000 });
         console.log("Connected to MongoDB database successfully.");
         await seedDatabase();
     }

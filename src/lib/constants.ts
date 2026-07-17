@@ -69,7 +69,13 @@ export const SOCIAL_LINKS = [
 ] as const;
 
 /** API base URL */
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+export const API_BASE_URL = 
+  typeof window !== "undefined"
+    ? (process.env.NEXT_PUBLIC_API_URL || `http://${window.location.hostname}:5000/api`)
+    : (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api");
 
 /** Socket.io URL */
-export const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000";
+export const SOCKET_URL = 
+  typeof window !== "undefined"
+    ? (process.env.NEXT_PUBLIC_SOCKET_URL || `http://${window.location.hostname}:5000`)
+    : (process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000");

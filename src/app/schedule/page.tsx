@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { RiTimeLine, RiMapPinLine, RiFlagLine, RiNotification3Line } from "react-icons/ri";
+import { RiTimeLine, RiMapPinLine, RiNotification3Line } from "react-icons/ri";
 
 const timelineEvents = {
   day1: [
