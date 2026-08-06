@@ -14,7 +14,12 @@ const photos = [
 
 export function GalleryPreview() {
   return (
-    <section className="relative bg-festival-dark section-padding border-t border-white/5">
+    <section className="relative bg-[#05050A] section-padding border-t border-vibranium-purple/20 overflow-hidden font-mono">
+      {/* Ambient Color Blending */}
+      <div className="absolute top-1/2 left-1/4 w-96 h-96 rounded-full bg-vibranium-purple/10 blur-[130px] pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-arc-cyan/10 blur-[130px] pointer-events-none" />
+
+
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div className="space-y-3">

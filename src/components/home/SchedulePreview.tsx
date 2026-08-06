@@ -25,8 +25,8 @@ export function SchedulePreview() {
   const [activeDay, setActiveDay] = useState<"day1" | "day2">("day1");
 
   return (
-    <section className="relative bg-[#080B14] section-padding border-t border-white/10 overflow-hidden min-h-[600px] font-mono">
-      {/* Background Marvel Doctor Strange Artwork — Face 100% Clearly Visible */}
+    <section className="relative bg-[#05050A] section-padding border-t border-metallic-gold/20 overflow-hidden min-h-[600px] font-mono">
+      {/* Background Marvel Doctor Strange Artwork — Smooth Color Edge Blending */}
       <div className="absolute inset-0 z-0 opacity-90 pointer-events-none overflow-hidden">
         <Image
           src="/MARVEL/Doctor Strange.png"
@@ -35,10 +35,11 @@ export function SchedulePreview() {
           priority
           className="object-cover object-top filter brightness-105 contrast-125 saturate-135 drop-shadow-[0_0_50px_rgba(0,212,255,0.4)] scale-[1.02]"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#080B14] via-transparent to-[#080B14]/40 z-[1]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_45%,rgba(8,11,20,0.85)_90%)] z-[1]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#05050A] via-transparent to-[#05050A] z-[1]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_50%,rgba(5,5,10,0.8)_95%)] z-[1]" />
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[350px] rounded-full bg-arc-cyan/15 blur-[140px] z-[1]" />
       </div>
+
 
       <div className="max-w-4xl mx-auto relative z-10">
         {/* Header Container */}

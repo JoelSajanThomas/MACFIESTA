@@ -54,8 +54,8 @@ export function InfinityChallenge() {
   const [activeStone, setActiveStone] = useState(INFINITY_STONES[0]);
 
   return (
-    <section className="relative bg-[#080B14] section-padding border-t border-white/10 overflow-hidden min-h-[600px]">
-      {/* Background Infinity Gauntlet Marvel Image — Ultra High 100% Visibility */}
+    <section className="relative bg-[#05050A] section-padding border-t border-arc-cyan/20 overflow-hidden min-h-[600px]">
+      {/* Background Infinity Gauntlet Marvel Image — Ultra High 100% Visibility with Edge Blending */}
       <div className="absolute inset-0 z-0 opacity-100 pointer-events-none">
         <Image
           src="/MARVEL/4081455907815375.png"
@@ -64,8 +64,8 @@ export function InfinityChallenge() {
           priority
           className="object-cover object-top filter brightness-115 contrast-130 saturate-140 drop-shadow-[0_0_50px_rgba(237,29,36,0.6)]"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#080B14] via-transparent to-[#080B14]/20 z-[1]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_60%,rgba(8,11,20,0.6)_95%)] z-[1]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#05050A] via-transparent to-[#05050A] z-[1]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_60%,rgba(5,5,10,0.7)_95%)] z-[1]" />
       </div>
 
       {/* Background ambient glow matching active stone */}
