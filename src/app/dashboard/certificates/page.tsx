@@ -7,7 +7,7 @@ import { jsPDF } from "jspdf";
 import QRCode from "qrcode";
 
 const certificates = [
-  { event: "Byte & Code Hackathon", role: "First Place Winner", code: "CERT-MF-BC-098", date: "16 Nov 2025" }
+  { event: "Byte & Code Hackathon", role: "First Place Winner", code: "CERT-MF-BC-098", date: "25 Sep 2026" }
 ];
 
 export default function CertificatesPage() {

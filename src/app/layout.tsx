@@ -1,21 +1,18 @@
 import type { Metadata } from "next";
-import { Inter, Outfit, Orbitron } from "next/font/google";
+import { Inter, Orbitron, Bebas_Neue, Rajdhani } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { LoadingScreen } from "@/components/layout/LoadingScreen";
 import { CursorGlow } from "@/components/ui/CursorGlow";
 import { SmoothScrollProvider } from "@/providers/SmoothScrollProvider";
+import { MaintenanceGuard } from "@/components/layout/MaintenanceGuard";
+import { ParticleBackground } from "@/components/ui/ParticleBackground";
+import { JarvisAssistant } from "@/components/ui/JarvisAssistant";
 
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
-  display: "swap",
-});
-
-const outfit = Outfit({
-  subsets: ["latin"],
-  variable: "--font-outfit",
   display: "swap",
 });
 
@@ -26,16 +23,32 @@ const orbitron = Orbitron({
   weight: ["400", "500", "600", "700", "800", "900"],
 });
 
+const bebasNeue = Bebas_Neue({
+  subsets: ["latin"],
+  variable: "--font-bebas",
+  display: "swap",
+  weight: "400",
+});
+
+const rajdhani = Rajdhani({
+  subsets: ["latin"],
+  variable: "--font-rajdhani",
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://macfiesta.macfast.org"),
   title: {
-    default: "MacFiesta 2K26 — Where Legends Rise | MACFAST Tiruvalla",
-    template: "%s | MacFiesta 2K26",
+    default: "MACFIESTA MARVELVERSE 2K26 — Every Hero Has A Mission | MACFAST",
+    template: "%s | MACFIESTA MARVELVERSE 2K26",
   },
   description:
-    "MacFiesta 2K26 — The most awaited college cultural and technical festival of MACFAST, Tiruvalla. 26+ exciting events, gaming tournaments, cultural performances, and more. Register now!",
+    "MACFIESTA: MARVELVERSE — The premier national inter-collegiate Marvel Cinematic Universe cultural and technical festival at MACFAST, Tiruvalla. 26+ missions, gaming arena, pro show, coding tournaments, and superhero challenges.",
   keywords: [
     "MacFiesta",
+    "Marvelverse",
+    "Avengers Tower",
     "MACFAST",
     "college fest",
     "cultural festival",
@@ -47,29 +60,29 @@ export const metadata: Metadata = {
     "gaming",
     "hackathon",
   ],
-  authors: [{ name: "MacFiesta Team", url: "https://macfiesta.macfast.org" }],
+  authors: [{ name: "MacFiesta Marvelverse Team", url: "https://macfiesta.macfast.org" }],
   openGraph: {
     type: "website",
     locale: "en_IN",
     url: "https://macfiesta.macfast.org",
-    siteName: "MacFiesta 2K26",
-    title: "MacFiesta 2K26 — Where Legends Rise",
+    siteName: "MACFIESTA MARVELVERSE 2K26",
+    title: "MACFIESTA MARVELVERSE 2K26 — Every Hero Has A Mission",
     description:
-      "The most awaited college cultural and technical festival of MACFAST, Tiruvalla. 26+ events, gaming, coding, cultural performances, and more!",
+      "The ultimate Avengers Headquarters digital experience! 26+ missions, gaming arena, coding sprint, and cultural performances.",
     images: [
       {
         url: "/logo.png",
         width: 1200,
         height: 630,
-        alt: "MacFiesta 2K26 Logo",
+        alt: "MacFiesta Marvelverse Logo",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "MacFiesta 2K26 — Where Legends Rise",
+    title: "MACFIESTA MARVELVERSE 2K26 — Every Hero Has A Mission",
     description:
-      "Join the most exciting college fest at MACFAST Tiruvalla! 26+ events await.",
+      "Join the Avengers Command Center at MACFAST Tiruvalla! 26+ high-tech missions await.",
     images: ["/logo.png"],
   },
   robots: {
@@ -88,20 +101,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" suppressHydrationWarning={true}>
       <body
-        className={`${inter.variable} ${outfit.variable} ${orbitron.variable} antialiased noise-overlay`}
+        className={`${inter.variable} ${orbitron.variable} ${bebasNeue.variable} ${rajdhani.variable} antialiased noise-overlay`}
+        suppressHydrationWarning={true}
       >
         <LoadingScreen />
         <CursorGlow />
+        <ParticleBackground />
+        <JarvisAssistant />
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
-        <SmoothScrollProvider>
-          <Navbar />
-          <main id="main-content">{children}</main>
-          <Footer />
-        </SmoothScrollProvider>
+        <MaintenanceGuard>
+          <SmoothScrollProvider>
+            <Navbar />
+            <main id="main-content">{children}</main>
+            <Footer />
+          </SmoothScrollProvider>
+        </MaintenanceGuard>
       </body>
     </html>
   );

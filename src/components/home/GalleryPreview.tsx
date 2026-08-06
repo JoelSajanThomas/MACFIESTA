@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { RiArrowRightLine, RiImageLine } from "react-icons/ri";
+import { RiArrowRightLine, RiImageLine, RiFlashlightLine } from "react-icons/ri";
 
 const photos = [
   { url: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=800&auto=format&fit=crop", title: "DJ Show Energy" },
@@ -19,21 +19,22 @@ export function GalleryPreview() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div className="space-y-3">
             <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-festival-gold text-xs font-bold tracking-[0.2em] uppercase"
-              style={{ fontFamily: "var(--font-heading)" }}
+              className="text-arc-cyan text-xs font-mono font-bold tracking-[0.25em] uppercase flex items-center gap-1.5"
             >
-              Visual Memories
+              <RiFlashlightLine className="animate-pulse" /> S.H.I.E.L.D. VISUAL ARCHIVES
             </motion.div>
             <motion.h2
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="section-title text-white"
+              transition={{ delay: 0.1 }}
+              className="section-title text-white uppercase"
+              style={{ fontFamily: "var(--font-heading)" }}
             >
-              Festival <span className="gradient-text-gold neon-gold">Gallery</span>
+              Festival <span className="marvel-bang-comic-gradient font-black drop-shadow-[0_0_15px_rgba(255,102,0,0.4)]">Gallery</span>
             </motion.h2>
           </div>
 

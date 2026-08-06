@@ -1,35 +1,47 @@
 @import "tailwindcss";
 
 /* ============================================
-   MacFiesta 2K25 — Design System & Global Styles
+   MacFiesta PRO 2K26 — Marvel Cinematic Command Center UI/UX
    ============================================ */
 
-/* --- Custom Theme Tokens --- */
+/* --- Marvel Cinematic Theme Tokens --- */
 @theme {
-  --color-festival-gold: #EAB308;
-  --color-festival-gold-light: #FACC15;
-  --color-festival-gold-dark: #CA8A04;
-  --color-festival-purple: #7C3AED;
-  --color-festival-purple-light: #A78BFA;
-  --color-festival-purple-dark: #5B21B6;
-  --color-festival-cyan: #06B6D4;
-  --color-festival-cyan-light: #22D3EE;
-  --color-festival-pink: #EC4899;
-  --color-festival-pink-light: #F472B6;
-  --color-festival-orange: #F97316;
-  --color-festival-orange-light: #FB923C;
-  --color-festival-blue: #3B82F6;
-  --color-festival-blue-light: #60A5FA;
-  --color-festival-dark: #030712;
-  --color-festival-dark-card: #0a0f1e;
-  --color-festival-dark-elevated: #111827;
-  --color-festival-dark-border: #1f2937;
-  --color-festival-surface: rgba(15, 23, 42, 0.8);
+  /* Primary Marvel Palette */
+  --color-marvel-red: #ED1D24;
+  --color-marvel-red-bright: #FF2D35;
+  --color-marvel-red-dark: #B01018;
+  --color-arc-cyan: #00D4FF;
+  --color-arc-cyan-dim: #00A3C7;
+  --color-vibranium-purple: #7B2FBE;
+  --color-vibranium-purple-dim: #5A1F8E;
+  --color-metallic-gold: #D4AF37;
+  --color-metallic-gold-light: #E8C84A;
+  --color-metallic-gold-dark: #A88B2B;
+  --color-neon-blue: #1E90FF;
+  --color-stark-white: #F0F0F0;
+  --color-stark-silver: #C0C0C0;
 
-  --font-heading: 'Orbitron', 'Inter', sans-serif;
-  --font-body: 'Inter', system-ui, sans-serif;
-  --font-display: 'Outfit', 'Inter', sans-serif;
+  /* Legacy aliases (backward compat — mapped to Marvel palette) */
+  --color-festival-crimson: #ED1D24;
+  --color-festival-crimson-bright: #FF2D35;
+  --color-festival-crimson-dark: #B01018;
+  --color-festival-gold: #D4AF37;
+  --color-festival-gold-light: #E8C84A;
+  --color-festival-gold-dark: #A88B2B;
+  --color-festival-silver: #C0C0C0;
+  --color-festival-steel: #2A2D35;
+  --color-festival-dark: #0A0A0F;
+  --color-festival-dark-card: #111118;
+  --color-festival-dark-elevated: #1A1A24;
+  --color-festival-dark-border: rgba(237, 29, 36, 0.30);
+  --color-festival-surface: rgba(17, 17, 24, 0.85);
 
+  /* Typography */
+  --font-heading: 'Orbitron', 'Rajdhani', 'Bebas Neue', sans-serif;
+  --font-body: 'Rajdhani', 'Inter', system-ui, sans-serif;
+  --font-display: 'Bebas Neue', 'Orbitron', sans-serif;
+
+  /* Animations */
   --animate-float: float 6s ease-in-out infinite;
   --animate-float-delayed: float 6s ease-in-out 2s infinite;
   --animate-glow-pulse: glow-pulse 2s ease-in-out infinite;
@@ -40,81 +52,280 @@
   --animate-scale-in: scale-in 0.3s ease-out;
   --animate-ticker: ticker 30s linear infinite;
   --animate-visualizer-bar: visualizer-bar 1.2s ease-in-out infinite;
+  --animate-arc-spin: arc-reactor-spin 4s linear infinite;
+  --animate-energy-pulse: energy-pulse 2s ease-in-out infinite;
+  --animate-scan-line: scan-line 3s linear infinite;
+  --animate-hex-drift: hex-grid-move 20s linear infinite;
 }
 
-/* --- Keyframe Animations --- */
+/* ============================================
+   KEYFRAME ANIMATIONS
+   ============================================ */
+
 @keyframes float {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-20px) rotate(3deg); }
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-20px) rotate(2deg);
+  }
 }
 
 @keyframes glow-pulse {
-  0%, 100% { opacity: 0.5; filter: blur(20px); }
-  50% { opacity: 1; filter: blur(30px); }
+
+  0%,
+  100% {
+    opacity: 0.6;
+    filter: blur(20px);
+  }
+
+  50% {
+    opacity: 1;
+    filter: blur(35px);
+  }
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 @keyframes slide-up {
-  from { opacity: 0; transform: translateY(40px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slide-down {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes scale-in {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes ticker {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 @keyframes visualizer-bar {
-  0%, 100% { transform: scaleY(0.3); }
-  50% { transform: scaleY(1); }
+
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+
+  50% {
+    transform: scaleY(1);
+  }
 }
 
 @keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-@keyframes pulse-ring {
-  0% { transform: scale(0.8); opacity: 1; }
-  100% { transform: scale(2); opacity: 0; }
+/* --- Marvel-Specific Keyframes --- */
+
+@keyframes arc-reactor-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-@keyframes gradient-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+@keyframes energy-pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(0, 212, 255, 0.3), 0 0 15px rgba(0, 212, 255, 0.1);
+    border-color: rgba(0, 212, 255, 0.25);
+  }
+
+  50% {
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.5), 0 0 40px rgba(0, 212, 255, 0.2);
+    border-color: rgba(0, 212, 255, 0.5);
+  }
 }
 
-@keyframes text-reveal {
-  from { clip-path: inset(0 100% 0 0); }
-  to { clip-path: inset(0 0 0 0); }
+@keyframes energy-pulse-red {
+
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(237, 29, 36, 0.3), 0 0 15px rgba(237, 29, 36, 0.1);
+    border-color: rgba(237, 29, 36, 0.25);
+  }
+
+  50% {
+    box-shadow: 0 0 15px rgba(237, 29, 36, 0.5), 0 0 40px rgba(237, 29, 36, 0.2);
+    border-color: rgba(237, 29, 36, 0.5);
+  }
 }
 
-@keyframes count-up {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes holographic-shimmer {
+  0% {
+    background-position: -200% 0;
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 0.08;
+  }
+
+  100% {
+    background-position: 200% 0;
+    opacity: 0;
+  }
 }
 
-/* --- Base Styles --- */
+@keyframes hex-grid-move {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  100% {
+    transform: translate(-60px, -34px);
+  }
+}
+
+@keyframes scan-line {
+  0% {
+    transform: translateY(-100%);
+  }
+
+  100% {
+    transform: translateY(100vh);
+  }
+}
+
+@keyframes reactor-charge {
+  0% {
+    width: 0%;
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    width: 100%;
+    opacity: 0.8;
+  }
+}
+
+@keyframes data-stream {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  90% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes hud-blink {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes energy-border-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+@keyframes ripple-out {
+  0% {
+    transform: scale(0);
+    opacity: 0.6;
+  }
+
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
 html {
   scroll-behavior: smooth;
   color-scheme: dark;
@@ -123,7 +334,7 @@ html {
 }
 
 body {
-  background: var(--color-festival-dark);
+  background: #0A0A0F;
   color: #e2e8f0;
   font-family: var(--font-body);
   max-width: 100vw;
@@ -132,164 +343,324 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* --- Custom Scrollbar --- */
+/* ============================================
+   DIAGONAL ANGLED CUTS
+   ============================================ */
+
+.clip-angled-bottom {
+  clip-path: polygon(0 0, 100% 0, 100% 92%, 0 100%);
+}
+
+.clip-angled-top {
+  clip-path: polygon(0 3vw, 100% 0, 100% 100%, 0 100%);
+}
+
+.emblem-glow {
+  box-shadow: 0 0 25px #ED1D24, 0 0 50px rgba(237, 29, 36, 0.6);
+}
+
+/* ============================================
+   CUSTOM SCROLLBAR — Arc Reactor Style
+   ============================================ */
+
 ::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-festival-dark);
+  background: #0A0A0F;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--color-festival-purple), var(--color-festival-gold));
+  background: linear-gradient(180deg, #ED1D24, #00D4FF);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, var(--color-festival-cyan), var(--color-festival-pink));
+  background: linear-gradient(180deg, #FF2D35, #00D4FF);
 }
 
-/* --- Selection --- */
+/* --- Admin Panel Scrollbar Utilities --- */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(237, 29, 36, 0.4) transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(237, 29, 36, 0.3);
+  border-radius: 9999px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(237, 29, 36, 0.7);
+}
+
+/* ============================================
+   SELECTION
+   ============================================ */
+
 ::selection {
-  background: rgba(234, 179, 8, 0.3);
+  background: rgba(237, 29, 36, 0.4);
   color: #ffffff;
 }
 
-/* --- Glassmorphism Utilities --- */
+/* ============================================
+   GLASSMORPHISM & METALLIC CARD SYSTEM
+   ============================================ */
+
+/* Standard glass */
 .glass {
-  background: rgba(15, 23, 42, 0.6);
+  background: rgba(17, 17, 24, 0.75);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(0, 212, 255, 0.12);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Strong glass */
+.glass-strong {
+  background: rgba(12, 12, 18, 0.92);
+  backdrop-filter: blur(35px);
+  -webkit-backdrop-filter: blur(35px);
+  border: 1px solid rgba(0, 212, 255, 0.18);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+}
+
+/* Interactive glass card */
+.glass-card {
+  background: rgba(15, 15, 22, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.glass-strong {
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.glass-card {
-  background: rgba(10, 15, 30, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(124, 58, 237, 0.15);
+  border: 1px solid rgba(0, 212, 255, 0.10);
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .glass-card:hover {
-  border-color: rgba(234, 179, 8, 0.3);
-  box-shadow: 
-    0 0 30px rgba(234, 179, 8, 0.08),
-    0 20px 40px rgba(0, 0, 0, 0.3);
-  transform: translateY(-4px);
+  border-color: rgba(237, 29, 36, 0.45);
+  box-shadow:
+    0 0 25px rgba(237, 29, 36, 0.15),
+    0 0 50px rgba(0, 212, 255, 0.08),
+    0 20px 40px rgba(0, 0, 0, 0.6);
+  transform: translateY(-5px) scale(1.01);
 }
 
-/* --- Neon Glow Utilities --- */
+/* --- Marvel Glass (Arc Reactor tinted) --- */
+.marvel-glass {
+  background: rgba(10, 15, 25, 0.8);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(0, 212, 255, 0.15);
+  box-shadow:
+    0 0 20px rgba(0, 212, 255, 0.05),
+    0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* --- Marvel Card (energy border + hover glow) --- */
+.marvel-card {
+  background: rgba(12, 14, 24, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 212, 255, 0.12);
+  border-radius: 1rem;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+}
+
+.marvel-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.03), transparent 50%, rgba(237, 29, 36, 0.03));
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.marvel-card:hover {
+  border-color: rgba(237, 29, 36, 0.4);
+  box-shadow:
+    0 0 30px rgba(237, 29, 36, 0.12),
+    0 0 60px rgba(0, 212, 255, 0.06),
+    0 20px 50px rgba(0, 0, 0, 0.5);
+  transform: translateY(-6px) scale(1.015);
+}
+
+.marvel-card:hover::before {
+  opacity: 1;
+}
+
+/* --- Stark Panel --- */
+.stark-panel {
+  background: linear-gradient(135deg, rgba(12, 14, 24, 0.9), rgba(20, 22, 35, 0.85));
+  border: 1px solid rgba(0, 212, 255, 0.18);
+  border-radius: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.stark-panel::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00D4FF, transparent);
+  opacity: 0.6;
+}
+
+/* --- HUD Panel --- */
+.hud-panel {
+  background: rgba(10, 15, 25, 0.8);
+  border: 1px solid rgba(0, 212, 255, 0.15);
+  border-radius: 0.75rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hud-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #ED1D24, #00D4FF);
+  border-radius: 4px 0 0 4px;
+}
+
+.hud-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.03), transparent);
+  pointer-events: none;
+}
+
+/* ============================================
+   NEON GLOW TEXT UTILITIES
+   ============================================ */
+
 .neon-gold {
   text-shadow:
-    0 0 5px rgba(234, 179, 8, 0.75),
-    0 0 15px rgba(234, 179, 8, 0.35),
-    0 2px 4px rgba(0, 0, 0, 0.5);
+    0 0 8px rgba(237, 29, 36, 0.9),
+    0 0 20px rgba(212, 175, 55, 0.6),
+    0 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 .neon-title-gold {
   text-shadow:
-    0 0 5px rgba(234, 179, 8, 0.85),
-    0 0 15px rgba(234, 179, 8, 0.45),
-    0 0 30px rgba(234, 179, 8, 0.2),
-    0 2px 4px rgba(0, 0, 0, 0.6);
+    0 0 10px rgba(237, 29, 36, 0.95),
+    0 0 25px rgba(212, 175, 55, 0.7),
+    0 0 45px rgba(237, 29, 36, 0.3),
+    0 2px 6px rgba(0, 0, 0, 0.9);
 }
 
-.neon-purple {
+.neon-accent-gold {
   text-shadow:
-    0 0 7px rgba(124, 58, 237, 0.6),
-    0 0 20px rgba(124, 58, 237, 0.3),
-    0 0 42px rgba(124, 58, 237, 0.1);
+    0 0 8px rgba(237, 29, 36, 0.9),
+    0 0 20px rgba(212, 175, 55, 0.6);
 }
 
 .neon-cyan {
   text-shadow:
-    0 0 7px rgba(6, 182, 212, 0.6),
-    0 0 20px rgba(6, 182, 212, 0.3),
-    0 0 42px rgba(6, 182, 212, 0.1);
+    0 0 8px rgba(0, 212, 255, 0.8),
+    0 0 20px rgba(0, 212, 255, 0.4),
+    0 2px 4px rgba(0, 0, 0, 0.8);
 }
 
-.neon-border-gold {
+.neon-border-amber {
   box-shadow:
-    0 0 10px rgba(234, 179, 8, 0.15),
-    0 0 30px rgba(234, 179, 8, 0.05),
-    inset 0 0 10px rgba(234, 179, 8, 0.02);
+    0 0 15px rgba(237, 29, 36, 0.2),
+    0 0 35px rgba(0, 212, 255, 0.1),
+    inset 0 0 15px rgba(0, 212, 255, 0.03);
 }
 
-.neon-border-purple {
-  box-shadow:
-    0 0 10px rgba(124, 58, 237, 0.15),
-    0 0 30px rgba(124, 58, 237, 0.05),
-    inset 0 0 10px rgba(124, 58, 237, 0.02);
-}
+/* ============================================
+   METALLIC GRADIENTS
+   ============================================ */
 
-.neon-border-cyan {
-  box-shadow:
-    0 0 10px rgba(6, 182, 212, 0.15),
-    0 0 30px rgba(6, 182, 212, 0.05),
-    inset 0 0 10px rgba(6, 182, 212, 0.02);
-}
-
-/* --- Gradient Utilities --- */
 .gradient-gold {
-  background: linear-gradient(135deg, #EAB308, #F97316);
-}
-
-.gradient-purple-cyan {
-  background: linear-gradient(135deg, #7C3AED, #06B6D4);
-}
-
-.gradient-festival {
-  background: linear-gradient(135deg, #7C3AED, #EC4899, #EAB308);
+  background: linear-gradient(180deg, #FFE600 0%, #FFD700 25%, #FF6600 55%, #ED1D24 85%, #B91C1C 100%);
 }
 
 .gradient-text-gold {
-  background: linear-gradient(135deg, #EAB308, #F97316, #FACC15);
+  background: linear-gradient(180deg, #FFE600 0%, #FFD700 25%, #FF6600 55%, #ED1D24 85%, #B91C1C 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.gradient-text-festival {
-  background: linear-gradient(135deg, #7C3AED, #EC4899, #EAB308);
+.gradient-text-amber {
+  background: linear-gradient(180deg, #FFE600 0%, #FFD700 25%, #FF6600 55%, #ED1D24 85%, #B91C1C 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .gradient-text-cyan {
-  background: linear-gradient(135deg, #06B6D4, #3B82F6);
+  background: linear-gradient(135deg, #00D4FF, #1E90FF, #FFFFFF);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* --- Button Styles --- */
+.gradient-marvel {
+  background: linear-gradient(180deg, #FFE600 0%, #FFD700 25%, #FF6600 55%, #ED1D24 85%, #B91C1C 100%);
+}
+
+.gradient-text-marvel {
+  background: linear-gradient(180deg, #FFE600 0%, #FFD700 25%, #FF6600 55%, #ED1D24 85%, #B91C1C 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================
+   MARVEL "BANG!!" POP ART COMIC GRADIENT (YELLOW -> ORANGE -> RED)
+   ============================================ */
+
+.marvel-bang-comic-gradient {
+  background: linear-gradient(180deg, #FFE600 0%, #FFD700 25%, #FF6600 55%, #ED1D24 85%, #B91C1C 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(3px 4px 0px #000000) drop-shadow(0 0 20px rgba(255, 102, 0, 0.5));
+}
+
+/* ============================================
+   MARVEL CINEMATIC BUTTONS
+   ============================================ */
+
 .btn-primary {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.875rem 2rem;
+  padding: 0.875rem 2.2rem;
   border-radius: 9999px;
-  font-weight: 700;
+  font-weight: 900;
   font-family: var(--font-heading);
   font-size: 0.85rem;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  background: linear-gradient(135deg, #EAB308, #F97316);
-  color: #030712;
-  border: none;
+  background: linear-gradient(135deg, #ED1D24, #B01018);
+  color: #FFFFFF;
+  border: 1px solid rgba(0, 212, 255, 0.2);
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 0 20px rgba(237, 29, 36, 0.3), 0 0 40px rgba(0, 212, 255, 0.08);
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
@@ -297,18 +668,39 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, #FACC15, #FB923C);
+  background: linear-gradient(135deg, #FF2D35, #D4AF37);
   opacity: 0;
   transition: opacity 0.3s;
 }
 
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(0, 212, 255, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.5s, height 0.5s, opacity 0.5s;
+  opacity: 0;
+}
+
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 30px rgba(234, 179, 8, 0.4), 0 10px 30px rgba(0, 0, 0, 0.3);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 0 35px rgba(237, 29, 36, 0.5), 0 0 60px rgba(0, 212, 255, 0.15), 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .btn-primary:hover::before {
   opacity: 1;
+}
+
+.btn-primary:active::after {
+  width: 200px;
+  height: 200px;
+  opacity: 0;
+  transition: 0s;
 }
 
 .btn-primary span {
@@ -320,33 +712,131 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.875rem 2rem;
+  padding: 0.875rem 2.2rem;
   border-radius: 9999px;
-  font-weight: 700;
+  font-weight: 900;
   font-family: var(--font-heading);
   font-size: 0.85rem;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  background: transparent;
-  color: #EAB308;
-  border: 2px solid rgba(234, 179, 8, 0.4);
+  background: rgba(17, 17, 24, 0.8);
+  color: #FFFFFF;
+  border: 2px solid rgba(0, 212, 255, 0.35);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .btn-outline:hover {
-  background: rgba(234, 179, 8, 0.1);
-  border-color: #EAB308;
+  background: rgba(0, 212, 255, 0.08);
+  border-color: #00D4FF;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 0 25px rgba(0, 212, 255, 0.25), 0 0 50px rgba(0, 212, 255, 0.08);
+}
+
+/* --- Marvel Button (full energy charge) --- */
+.marvel-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 2.2rem;
+  border-radius: 0.75rem;
+  font-weight: 900;
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #ED1D24, #B01018);
+  color: #FFFFFF;
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(237, 29, 36, 0.3);
+  transition: all 0.3s ease;
+}
+
+.marvel-btn::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 0;
+  background: linear-gradient(90deg, #00D4FF, #D4AF37);
+  transition: width 0.4s ease;
+}
+
+.marvel-btn:hover {
+  box-shadow: 0 0 35px rgba(237, 29, 36, 0.5), 0 0 15px rgba(0, 212, 255, 0.2);
   transform: translateY(-2px);
-  box-shadow: 0 0 20px rgba(234, 179, 8, 0.15);
 }
 
-/* --- Magnetic Button --- */
-.magnetic-btn {
-  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+.marvel-btn:hover::before {
+  width: 100%;
 }
 
-/* --- Section Styles --- */
+/* ============================================
+   S.H.I.E.L.D. TIMELINE STYLES
+   ============================================ */
+
+.shield-timeline {
+  position: relative;
+  border-left: 2px solid rgba(0, 212, 255, 0.2);
+}
+
+.shield-timeline::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -1px;
+  width: 2px;
+  height: 60px;
+  background: linear-gradient(180deg, #00D4FF, transparent);
+  animation: data-stream 3s linear infinite;
+}
+
+.shield-timeline-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #00D4FF;
+  background: #0A0A0F;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+  transition: all 0.3s;
+}
+
+.shield-timeline-dot:hover,
+.shield-timeline-dot.active {
+  background: #00D4FF;
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+}
+
+/* ============================================
+   AVENGER BADGES (Gold / Silver / Bronze)
+   ============================================ */
+
+.avenger-badge-gold {
+  background: linear-gradient(135deg, #D4AF37, #F5D76E, #D4AF37);
+  color: #0A0A0F;
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+}
+
+.avenger-badge-silver {
+  background: linear-gradient(135deg, #8E8E8E, #C0C0C0, #8E8E8E);
+  color: #0A0A0F;
+  box-shadow: 0 0 15px rgba(192, 192, 192, 0.3);
+}
+
+.avenger-badge-bronze {
+  background: linear-gradient(135deg, #CD7F32, #E8A957, #CD7F32);
+  color: #0A0A0F;
+  box-shadow: 0 0 15px rgba(205, 127, 50, 0.3);
+}
+
+/* ============================================
+   SECTION STYLES
+   ============================================ */
+
 .section-padding {
   padding: 6rem 1.5rem;
 }
@@ -360,9 +850,9 @@ body {
 .section-title {
   font-family: var(--font-heading);
   font-size: 2.5rem;
-  font-weight: 800;
+  font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   line-height: 1.1;
 }
 
@@ -372,68 +862,40 @@ body {
   }
 }
 
-/* --- Grid Noise Overlay --- */
+/* ============================================
+   GRID NOISE & AMBIENT OVERLAYS
+   ============================================ */
+
 .noise-overlay::before {
   content: '';
   position: fixed;
   inset: 0;
   z-index: 9999;
   pointer-events: none;
-  opacity: 0.015;
+  opacity: 0.018;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
 
-/* --- Cursor Glow --- */
-.cursor-glow {
+/* Hex Grid overlay (Stark/Wakanda tech) */
+.hex-grid-overlay {
   position: fixed;
-  width: 300px;
-  height: 300px;
-  border-radius: 50%;
+  inset: 0;
   pointer-events: none;
-  z-index: 50;
-  background: radial-gradient(circle, rgba(124, 58, 237, 0.08) 0%, transparent 70%);
-  transform: translate(-50%, -50%);
-  transition: opacity 0.3s;
+  z-index: 1;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='34'%3E%3Cpath d='M30 0L60 17L30 34L0 17Z' fill='none' stroke='%2300D4FF' stroke-width='0.5'/%3E%3C/svg%3E");
+  background-size: 60px 34px;
+  animation: hex-grid-move 20s linear infinite;
 }
 
-/* --- Page Transition --- */
-.page-transition-enter {
-  opacity: 0;
-  transform: translateY(20px);
-}
+/* ============================================
+   RESPONSIVE TYPE SCALE
+   ============================================ */
 
-.page-transition-enter-active {
-  opacity: 1;
-  transform: translateY(0);
-  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-/* --- Countdown Flip Card --- */
-.flip-card {
-  perspective: 400px;
-}
-
-.flip-card-inner {
-  position: relative;
-  transform-style: preserve-3d;
-  transition: transform 0.6s cubic-bezier(0.37, 0, 0.63, 1);
-}
-
-/* --- Loading Spinner --- */
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(234, 179, 8, 0.2);
-  border-top-color: #EAB308;
-  border-radius: 50%;
-  animation: spin-slow 0.8s linear infinite;
-}
-
-/* --- Responsive Type Scale --- */
 .text-hero {
-  font-size: clamp(3rem, 8vw, 8rem);
+  font-size: clamp(3.2rem, 8.5vw, 8.5rem);
   font-weight: 900;
-  line-height: 0.95;
+  line-height: 0.92;
   letter-spacing: -0.02em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -441,29 +903,99 @@ body {
 }
 
 .text-subtitle {
-  font-size: clamp(1rem, 2vw, 1.5rem);
+  font-size: clamp(1rem, 2.2vw, 1.5rem);
   line-height: 1.4;
 }
 
-/* --- Focus styles for accessibility --- */
+/* ============================================
+   FOCUS & ACCESSIBILITY
+   ============================================ */
+
 :focus-visible {
-  outline: 2px solid #EAB308;
+  outline: 2px solid #00D4FF;
   outline-offset: 2px;
 }
 
-/* --- Skip to main content --- */
 .skip-link {
   position: absolute;
   top: -100%;
   left: 0;
   padding: 1rem;
-  background: #EAB308;
-  color: #030712;
+  background: #ED1D24;
+  color: #FFFFFF;
   z-index: 10000;
-  font-weight: 700;
+  font-weight: 900;
   transition: top 0.2s;
 }
 
 .skip-link:focus {
   top: 0;
+}
+
+/* ============================================
+   SCAN LINE EFFECT (for hover overlays)
+   ============================================ */
+
+.scan-line-hover::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.5), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+  animation: scan-line 2s linear infinite;
+  pointer-events: none;
+}
+
+.scan-line-hover:hover::after {
+  opacity: 1;
+}
+
+/* ============================================
+   ENERGY BORDER FLOW (for interactive elements)
+   ============================================ */
+
+.energy-border {
+  position: relative;
+}
+
+.energy-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(90deg, transparent, #00D4FF, #ED1D24, transparent);
+  background-size: 200% 100%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s;
+  animation: energy-border-flow 3s linear infinite;
+}
+
+.energy-border:hover::before {
+  opacity: 1;
+}
+
+/* ============================================
+   CURSOR GLOW (Arc Reactor)
+   ============================================ */
+
+.cursor-glow {
+  position: fixed;
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 212, 255, 0.06) 0%, rgba(0, 212, 255, 0.02) 40%, transparent 70%);
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s;
+  will-change: left, top;
 }

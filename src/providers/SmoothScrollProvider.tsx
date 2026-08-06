@@ -1,16 +1,27 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 
 /**
- * Provides Lenis smooth scrolling globally.
- * Wraps children with no visual output — just initializes the scroll engine.
+ * Provides Lenis smooth scrolling globally for public pages.
+ * Disables Lenis on /admin routes so native workspace scrolling works seamlessly.
  */
 export function SmoothScrollProvider({ children }: { children: React.ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
+    // Disable Lenis smooth scrolling on /admin routes to allow native container scrolling
+    if (pathname?.startsWith("/admin")) {
+      if (lenisRef.current) {
+        lenisRef.current.destroy();
+        lenisRef.current = null;
+      }
+      return;
+    }
+
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -27,9 +38,13 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
     requestAnimationFrame(raf);
 
     return () => {
-      lenis.destroy();
+      if (lenisRef.current) {
+        lenisRef.current.destroy();
+        lenisRef.current = null;
+      }
     };
-  }, []);
+  }, [pathname]);
 
   return <>{children}</>;
 }
+

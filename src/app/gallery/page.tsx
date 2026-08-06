@@ -25,11 +25,11 @@ export default function GalleryPage() {
   return (
     <div className="bg-festival-dark min-h-screen pt-28 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        
+
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <h1 className="text-4xl md:text-5xl font-black uppercase tracking-wider text-white" style={{ fontFamily: "var(--font-heading)" }}>
-            Media <span className="gradient-text-gold neon-gold">Gallery</span>
+            Media <span className="marvel-bang-comic-gradient font-black">Gallery</span>
           </h1>
           <p className="text-white/60 text-sm md:text-base">
             Glimpses of premium performances, tech sprint presentations, and general awards ceremonies.
@@ -42,11 +42,10 @@ export default function GalleryPage() {
             <button
               key={cat}
               onClick={() => setFilter(cat)}
-              className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-all ${
-                filter === cat
-                  ? "bg-festival-gold text-festival-dark shadow-[0_0_15px_rgba(234,179,8,0.2)]"
-                  : "bg-white/5 text-white/60 hover:text-white border border-white/5"
-              }`}
+              className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-all ${filter === cat
+                ? "bg-festival-gold text-festival-dark shadow-[0_0_15px_rgba(234,179,8,0.2)]"
+                : "bg-white/5 text-white/60 hover:text-white border border-white/5"
+                }`}
               style={{ fontFamily: "var(--font-heading)" }}
             >
               {cat}
@@ -73,7 +72,7 @@ export default function GalleryPage() {
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                
+
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                   <div className="text-center space-y-2 translate-y-4 group-hover:translate-y-0 transition-all duration-300">
                     <span className="p-3 bg-festival-gold text-festival-dark rounded-full text-lg inline-block">

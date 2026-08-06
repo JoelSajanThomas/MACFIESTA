@@ -49,11 +49,14 @@ export interface Registration {
   eventId: string;
   teamName?: string;
   teamMembers?: TeamMember[];
-  paymentStatus: "pending" | "completed" | "failed" | "refunded";
+  paymentStatus: "pending" | "completed" | "failed" | "refunded" | "cancelled_no_refund";
+  status?: "active" | "cancelled";
+  cancelledAt?: string;
+  cancellationPolicyNotice?: string;
   paymentId?: string;
   qrCode: string;
   entryPass: string;
-  registrationDate: string;
+  registrationDate?: string;
 }
 
 export interface TeamMember {

@@ -13,8 +13,8 @@ export const FESTIVAL_CONFIG = {
   college: "MACFAST",
   collegeFull: "Mar Athanasios College for Advanced Studies, Tiruvalla",
   /** Target date for countdown timer (ISO string) — update as needed */
-  festivalDate: new Date("2026-11-13T09:00:00+05:30"),
-  festivalEndDate: new Date("2026-11-14T22:00:00+05:30"),
+  festivalDate: new Date("2026-09-24T09:00:00+05:30"),
+  festivalEndDate: new Date("2026-09-25T22:00:00+05:30"),
   registrationFee: 150,
   lunchFee: 200,
   totalEvents: 26,
@@ -30,7 +30,7 @@ export const NAV_ITEMS = [
   { label: "Gallery", href: "/gallery" },
   { label: "Scoreboard", href: "/scoreboard" },
   { label: "Results", href: "/results" },
-  { label: "Navigator", href: "/navigator" },
+  { label: "Accommodation", href: "/accommodation" },
   { label: "Contact", href: "/contact" },
 ] as const;
 
@@ -69,13 +69,13 @@ export const SOCIAL_LINKS = [
 ] as const;
 
 /** API base URL */
-export const API_BASE_URL = 
+export const API_BASE_URL =
   typeof window !== "undefined"
     ? (process.env.NEXT_PUBLIC_API_URL || `http://${window.location.hostname}:5000/api`)
     : (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api");
 
 /** Socket.io URL */
-export const SOCKET_URL = 
+export const SOCKET_URL =
   typeof window !== "undefined"
     ? (process.env.NEXT_PUBLIC_SOCKET_URL || `http://${window.location.hostname}:5000`)
     : (process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000");

@@ -91,7 +91,7 @@ export let localEvents: any[] = [
       "Decisions of the gaming coordinators are final and binding."
     ],
     coverImage: "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=800&auto=format&fit=crop",
-    date: "13 Nov 2026",
+    date: "24 Sep 2026",
     time: "Day 1, 11:00 AM onwards",
     venue: "MACFAST Esports Lounge",
     category: "gaming",
@@ -118,7 +118,7 @@ export let localEvents: any[] = [
       "Re-entry is allowed only under coordinator authorization."
     ],
     coverImage: "https://images.unsplash.com/photo-1506157786151-b8491531f063?q=80&w=800&auto=format&fit=crop",
-    date: "14 Nov 2026",
+    date: "25 Sep 2026",
     time: "Day 2, 06:00 PM - 10:00 PM",
     venue: "Main Campus Athletic Grounds",
     category: "cultural",
@@ -145,7 +145,7 @@ export let localEvents: any[] = [
       "Use of open source libraries is encouraged with attribution."
     ],
     coverImage: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=800&auto=format&fit=crop",
-    date: "13 Nov 2026",
+    date: "24 Sep 2026",
     time: "Day 1, 10:00 AM onwards",
     venue: "MACFAST Computer Labs",
     category: "technical",

@@ -2,12 +2,15 @@ import express, { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { User } from "./models/User";
+import { Registration } from "./models/Registration";
 import {
   JWT_SECRET,
   authenticateToken,
   authorizeAdmin,
   isDbConnected,
   localUsers,
+  localEvents,
+  localRegistrations,
   localARLocations,
   localVolunteers,
   localPayments,
@@ -329,4 +332,24 @@ adminRouter.get("/reports/export", [authenticateToken, authorizeAdmin] as any, (
     message: `Export payload generated for ${type} in ${format} format`,
     payload: `MOCK_EXPORT_DATA_${type?.toString().toUpperCase()}_${Date.now()}`
   });
+});
+
+// 8. Registrations Audit API
+adminRouter.get("/registrations", [authenticateToken, authorizeAdmin] as any, async (req: Request, res: Response) => {
+  try {
+    if (isDbConnected()) {
+      const registrations = await Registration.find().populate("userId").populate("eventId");
+      res.json({ success: true, registrations });
+    } else {
+      const myRegs = localRegistrations.map((r) => {
+        const userObj = localUsers.find((u) => u._id === r.userId);
+        const eventIdStr = typeof r.eventId === "object" ? r.eventId._id : r.eventId;
+        const eventObj = localEvents.find((e) => e._id === eventIdStr);
+        return { ...r, userId: userObj || r.userId, eventId: eventObj || r.eventId };
+      });
+      res.json({ success: true, registrations: myRegs });
+    }
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 });

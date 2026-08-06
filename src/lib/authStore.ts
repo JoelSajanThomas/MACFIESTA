@@ -17,7 +17,8 @@ interface AuthState {
   logout: () => void;
   fetchProfile: () => Promise<void>;
   fetchRegistrations: () => Promise<void>;
-  registerForEvent: (eventId: string) => Promise<{ success: boolean; message?: string }>;
+  registerForEvent: (eventId: string, paymentData?: { paymentId?: string; paymentMethod?: string; amount?: number }) => Promise<{ success: boolean; message?: string; registration?: any; txId?: string }>;
+  cancelRegistration: (registrationId: string) => Promise<{ success: boolean; message?: string }>;
   forgotPassword: (email: string) => Promise<{ success: boolean; message?: string }>;
   resetPassword: (token: string, password: string) => Promise<{ success: boolean; message?: string }>;
 }
@@ -32,7 +33,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   initialize: () => {
     if (typeof window !== "undefined") {
-      // Sync logout across tabs (only works for same storage key type)
+      // Sync logout across tabs
       const syncLogout = (event: StorageEvent) => {
         if (event.key === "macfiesta_token" && !event.newValue) {
           get().logout();
@@ -138,11 +139,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (typeof window !== "undefined") {
       sessionStorage.removeItem("macfiesta_token");
       sessionStorage.removeItem("macfiesta_user");
+      localStorage.removeItem("macfiesta_active_page");
       sessionStorage.clear();
       document.cookie = "macfiesta_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       document.cookie = "macfiesta_user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      set({ token: null, user: null, registrations: [] });
+      window.location.href = "/admin/login";
+    } else {
+      set({ token: null, user: null, registrations: [] });
     }
-    set({ token: null, user: null, registrations: [] });
   },
 
   fetchProfile: async () => {
@@ -167,18 +172,40 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  registerForEvent: async (eventId) => {
+  registerForEvent: async (eventId, paymentData) => {
     try {
-      const response = await api.post("/registrations", { eventId });
+      const response = await api.post("/registrations", {
+        eventId,
+        paymentCompleted: true,
+        paymentId: paymentData?.paymentId || `TXN_${Math.floor(10000000 + Math.random() * 90000000)}`,
+        paymentMethod: paymentData?.paymentMethod || "UPI",
+        amount: paymentData?.amount || 250
+      });
       if (response.data.success) {
         await get().fetchRegistrations();
-        await get().fetchProfile(); // update XP points & badges
-        return { success: true };
+        await get().fetchProfile();
+        return { success: true, registration: response.data.registration, txId: response.data.txId };
       }
       return { success: false, message: response.data.message || "Failed to register" };
     } catch (err) {
       const apiError = err as { response?: { data?: { message?: string } } };
       const message = apiError.response?.data?.message || "Registration error. Try again.";
+      return { success: false, message };
+    }
+  },
+
+  cancelRegistration: async (registrationId) => {
+    try {
+      const response = await api.post(`/registrations/${registrationId}/cancel`);
+      if (response.data.success) {
+        await get().fetchRegistrations();
+        await get().fetchProfile();
+        return { success: true, message: response.data.message };
+      }
+      return { success: false, message: response.data.message || "Failed to cancel registration" };
+    } catch (err) {
+      const apiError = err as { response?: { data?: { message?: string } } };
+      const message = apiError.response?.data?.message || "Cancellation failed. Try again.";
       return { success: false, message };
     }
   },

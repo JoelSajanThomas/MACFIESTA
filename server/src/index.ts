@@ -532,12 +532,21 @@ app.delete("/api/events/:slug", [authenticateToken, authorizeAdmin] as any, asyn
 
 app.post("/api/registrations", authenticateToken as any, async (req: AuthRequest, res: Response) => {
   try {
-    const { eventId } = req.body;
+    const { eventId, paymentCompleted, paymentId, paymentMethod, amount } = req.body;
     const userId = req.user?.id;
 
     if (!eventId) {
       return res.status(400).json({ success: false, message: "Event ID is required" });
     }
+
+    if (!paymentCompleted) {
+      return res.status(400).json({
+        success: false,
+        message: "Payment is required. Event registration can only be completed after successful payment."
+      });
+    }
+
+    const txId = paymentId || `TXN_${Math.floor(10000000 + Math.random() * 90000000)}`;
 
     if (isDbConnected()) {
       const event = await Event.findById(eventId);
@@ -554,29 +563,48 @@ app.post("/api/registrations", authenticateToken as any, async (req: AuthRequest
         return res.status(400).json({ success: false, message: "No seats left in this event" });
       }
 
+      const user = await User.findById(userId);
       const entryPass = `MF-2K26-${Math.floor(1000 + Math.random() * 9000)}`;
 
-      const qrPayload = JSON.stringify({
-        userId,
-        eventId,
-        pass: entryPass,
-        date: new Date()
-      });
+      const qrPayload = `MACFIESTA 2K26 OFFICIAL ENTRY TICKET
+------------------------------------
+Pass Code: ${entryPass}
+Participant: ${user?.name || "Delegate"}
+Email: ${user?.email || "N/A"}
+College: ${user?.college || "MACFAST Tiruvalla"}
+Event: ${event.title} (${event.category ? event.category.toUpperCase() : "GENERAL"})
+Date & Time: ${event.date} @ ${event.time}
+Venue: ${event.venue}
+Payment Status: VERIFIED & PAID
+Organized By: MACFAST Tiruvalla
+Verification Link: https://macfiesta.macfast.org/verify/${entryPass}
+------------------------------------`;
 
-      const qrCodeBase64 = await QRCode.toDataURL(qrPayload);
+      const qrCodeBase64 = await QRCode.toDataURL(qrPayload, { margin: 1, width: 300 });
 
       const newReg = await Registration.create({
         userId,
         eventId,
         paymentStatus: "completed",
+        paymentId: txId,
         qrCode: qrCodeBase64,
         entryPass
+      });
+
+      // Record payment log
+      localPayments.push({
+        _id: `pay-${Date.now()}`,
+        email: user?.email || "student@macfast.org",
+        amount: amount || 250,
+        gateway: paymentMethod || "UPI",
+        txId,
+        status: "completed",
+        date: new Date().toISOString()
       });
 
       event.registeredCount += 1;
       await event.save();
 
-      const user = await User.findById(userId);
       if (user) {
         user.xpPoints += 100;
         if (user.xpPoints >= 150 && !user.badges.some((b: any) => b.id === "competitor")) {
@@ -585,7 +613,7 @@ app.post("/api/registrations", authenticateToken as any, async (req: AuthRequest
         await user.save();
       }
 
-      res.status(201).json({ success: true, registration: newReg });
+      res.status(201).json({ success: true, registration: newReg, txId });
     } else {
       const event = localEvents.find(e => e._id === eventId);
       if (!event) {
@@ -601,30 +629,49 @@ app.post("/api/registrations", authenticateToken as any, async (req: AuthRequest
         return res.status(400).json({ success: false, message: "No seats left in this event" });
       }
 
+      const user = localUsers.find(u => u._id === userId);
       const entryPass = `MF-2K26-${Math.floor(1000 + Math.random() * 9000)}`;
 
-      const qrPayload = JSON.stringify({
-        userId,
-        eventId,
-        pass: entryPass,
-        date: new Date()
-      });
+      const qrPayload = `MACFIESTA 2K26 OFFICIAL ENTRY TICKET
+------------------------------------
+Pass Code: ${entryPass}
+Participant: ${user?.name || "Delegate"}
+Email: ${user?.email || "N/A"}
+College: ${user?.college || "MACFAST Tiruvalla"}
+Event: ${event.title} (${event.category ? event.category.toUpperCase() : "GENERAL"})
+Date & Time: ${event.date} @ ${event.time}
+Venue: ${event.venue}
+Payment Status: VERIFIED & PAID
+Organized By: MACFAST Tiruvalla
+Verification Link: https://macfiesta.macfast.org/verify/${entryPass}
+------------------------------------`;
 
-      const qrCodeBase64 = await QRCode.toDataURL(qrPayload);
+      const qrCodeBase64 = await QRCode.toDataURL(qrPayload, { margin: 1, width: 300 });
 
       const newReg = {
         _id: `reg-${Date.now()}`,
         userId,
         eventId,
         paymentStatus: "completed",
+        paymentId: txId,
         qrCode: qrCodeBase64,
         entryPass
       };
       localRegistrations.push(newReg);
 
+      // Record payment log
+      localPayments.push({
+        _id: `pay-${Date.now()}`,
+        email: user?.email || "student@macfast.org",
+        amount: amount || 250,
+        gateway: paymentMethod || "UPI",
+        txId,
+        status: "completed",
+        date: new Date().toISOString()
+      });
+
       event.registeredCount += 1;
 
-      const user = localUsers.find(u => u._id === userId);
       if (user) {
         user.xpPoints += 100;
         if (user.xpPoints >= 150 && !user.badges.some((b: any) => b.id === "competitor")) {
@@ -632,7 +679,7 @@ app.post("/api/registrations", authenticateToken as any, async (req: AuthRequest
         }
       }
 
-      res.status(201).json({ success: true, registration: newReg });
+      res.status(201).json({ success: true, registration: newReg, txId });
     }
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
@@ -652,6 +699,79 @@ app.get("/api/registrations/my", authenticateToken as any, async (req: AuthReque
           return { ...r, eventId: event };
         });
       res.json({ success: true, registrations: myRegs });
+    }
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+app.post("/api/registrations/:id/cancel", authenticateToken as any, async (req: AuthRequest, res: Response) => {
+  try {
+    const regId = req.params.id;
+    const userId = req.user?.id;
+
+    if (isDbConnected()) {
+      const registration = await Registration.findById(regId);
+      if (!registration) {
+        return res.status(404).json({ success: false, message: "Registration record not found" });
+      }
+
+      if (registration.userId.toString() !== userId) {
+        return res.status(403).json({ success: false, message: "Unauthorized to cancel this registration" });
+      }
+
+      if (registration.status === "cancelled") {
+        return res.status(400).json({ success: false, message: "This event registration is already cancelled" });
+      }
+
+      registration.status = "cancelled";
+      registration.paymentStatus = "cancelled_no_refund";
+      registration.cancelledAt = new Date();
+      registration.cancellationPolicyNotice = "Cancelled by participant without refund of money per event policy.";
+      await registration.save();
+
+      // Release seat in event
+      const event = await Event.findById(registration.eventId);
+      if (event && event.registeredCount > 0) {
+        event.registeredCount -= 1;
+        await event.save();
+      }
+
+      res.json({
+        success: true,
+        message: "Event registration cancelled successfully. As per festival policy, no refund of money is provided.",
+        registration
+      });
+    } else {
+      const reg = localRegistrations.find(r => r._id === regId);
+      if (!reg) {
+        return res.status(404).json({ success: false, message: "Registration record not found" });
+      }
+
+      if (reg.userId !== userId) {
+        return res.status(403).json({ success: false, message: "Unauthorized to cancel this registration" });
+      }
+
+      if (reg.status === "cancelled") {
+        return res.status(400).json({ success: false, message: "This event registration is already cancelled" });
+      }
+
+      reg.status = "cancelled";
+      reg.paymentStatus = "cancelled_no_refund";
+      reg.cancelledAt = new Date().toISOString();
+      reg.cancellationPolicyNotice = "Cancelled by participant without refund of money per event policy.";
+
+      const eventIdStr = typeof reg.eventId === "object" ? reg.eventId._id : reg.eventId;
+      const event = localEvents.find(e => e._id === eventIdStr);
+      if (event && event.registeredCount > 0) {
+        event.registeredCount -= 1;
+      }
+
+      res.json({
+        success: true,
+        message: "Event registration cancelled successfully. As per festival policy, no refund of money is provided.",
+        registration: reg
+      });
     }
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
