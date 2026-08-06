@@ -55,24 +55,18 @@ export function InfinityChallenge() {
 
   return (
     <section className="relative bg-[#080B14] section-padding border-t border-white/10 overflow-hidden min-h-[600px]">
-      {/* Background Marvel Video Loop (High Visibility) */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-85">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="auto"
-          onPause={(e) => e.currentTarget.play()}
-          onEnded={(e) => e.currentTarget.play()}
-          className="w-full h-full object-cover filter brightness-115 contrast-120 scale-105"
-        >
-          <source src="/MARVEL/Video Project 4.mp4" type="video/mp4" />
-        </video>
-        <div className="absolute inset-0 bg-gradient-to-t from-[#080B14] via-[#080B14]/40 to-[#080B14]/70 z-[1]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(8,11,20,0.8)_95%)] z-[1]" />
+      {/* Background Infinity Gauntlet Marvel Image — Ultra High 100% Visibility */}
+      <div className="absolute inset-0 z-0 opacity-100 pointer-events-none">
+        <Image
+          src="/MARVEL/4081455907815375.png"
+          alt="Infinity Gauntlet Background"
+          fill
+          priority
+          className="object-cover object-top filter brightness-115 contrast-130 saturate-140 drop-shadow-[0_0_50px_rgba(237,29,36,0.6)]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#080B14] via-transparent to-[#080B14]/20 z-[1]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_60%,rgba(8,11,20,0.6)_95%)] z-[1]" />
       </div>
-
 
       {/* Background ambient glow matching active stone */}
       <div
