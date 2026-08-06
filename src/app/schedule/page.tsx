@@ -29,8 +29,26 @@ export default function SchedulePage() {
   });
 
   return (
-    <div className="bg-[#05050A] min-h-screen pt-28 pb-16 text-white font-mono">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+    <div className="bg-[#05050A] min-h-screen pt-28 pb-16 text-white font-mono relative overflow-hidden">
+      {/* Background Marvel Video Project 4.mp4 Loop (High Visibility) */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-80">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          onPause={(e) => e.currentTarget.play()}
+          onEnded={(e) => e.currentTarget.play()}
+          className="w-full h-full object-cover filter brightness-110 contrast-115 scale-[1.02]"
+        >
+          <source src="/MARVEL/Video Project 4.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-gradient-to-b from-[#05050A]/40 via-[#05050A]/60 to-[#05050A]/90" />
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 relative z-10">
+
         
         {/* Header */}
         <div className="text-center space-y-3">
