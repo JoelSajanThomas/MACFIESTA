@@ -139,10 +139,13 @@ export default function AccommodationPage() {
   };
 
   return (
-    <div className="bg-festival-dark min-h-screen pt-28 pb-20 text-white">
-      {/* Background Neon ambient lighting */}
-      <div className="fixed top-0 left-1/4 w-[500px] h-[500px] bg-festival-gold/10 rounded-full blur-[140px] pointer-events-none z-0" />
-      <div className="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-festival-purple/10 rounded-full blur-[140px] pointer-events-none z-0" />
+    <div className="bg-[#05050A] min-h-screen pt-28 pb-20 text-white font-mono relative overflow-hidden">
+      {/* Background Marvel Neon Ambient Color Blending */}
+      <div className="absolute top-1/4 left-1/4 w-[600px] h-[400px] bg-arc-cyan/10 rounded-full blur-[140px] pointer-events-none z-0" />
+      <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[400px] bg-marvel-red/10 rounded-full blur-[140px] pointer-events-none z-0" />
+      <div className="absolute top-2/3 left-1/3 w-[500px] h-[350px] bg-metallic-gold/10 rounded-full blur-[140px] pointer-events-none z-0" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_45%,rgba(5,5,10,0.85)_95%)] pointer-events-none z-0" />
+
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-12">
 
