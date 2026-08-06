@@ -110,12 +110,16 @@ export function HeroSection() {
           loop
           muted
           playsInline
-          className="w-full h-full object-cover filter brightness-110 contrast-115 scale-[1.02] opacity-80"
+          preload="auto"
+          onPause={(e) => e.currentTarget.play()}
+          onEnded={(e) => e.currentTarget.play()}
+          className="w-full h-full object-cover filter brightness-115 contrast-120 scale-[1.02] opacity-90"
         >
           <source src="/MARVEL/Video Project 4.mp4" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-gradient-to-t from-[#05050A] via-[#05050A]/40 to-[#05050A]/50 z-[1]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(5,5,10,0.85)_90%)] z-[1]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#05050A] via-[#05050A]/30 to-[#05050A]/40 z-[1]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_50%,rgba(5,5,10,0.8)_95%)] z-[1]" />
+
 
         {/* Floating Iron Man Overlay Graphic */}
         <div className="absolute top-10 right-8 opacity-35 hidden xl:block pointer-events-none z-[2]">

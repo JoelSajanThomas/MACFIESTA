@@ -17,18 +17,22 @@ export function AboutFestival() {
   return (
     <section className="relative bg-[#05050A] section-padding border-t border-white/10 overflow-hidden font-mono">
       {/* Background Marvel Video Project 4.mp4 Loop */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-40">
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-50">
         <video
           autoPlay
           loop
           muted
           playsInline
-          className="w-full h-full object-cover filter brightness-110 contrast-125"
+          preload="auto"
+          onPause={(e) => e.currentTarget.play()}
+          onEnded={(e) => e.currentTarget.play()}
+          className="w-full h-full object-cover filter brightness-115 contrast-125"
         >
           <source src="/MARVEL/Video Project 4.mp4" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-[#05050A]/70" />
+        <div className="absolute inset-0 bg-[#05050A]/60" />
       </div>
+
 
       {/* Background Marvel energy glow */}
       <div className="absolute top-1/4 left-1/10 w-96 h-96 rounded-full bg-marvel-red/10 blur-[130px] pointer-events-none" />
