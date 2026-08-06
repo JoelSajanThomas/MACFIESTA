@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Image from "next/image";
-
 import {
   RiHotelBedLine,
   RiMenLine,
@@ -18,6 +17,7 @@ import {
   RiCloseLine,
   RiSparklingLine
 } from "react-icons/ri";
+
 
 type AccommodationHostel = {
   id: string;
@@ -142,16 +142,16 @@ export default function AccommodationPage() {
 
   return (
     <div className="bg-[#05050A] min-h-screen pt-28 pb-20 text-white font-mono relative overflow-hidden">
-      {/* Background Marvel Captain America /MARVEL/captain.jpg Wallpaper */}
+      {/* Background Marvel Loki Series Wallpaper */}
       <div className="absolute inset-0 z-0 opacity-85 pointer-events-none">
         <Image
-          src="/MARVEL/captain.jpg"
-          alt="Captain America Accommodation Background"
+          src="/MARVEL/Loki Series.jpg"
+          alt="Loki Series Accommodation Wallpaper"
           fill
           priority
           className="object-cover object-center filter brightness-110 contrast-125 scale-[1.02]"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#05050A]/40 via-[#05050A]/65 to-[#05050A]/95 z-[1]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#05050A]/40 via-[#05050A]/60 to-[#05050A]/95 z-[1]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_45%,rgba(5,5,10,0.85)_95%)] z-[1]" />
       </div>
 
