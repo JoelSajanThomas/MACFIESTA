@@ -26,12 +26,94 @@ import { useAuthStore } from "@/lib/authStore";
 import { Event } from "@/types";
 import { downloadEventTicketPDF } from "@/lib/ticketGenerator";
 
+const DEFAULT_EVENTS: Record<string, Event> = {
+  "urumi-gaming": {
+    _id: "default-1",
+    title: "Urumi Gaming Arena",
+    slug: "urumi-gaming",
+    description: "Prepare your triggers and coordination as we host the ultimate esports arena showdown. Featuring competitive lobbies in Valorant, BGMI and FIFA formats.",
+    rules: [
+      "All squad members must belong to the same college/institution.",
+      "Players must bring their own mobile devices, charging adapters, and headsets.",
+      "Emulators are strictly prohibited for BGMI battles.",
+      "Decisions of the gaming coordinators are final and binding."
+    ],
+    coverImage: "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=800&auto=format&fit=crop",
+    date: "24 Sep 2026",
+    time: "Day 1, 11:00 AM onwards",
+    venue: "MACFAST Esports Lounge",
+    category: "gaming",
+    type: "squad",
+    prizePool: 30000,
+    difficulty: "expert",
+    maxSeats: 8,
+    registeredCount: 0,
+    isLive: true,
+    status: "upcoming",
+    createdAt: "2026-08-01T00:00:00.000Z",
+    coordinator: { name: "Abhijith R.", phone: "+91 94470 12345", email: "abhijith@macfast.org" }
+  },
+  "dusk-n-dawn": {
+    _id: "default-2",
+    title: "Dusk 'N Dawn Concert",
+    slug: "dusk-n-dawn",
+    description: "MacFiesta's signature ending performance featuring national music tracks, DJ battles, and EDM showcase from guest artists.",
+    rules: [
+      "Gates open at 05:30 PM. Unified entry pass / QR badge is mandatory.",
+      "Alcohol, smoking, and narcotic substances are strictly prohibited inside the grounds.",
+      "Outside food or metal items are not allowed.",
+      "Re-entry is allowed only under coordinator authorization."
+    ],
+    coverImage: "/MARVEL/Doctor Strange.png",
+    date: "25 Sep 2026",
+    time: "Day 2, 06:00 PM - 10:00 PM",
+    venue: "Main Campus Athletic Grounds",
+    category: "cultural",
+    type: "group",
+    prizePool: 50000,
+    difficulty: "hard",
+    maxSeats: 120,
+    registeredCount: 0,
+    isLive: false,
+    status: "upcoming",
+    createdAt: "2026-08-01T00:00:00.000Z",
+    coordinator: { name: "Suresh Pillai", phone: "+91 94470 54321", email: "suresh@macfast.org" }
+  },
+  "byte-and-code": {
+    _id: "default-3",
+    title: "Byte & Code Hackathon",
+    slug: "byte-and-code",
+    description: "24-hour design and code sprint where developers form teams to construct digital solutions addressing real-world problem statements.",
+    rules: [
+      "Work must be started from scratch. Pre-built templates are disqualified.",
+      "All code must be committed to a public GitHub repository.",
+      "Teams must present their live demonstration before the panel.",
+      "Use of open source libraries is encouraged with attribution."
+    ],
+    coverImage: "/MARVEL/4081455907815375.png",
+    date: "24 Sep 2026",
+    time: "Day 1, 10:00 AM onwards",
+    venue: "MACFAST Computer Labs",
+    category: "technical",
+    type: "duo",
+    prizePool: 25000,
+    difficulty: "expert",
+    maxSeats: 12,
+    registeredCount: 0,
+    isLive: true,
+    status: "upcoming",
+    createdAt: "2026-08-01T00:00:00.000Z",
+    coordinator: { name: "Anjali Mathew", phone: "+91 94470 98765", email: "anjali@macfast.org" }
+  }
+};
+
+
 export default function EventDetailClient({ slug }: { slug: string }) {
   const router = useRouter();
 
   const { user, registrations, registerForEvent } = useAuthStore();
-  const [event, setEvent] = useState<Event | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [event, setEvent] = useState<Event | null>(() => DEFAULT_EVENTS[slug] || null);
+  const [loading, setLoading] = useState(() => !DEFAULT_EVENTS[slug]);
   const [registering, setRegistering] = useState(false);
   const [msg, setMsg] = useState({ text: "", isError: false });
 
@@ -50,11 +132,11 @@ export default function EventDetailClient({ slug }: { slug: string }) {
     async function loadEvent() {
       try {
         const res = await api.get(`/events/${slug}`);
-        if (res.data && res.data.success) {
+        if (res.data && res.data.success && res.data.event) {
           setEvent(res.data.event);
         }
       } catch (err) {
-        console.error("Failed to load event details", err);
+        console.warn("API load failed, using default event data.");
       } finally {
         setLoading(false);
       }
@@ -62,7 +144,7 @@ export default function EventDetailClient({ slug }: { slug: string }) {
     loadEvent();
   }, [slug]);
 
-  if (loading) {
+  if (loading && !event) {
     return (
       <div className="bg-[#05050A] min-h-screen pt-28 flex items-center justify-center font-mono">
         <div className="text-arc-cyan text-sm font-bold uppercase tracking-widest animate-pulse flex items-center gap-2">
@@ -74,8 +156,15 @@ export default function EventDetailClient({ slug }: { slug: string }) {
   }
 
   if (!event) {
-    notFound();
+    return (
+      <div className="bg-[#05050A] min-h-screen pt-28 flex flex-col items-center justify-center font-mono text-center p-6 space-y-4">
+        <h2 className="text-2xl font-black text-marvel-red uppercase">Mission Not Found</h2>
+        <p className="text-xs text-white/60">The requested mission brief does not exist or has been archived.</p>
+        <Link href="/events" className="btn-primary text-xs px-6 py-3 rounded-full">Return to Mission Directory</Link>
+      </div>
+    );
   }
+
 
   const isRegistered = registrations.some(
     (r) =>
