@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import {
   RiHotelBedLine,
   RiMenLine,
@@ -17,7 +16,6 @@ import {
   RiCloseLine,
   RiSparklingLine
 } from "react-icons/ri";
-
 
 type AccommodationHostel = {
   id: string;
@@ -142,19 +140,22 @@ export default function AccommodationPage() {
 
   return (
     <div className="bg-[#05050A] min-h-screen pt-28 pb-20 text-white font-mono relative overflow-hidden">
-      {/* Background Marvel Loki Series Wallpaper — Ultra High 100% Visibility */}
-      <div className="absolute inset-0 z-0 opacity-100 pointer-events-none">
-        <Image
-          src="/MARVEL/Loki Series.jpg"
-          alt="Loki Series Accommodation Wallpaper"
-          fill
-          priority
-          className="object-cover object-center filter brightness-115 contrast-130 saturate-135 scale-[1.02]"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#05050A]/20 via-[#05050A]/40 to-[#05050A]/90 z-[1]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_60%,rgba(5,5,10,0.6)_95%)] z-[1]" />
+      {/* Background Marvel Video Project 7.mp4 Loop (High Visibility) */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-80">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          onPause={(e) => e.currentTarget.play()}
+          onEnded={(e) => e.currentTarget.play()}
+          className="w-full h-full object-cover filter brightness-110 contrast-115 scale-[1.02]"
+        >
+          <source src="/MARVEL/Video Project 7.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-gradient-to-b from-[#05050A]/40 via-[#05050A]/60 to-[#05050A]/90" />
       </div>
-
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-12">
 
