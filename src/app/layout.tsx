@@ -89,11 +89,8 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
-  other: {
-    "Cache-Control": "no-store, no-cache, must-revalidate",
-    "Pragma": "no-cache",
-  },
 };
+
 
 export default function RootLayout({
   children,
