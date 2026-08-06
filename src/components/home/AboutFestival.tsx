@@ -16,9 +16,24 @@ export function AboutFestival() {
 
   return (
     <section className="relative bg-[#05050A] section-padding border-t border-white/10 overflow-hidden font-mono">
+      {/* Background Marvel Video Project 4.mp4 Loop */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-40">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover filter brightness-110 contrast-125"
+        >
+          <source src="/MARVEL/Video Project 4.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-[#05050A]/70" />
+      </div>
+
       {/* Background Marvel energy glow */}
       <div className="absolute top-1/4 left-1/10 w-96 h-96 rounded-full bg-marvel-red/10 blur-[130px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/10 w-96 h-96 rounded-full bg-arc-cyan/10 blur-[130px] pointer-events-none" />
+
 
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
