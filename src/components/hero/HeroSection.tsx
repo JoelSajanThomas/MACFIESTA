@@ -103,22 +103,18 @@ export function HeroSection() {
 
   return (
     <section className="relative w-full min-h-screen flex flex-col justify-between overflow-hidden bg-[#05050A] pt-24 md:pt-32">
-      {/* Background Marvel Video Project 4.mp4 Loop & Dynamic Overlay */}
+      {/* Background Marvel 3025924746959430.jpg Wallpaper & Dynamic Overlay */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="auto"
-          onPause={(e) => e.currentTarget.play()}
-          onEnded={(e) => e.currentTarget.play()}
-          className="w-full h-full object-cover filter brightness-115 contrast-120 scale-[1.02] opacity-90"
-        >
-          <source src="/MARVEL/Video Project 4.mp4" type="video/mp4" />
-        </video>
+        <Image
+          src="/MARVEL/3025924746959430.jpg"
+          alt="Welcome to MacFiesta Marvel Wallpaper Background"
+          fill
+          priority
+          className="object-cover object-center filter brightness-110 contrast-125 opacity-90 scale-[1.02]"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-[#05050A] via-[#05050A]/30 to-[#05050A]/40 z-[1]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_50%,rgba(5,5,10,0.8)_95%)] z-[1]" />
+
 
 
         {/* Floating Iron Man Overlay Graphic */}
