@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { RiMailSendLine, RiPhoneLine, RiMapPin2Line, RiQuestionLine } from "react-icons/ri";
 
 const faqs = [
@@ -22,8 +23,22 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="bg-festival-dark min-h-screen pt-28 pb-16">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+    <div className="bg-[#05050A] min-h-screen pt-28 pb-16 relative overflow-hidden font-mono text-white">
+      {/* Background Marvel peakpx.png Wallpaper */}
+      <div className="absolute inset-0 z-0 opacity-90 pointer-events-none">
+        <Image
+          src="/MARVEL/peakpx.png"
+          alt="Marvel Contact Background"
+          fill
+          priority
+          className="object-cover object-center filter brightness-110 contrast-125 saturate-130 scale-[1.02]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#05050A]/40 via-[#05050A]/60 to-[#05050A]/95" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_50%,rgba(5,5,10,0.85)_95%)]" />
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16 relative z-10">
+
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
