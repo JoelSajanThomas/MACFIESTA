@@ -23,8 +23,10 @@ import {
 } from "react-icons/ri";
 import { api } from "@/lib/api";
 import { useAuthStore } from "@/lib/authStore";
+import { useFestivalControl } from "@/lib/festivalStore";
 import { Event } from "@/types";
 import { downloadEventTicketPDF } from "@/lib/ticketGenerator";
+
 
 const DEFAULT_EVENTS: Record<string, Event> = {
   "urumi-gaming": {
@@ -166,6 +168,8 @@ export default function EventDetailClient({ slug }: { slug: string }) {
   }
 
 
+  const { settings } = useFestivalControl();
+
   const isRegistered = registrations.some(
     (r) =>
       r.status !== "cancelled" &&
@@ -174,6 +178,10 @@ export default function EventDetailClient({ slug }: { slug: string }) {
   const isFull = event.registeredCount >= event.maxSeats;
 
   const handleOpenCheckout = () => {
+    if (!settings.registrationOpen) {
+      setMsg({ text: "Registration has been officially closed by S.H.I.E.L.D. Admin Command.", isError: true });
+      return;
+    }
     if (!user) {
       router.push("/signin");
       return;
@@ -186,6 +194,11 @@ export default function EventDetailClient({ slug }: { slug: string }) {
 
   const handleProcessPayment = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!settings.registrationOpen) {
+      setMsg({ text: "Registration has been officially closed by S.H.I.E.L.D. Admin Command.", isError: true });
+      setIsPaymentModalOpen(false);
+      return;
+    }
     setPaymentStep("processing");
     setRegistering(true);
 
@@ -216,6 +229,7 @@ export default function EventDetailClient({ slug }: { slug: string }) {
       await downloadEventTicketPDF(createdRegistration, event, user);
     }
   };
+
 
   return (
     <div className="bg-[#05050A] min-h-screen pt-28 pb-16 text-white font-mono relative overflow-hidden">
@@ -358,7 +372,12 @@ export default function EventDetailClient({ slug }: { slug: string }) {
                   <span className="text-metallic-gold font-black">{event.maxSeats - event.registeredCount} Slots Left</span>
                 </div>
 
-                {isRegistered ? (
+                {!settings.registrationOpen ? (
+                  <button disabled className="btn-outline w-full text-center flex justify-center py-3.5 border-marvel-red/40 bg-marvel-red/10 text-marvel-red font-bold tracking-widest uppercase cursor-not-allowed">
+                    <RiLockLine className="mr-2 text-base" />
+                    <span>REGISTRATION CLOSED BY COMMAND HQ</span>
+                  </button>
+                ) : isRegistered ? (
                   <Link href="/dashboard" className="btn-outline w-full text-center flex justify-center py-3.5 border-arc-cyan text-arc-cyan">
                     <span>Mission Assigned — View Agent Pass</span>
                   </Link>
@@ -376,6 +395,7 @@ export default function EventDetailClient({ slug }: { slug: string }) {
                     <span>{user ? `Pay ₹${entryFee} & Join Mission` : "Agent Login to Join"}</span>
                   </button>
                 )}
+
               </div>
             </div>
           </div>

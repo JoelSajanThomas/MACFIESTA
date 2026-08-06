@@ -4,11 +4,14 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { RiPlayLine } from "react-icons/ri";
+import { RiPlayLine, RiLockLine } from "react-icons/ri";
 import { useAuthStore } from "@/lib/authStore";
+import { useFestivalControl } from "@/lib/festivalStore";
 
 export default function SignUpPage() {
   const router = useRouter();
+  const { settings } = useFestivalControl();
+
   const registerUser = useAuthStore((state) => state.registerUser);
   const [step, setStep] = useState(1);
   const [name, setName] = useState("");
@@ -104,11 +107,19 @@ export default function SignUpPage() {
             </p>
           </div>
 
+          {!settings.registrationOpen && (
+            <div className="p-3 bg-marvel-red/20 border border-marvel-red/40 text-marvel-red text-xs font-bold rounded-xl text-center flex items-center justify-center gap-2">
+              <RiLockLine className="text-base shrink-0" />
+              <span>RECRUITMENT CLOSED: S.H.I.E.L.D. Command HQ has officially closed registration.</span>
+            </div>
+          )}
+
           {errorMsg && (
             <div className="p-3 bg-festival-pink/15 border border-festival-pink/30 text-festival-pink text-xs rounded-xl text-center">
               {errorMsg}
             </div>
           )}
+
 
           <AnimatePresence mode="wait">
             {step === 1 ? (
@@ -242,10 +253,18 @@ export default function SignUpPage() {
             )}
           </div>
 
-          <button type="submit" disabled={submitting} className="btn-primary w-full justify-center flex py-3.5 gap-2 cursor-pointer">
-            <span>{submitting ? "Processing..." : step === 1 ? "Next Step" : "Complete Registration"}</span>
-            <RiPlayLine />
-          </button>
+          {!settings.registrationOpen ? (
+            <button type="button" disabled className="btn-outline w-full justify-center flex py-3.5 gap-2 border-marvel-red/40 bg-marvel-red/10 text-marvel-red font-bold uppercase cursor-not-allowed">
+              <RiLockLine />
+              <span>REGISTRATION CLOSED BY COMMAND</span>
+            </button>
+          ) : (
+            <button type="submit" disabled={submitting} className="btn-primary w-full justify-center flex py-3.5 gap-2 cursor-pointer">
+              <span>{submitting ? "Processing..." : step === 1 ? "Next Step" : "Complete Registration"}</span>
+              <RiPlayLine />
+            </button>
+          )}
+
         </form>
 
       </div>

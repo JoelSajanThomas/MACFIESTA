@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { api } from "./api";
+import { getFestivalSettings } from "./festivalStore";
 import { User, Registration } from "@/types";
+
 
 interface AuthState {
   user: User | null;
@@ -115,6 +117,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   registerUser: async (fields) => {
+    if (!getFestivalSettings().registrationOpen) {
+      return { success: false, message: "Registration has been officially closed by S.H.I.E.L.D. Admin Command." };
+    }
     set({ isLoading: true, error: null });
     try {
       const response = await api.post("/auth/register", fields);
@@ -134,6 +139,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return { success: false, message };
     }
   },
+
 
   logout: () => {
     if (typeof window !== "undefined") {
@@ -173,6 +179,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   registerForEvent: async (eventId, paymentData) => {
+    if (!getFestivalSettings().registrationOpen) {
+      return { success: false, message: "Registration has been officially closed by S.H.I.E.L.D. Admin Command." };
+    }
     try {
       const response = await api.post("/registrations", {
         eventId,
@@ -193,6 +202,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return { success: false, message };
     }
   },
+
 
   cancelRegistration: async (registrationId) => {
     try {
