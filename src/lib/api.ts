@@ -1,6 +1,5 @@
 import axios from "axios";
 import { API_BASE_URL } from "./constants";
-import { useAuthStore } from "./authStore";
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -33,7 +32,6 @@ api.interceptors.response.use(
       if (typeof window !== "undefined") {
         sessionStorage.removeItem("macfiesta_token");
         sessionStorage.removeItem("macfiesta_user");
-        useAuthStore.setState({ token: null, user: null, registrations: [] });
         // Optional: redirect to sign-in page if not on a public path
         if (
           window.location.pathname !== "/signin" &&
@@ -52,3 +50,4 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
