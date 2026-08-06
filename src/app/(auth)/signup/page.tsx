@@ -4,7 +4,17 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { RiPlayLine, RiLockLine } from "react-icons/ri";
+import {
+  RiPlayLine,
+  RiLockLine,
+  RiShieldFlashLine,
+  RiFlashlightLine,
+  RiNotification3Line,
+  RiCheckLine,
+  RiCompass3Line,
+  RiCalendarLine,
+  RiMailLine,
+} from "react-icons/ri";
 import { useAuthStore } from "@/lib/authStore";
 import { useFestivalControl } from "@/lib/festivalStore";
 
@@ -25,10 +35,9 @@ export default function SignUpPage() {
   const [submitting, setSubmitting] = useState(false);
   const [mounted, setMounted] = useState(false);
 
+  // Spot Notification State
   const [spotEmail, setSpotEmail] = useState("");
-  const [spotCollege, setSpotCollege] = useState("");
-  const [spotSent, setSpotSent] = useState(false);
-  const [spotSending, setSpotSending] = useState(false);
+  const [spotRegistered, setSpotRegistered] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -36,139 +45,11 @@ export default function SignUpPage() {
 
   if (!mounted) {
     return (
-      <div className="bg-festival-dark min-h-screen pt-28 pb-16 flex items-center justify-center">
+      <div className="bg-[#05050A] min-h-screen pt-28 pb-16 flex items-center justify-center font-mono">
         <div className="max-w-md w-full mx-auto px-4">
-          <div className="glass p-8 rounded-3xl border border-white/5 space-y-6 shadow-2xl relative h-[480px] flex items-center justify-center">
-            <div className="text-white/40 text-xs font-bold uppercase tracking-widest animate-pulse">Loading Portal...</div>
+          <div className="glass p-8 rounded-3xl border border-white/10 space-y-6 shadow-2xl relative h-[480px] flex items-center justify-center">
+            <div className="text-arc-cyan text-xs font-bold uppercase tracking-widest animate-pulse">Loading S.H.I.E.L.D. Portal...</div>
           </div>
-        </div>
-      </div>
-    );
-  }
-
-
-  const handleSendSpotRequest = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!spotEmail) return;
-    setSpotSending(true);
-    setTimeout(() => {
-      setSpotSending(false);
-      setSpotSent(true);
-    }, 1200);
-  };
-
-  // If Admin closed registration, show the Marvel S.H.I.E.L.D. Lockdown Screen
-  if (!settings.registrationOpen) {
-    return (
-      <div className="bg-[#05050A] min-h-screen pt-28 pb-16 flex items-center justify-center font-mono relative overflow-hidden text-white">
-        {/* Background Alert Pulse */}
-        <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,rgba(237,29,36,0.15),transparent_70%)] animate-pulse pointer-events-none" />
-        
-        {/* Ambient Neon HUD Orbs */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-marvel-red/10 blur-[140px] pointer-events-none" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-arc-cyan/10 blur-[140px] pointer-events-none" />
-
-        <div className="max-w-xl w-full mx-auto px-4 relative z-10 space-y-8">
-          
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="stark-panel p-8 md:p-10 rounded-3xl border border-marvel-red/40 bg-black/85 backdrop-blur-xl space-y-8 text-center shadow-[0_0_50px_rgba(237,29,36,0.3)] relative"
-          >
-            {/* Corner HUD Markers */}
-            <div className="absolute -top-1 -left-1 w-5 h-5 border-t-2 border-l-2 border-marvel-red rounded-tl" />
-            <div className="absolute -top-1 -right-1 w-5 h-5 border-t-2 border-r-2 border-marvel-red rounded-tr" />
-            <div className="absolute -bottom-1 -left-1 w-5 h-5 border-b-2 border-l-2 border-arc-cyan rounded-bl" />
-            <div className="absolute -bottom-1 -right-1 w-5 h-5 border-b-2 border-r-2 border-arc-cyan rounded-br" />
-
-            {/* Glowing Lock Reactor Badge */}
-            <div className="relative w-24 h-24 mx-auto flex items-center justify-center">
-              <div className="absolute inset-0 rounded-full border-2 border-marvel-red border-t-transparent animate-spin shadow-[0_0_30px_#ED1D24]" />
-              <div className="w-18 h-18 bg-marvel-red/20 border border-marvel-red rounded-full flex items-center justify-center text-marvel-red text-4xl shadow-[0_0_20px_#ED1D24]">
-                <RiLockLine />
-              </div>
-            </div>
-
-            {/* Directive Title */}
-            <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-marvel-red/50 bg-marvel-red/10 text-marvel-red text-[11px] font-bold tracking-[0.2em] uppercase shadow-[0_0_15px_rgba(237,29,36,0.3)]">
-                PROTOCOL RED • COMMAND LOCKDOWN
-              </div>
-              <h1 className="text-2xl md:text-4xl font-black text-white uppercase tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
-                Recruitment Vault Sealed
-              </h1>
-              <p className="text-xs text-white/60 leading-relaxed max-w-md mx-auto">
-                S.H.I.E.L.D. Admin Command has officially concluded delegate registration for MACFIESTA 2K26. All agent recruitment queues have been locked.
-              </p>
-            </div>
-
-            {/* Telemetry Terminal */}
-            <div className="bg-black/80 border border-white/10 p-4 rounded-2xl text-left space-y-2 text-xs font-mono">
-              <div className="flex justify-between border-b border-white/10 pb-2">
-                <span className="text-white/40 uppercase text-[10px]">Lockdown Directive:</span>
-                <span className="font-bold text-marvel-red">LEVEL 5 PROTOCOL ACTIVE</span>
-              </div>
-              <div className="flex justify-between border-b border-white/10 pb-2">
-                <span className="text-white/40 uppercase text-[10px]">Authorization:</span>
-                <span className="text-metallic-gold font-bold">S.H.I.E.L.D. DIRECTORS ONLY</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-white/40 uppercase text-[10px]">Spot Registration:</span>
-                <span className="text-arc-cyan font-bold">DESK CLEARANCE AT VENUE</span>
-              </div>
-            </div>
-
-            {/* Emergency Priority Beacon Signal Form */}
-            {!spotSent ? (
-              <form onSubmit={handleSendSpotRequest} className="space-y-3 pt-2 text-left">
-                <label className="block text-[11px] font-bold text-arc-cyan uppercase tracking-wider">
-                  Request Emergency Spot Entry Signal:
-                </label>
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <input
-                    type="email"
-                    required
-                    value={spotEmail}
-                    onChange={(e) => setSpotEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    className="flex-1 px-4 py-2.5 bg-white/5 border border-arc-cyan/30 rounded-xl text-white text-xs focus:border-arc-cyan focus:outline-none"
-                  />
-                  <button
-                    type="submit"
-                    disabled={spotSending}
-                    className="px-5 py-2.5 bg-marvel-red hover:bg-white hover:text-black text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all duration-300 shadow-[0_0_15px_#ED1D24] cursor-pointer shrink-0"
-                    style={{ fontFamily: "var(--font-heading)" }}
-                  >
-                    {spotSending ? "Dispatching..." : "Transmit Signal"}
-                  </button>
-                </div>
-              </form>
-            ) : (
-              <div className="p-4 bg-emerald-500/20 border border-emerald-500/40 rounded-2xl text-emerald-400 text-xs font-bold space-y-1">
-                <div>✓ Priority Signal Transmitted to J.A.R.V.I.S. Command Desk!</div>
-                <div className="text-[10px] text-white/60 font-normal">Our team will contact ({spotEmail}) if spot vacancies open.</div>
-              </div>
-            )}
-
-            {/* Actions & Navigation */}
-            <div className="grid grid-cols-2 gap-3 pt-2">
-              <Link
-                href="/events"
-                className="py-3 px-4 bg-white/5 hover:bg-arc-cyan/20 border border-arc-cyan/30 text-arc-cyan rounded-xl text-xs font-bold uppercase tracking-wider transition-all text-center"
-                style={{ fontFamily: "var(--font-heading)" }}
-              >
-                Browse Missions
-              </Link>
-              <Link
-                href="/signin"
-                className="py-3 px-4 bg-metallic-gold hover:bg-white text-black rounded-xl text-xs font-bold uppercase tracking-wider transition-all text-center shadow-[0_0_15px_rgba(212,175,55,0.3)]"
-                style={{ fontFamily: "var(--font-heading)" }}
-              >
-                Agent Sign In
-              </Link>
-            </div>
-          </motion.div>
         </div>
       </div>
     );
@@ -179,26 +60,20 @@ export default function SignUpPage() {
     setErrorMsg("");
 
     if (step === 1) {
-      // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
         setErrorMsg("Please enter a valid email address.");
         return;
       }
-
-      // Validate password length
       if (password.length < 6) {
         setErrorMsg("Password must be at least 6 characters long.");
         return;
       }
-
-      // Validate phone format
       const phoneRegex = /^\+?[0-9\s\-()]{7,15}$/;
       if (!phoneRegex.test(phone.replace(/\s+/g, ""))) {
         setErrorMsg("Please enter a valid phone number.");
         return;
       }
-
       setStep(2);
     } else {
       setErrorMsg("");
@@ -221,34 +96,138 @@ export default function SignUpPage() {
     }
   };
 
-  return (
-    <div className="bg-festival-dark min-h-screen pt-28 pb-16 flex items-center justify-center">
-      <div className="max-w-md w-full mx-auto px-4">
+  const handleSpotWaitlist = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!spotEmail) return;
+    setSpotRegistered(true);
+  };
 
-        <form onSubmit={handleNext} className="glass p-8 rounded-3xl border border-white/5 space-y-6 shadow-2xl relative">
-          {/* Step indicator */}
-          <div className="absolute top-6 right-8 text-[10px] font-bold text-festival-gold uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
+  // Dedicated Marvel Protocol Lockdown UI when Registration is Closed
+  if (!settings.registrationOpen) {
+    return (
+      <div className="bg-[#05050A] min-h-screen pt-28 pb-16 flex items-center justify-center font-mono relative overflow-hidden">
+        {/* Background Marvel laser grid & red alert aura */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] rounded-full bg-marvel-red/10 blur-[140px] pointer-events-none z-0" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(5,5,10,0.9)_95%)] pointer-events-none z-0" />
+
+        <div className="max-w-xl w-full mx-auto px-4 relative z-10 space-y-6">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="marvel-card p-8 md:p-10 rounded-3xl border-2 border-marvel-red/50 bg-[#0A0D1A]/90 backdrop-blur-xl text-center space-y-6 shadow-[0_0_60px_rgba(237,29,36,0.3)] relative overflow-hidden"
+          >
+            {/* Holographic scanner line */}
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-marvel-red to-transparent animate-pulse" />
+
+            {/* Glowing S.H.I.E.L.D. Lockdown Badge */}
+            <div className="w-20 h-20 bg-marvel-red/20 border-2 border-marvel-red text-marvel-red rounded-full flex items-center justify-center mx-auto text-4xl shadow-[0_0_30px_#ED1D24] animate-pulse">
+              <RiLockLine />
+            </div>
+
+            <div className="space-y-3">
+              <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-marvel-red/40 bg-marvel-red/10 text-marvel-red text-[10px] font-bold uppercase tracking-[0.25em] shadow-[0_0_15px_rgba(237,29,36,0.3)]">
+                <RiShieldFlashLine className="animate-spin-slow" />
+                <span>PROTOCOL 77-DELTA • RECRUITMENT SEALED</span>
+              </div>
+
+              <h2 className="text-2xl md:text-4xl font-black text-white uppercase tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
+                REGISTRATION <span className="text-marvel-red drop-shadow-[0_0_20px_#ED1D24]">CLOSED</span>
+              </h2>
+
+              <p className="text-xs sm:text-sm text-white/70 leading-relaxed font-mono">
+                S.H.I.E.L.D. Command HQ has officially filled maximum capacity quotas for new agent enrollments. All online recruitment gateways are temporarily locked.
+              </p>
+            </div>
+
+            {/* Emergency Spot Registration Waitlist */}
+            <div className="pt-4 border-t border-white/10 space-y-4">
+              <div className="text-left space-y-1">
+                <h4 className="text-xs font-bold text-metallic-gold uppercase tracking-wider flex items-center gap-2" style={{ fontFamily: "var(--font-heading)" }}>
+                  <RiNotification3Line className="text-arc-cyan" />
+                  Priority Spot Registration Waitlist
+                </h4>
+                <p className="text-[11px] text-white/50">
+                  Enter your email address to receive immediate J.A.R.V.I.S. alerts if spot clearance seats open up on festival day.
+                </p>
+              </div>
+
+              {spotRegistered ? (
+                <div className="p-4 bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+                  <RiCheckLine className="text-lg" />
+                  <span>AGENT PRIORITY ALERT ACTIVE: J.A.R.V.I.S. WILL NOTIFY YOU ON SPOT CLEARANCE DAY.</span>
+                </div>
+              ) : (
+                <form onSubmit={handleSpotWaitlist} className="flex gap-2">
+                  <input
+                    type="email"
+                    required
+                    value={spotEmail}
+                    onChange={(e) => setSpotEmail(e.target.value)}
+                    placeholder="agent.name@college.edu"
+                    className="flex-grow px-4 py-3 bg-black/60 border border-arc-cyan/30 rounded-xl text-white text-xs focus:border-arc-cyan focus:outline-none"
+                  />
+                  <button
+                    type="submit"
+                    className="px-5 py-3 bg-arc-cyan hover:bg-white text-black font-extrabold text-xs uppercase tracking-widest rounded-xl transition-all duration-300 cursor-pointer shadow-[0_0_15px_#00D4FF] shrink-0"
+                    style={{ fontFamily: "var(--font-heading)" }}
+                  >
+                    Get Alerted
+                  </button>
+                </form>
+              )}
+            </div>
+
+            {/* Quick Action Navigation Docks */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+              <Link
+                href="/events"
+                className="p-3 bg-white/5 border border-white/10 rounded-2xl hover:border-arc-cyan hover:bg-arc-cyan/10 text-white/80 hover:text-arc-cyan text-[11px] font-bold uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-1.5"
+              >
+                <RiCompass3Line />
+                <span>Browse Missions</span>
+              </Link>
+
+              <Link
+                href="/schedule"
+                className="p-3 bg-white/5 border border-white/10 rounded-2xl hover:border-metallic-gold hover:bg-metallic-gold/10 text-white/80 hover:text-metallic-gold text-[11px] font-bold uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-1.5"
+              >
+                <RiCalendarLine />
+                <span>View Timeline</span>
+              </Link>
+
+              <Link
+                href="/contact"
+                className="p-3 bg-white/5 border border-white/10 rounded-2xl hover:border-marvel-red hover:bg-marvel-red/10 text-white/80 hover:text-marvel-red text-[11px] font-bold uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-1.5"
+              >
+                <RiMailLine />
+                <span>Command Desk</span>
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-[#05050A] min-h-screen pt-28 pb-16 flex items-center justify-center font-mono">
+      <div className="max-w-md w-full mx-auto px-4">
+        <form onSubmit={handleNext} className="marvel-card p-8 rounded-3xl border border-arc-cyan/30 bg-[#0A0D1A] space-y-6 shadow-2xl relative">
+          <div className="absolute top-6 right-8 text-[10px] font-bold text-metallic-gold uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
             Step {step} of 2
           </div>
 
           <div className="text-center md:text-left space-y-1">
             <h3 className="text-xl font-bold text-white uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
-              Create Account
+              Create Agent Account
             </h3>
             <p className="text-xs text-white/40">
-              Register as festival attendee and competitor
+              Register as festival delegate & competitor
             </p>
           </div>
 
-          {!settings.registrationOpen && (
-            <div className="p-3 bg-marvel-red/20 border border-marvel-red/40 text-marvel-red text-xs font-bold rounded-xl text-center flex items-center justify-center gap-2">
-              <RiLockLine className="text-base shrink-0" />
-              <span>RECRUITMENT CLOSED: S.H.I.E.L.D. Command HQ has officially closed registration.</span>
-            </div>
-          )}
-
           {errorMsg && (
-            <div className="p-3 bg-festival-pink/15 border border-festival-pink/30 text-festival-pink text-xs rounded-xl text-center">
+            <div className="p-3 bg-marvel-red/20 border border-marvel-red/40 text-marvel-red text-xs rounded-xl text-center">
               {errorMsg}
             </div>
           )}
@@ -272,7 +251,7 @@ export default function SignUpPage() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="John Doe"
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-festival-gold/50 focus:outline-none text-white text-sm"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-arc-cyan focus:outline-none text-white text-sm"
                   />
                 </div>
                 <div>
@@ -285,7 +264,7 @@ export default function SignUpPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="john@college.edu"
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-festival-gold/50 focus:outline-none text-white text-sm"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-arc-cyan focus:outline-none text-white text-sm"
                   />
                 </div>
                 <div>
@@ -298,7 +277,7 @@ export default function SignUpPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-festival-gold/50 focus:outline-none text-white text-sm"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-arc-cyan focus:outline-none text-white text-sm"
                   />
                 </div>
                 <div>
@@ -311,7 +290,7 @@ export default function SignUpPage() {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+91 98765 43210"
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-festival-gold/50 focus:outline-none text-white text-sm"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-arc-cyan focus:outline-none text-white text-sm"
                   />
                 </div>
               </motion.div>
@@ -333,7 +312,7 @@ export default function SignUpPage() {
                     value={college}
                     onChange={(e) => setCollege(e.target.value)}
                     placeholder="MACFAST Tiruvalla"
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-festival-gold/50 focus:outline-none text-white text-sm"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-arc-cyan focus:outline-none text-white text-sm"
                   />
                 </div>
                 <div>
@@ -346,7 +325,7 @@ export default function SignUpPage() {
                     value={dept}
                     onChange={(e) => setDept(e.target.value)}
                     placeholder="Computer Applications"
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-festival-gold/50 focus:outline-none text-white text-sm"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-arc-cyan focus:outline-none text-white text-sm"
                   />
                 </div>
                 <div>
@@ -356,11 +335,11 @@ export default function SignUpPage() {
                   <select
                     value={year}
                     onChange={(e) => setYear(e.target.value)}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-festival-gold/50 focus:outline-none text-white text-sm"
+                    className="w-full px-4 py-3 bg-[#05050A] border border-white/10 rounded-xl focus:border-arc-cyan focus:outline-none text-white text-sm"
                   >
-                    <option value="1" className="bg-festival-dark-card">First Year (1st)</option>
-                    <option value="2" className="bg-festival-dark-card">Second Year (2nd)</option>
-                    <option value="3" className="bg-festival-dark-card">Third Year (3rd)</option>
+                    <option value="1">First Year (1st)</option>
+                    <option value="2">Second Year (2nd)</option>
+                    <option value="3">Third Year (3rd)</option>
                   </select>
                 </div>
               </motion.div>
@@ -373,32 +352,23 @@ export default function SignUpPage() {
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="text-festival-gold font-bold uppercase tracking-wider cursor-pointer"
+                className="text-metallic-gold font-bold uppercase tracking-wider cursor-pointer"
                 style={{ fontFamily: "var(--font-heading)" }}
               >
                 Previous Step
               </button>
             ) : (
-              <Link href="/signin" className="text-festival-gold font-bold uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
+              <Link href="/signin" className="text-metallic-gold font-bold uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
                 Sign In
               </Link>
             )}
           </div>
 
-          {!settings.registrationOpen ? (
-            <button type="button" disabled className="btn-outline w-full justify-center flex py-3.5 gap-2 border-marvel-red/40 bg-marvel-red/10 text-marvel-red font-bold uppercase cursor-not-allowed">
-              <RiLockLine />
-              <span>REGISTRATION CLOSED BY COMMAND</span>
-            </button>
-          ) : (
-            <button type="submit" disabled={submitting} className="btn-primary w-full justify-center flex py-3.5 gap-2 cursor-pointer">
-              <span>{submitting ? "Processing..." : step === 1 ? "Next Step" : "Complete Registration"}</span>
-              <RiPlayLine />
-            </button>
-          )}
-
+          <button type="submit" disabled={submitting} className="btn-primary w-full justify-center flex py-3.5 gap-2 cursor-pointer shadow-[0_0_20px_#ED1D24]">
+            <span>{submitting ? "Processing..." : step === 1 ? "Next Step" : "Complete Registration"}</span>
+            <RiPlayLine />
+          </button>
         </form>
-
       </div>
     </div>
   );
