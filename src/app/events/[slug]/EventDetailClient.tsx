@@ -240,7 +240,8 @@ export default function EventDetailClient({ slug }: { slug: string }) {
           loop
           muted
           playsInline
-          className="w-full h-full object-cover filter brightness-110 contrast-115 scale-105"
+          className="w-full h-full object-cover object-center filter brightness-110 contrast-115"
+
         >
           <source src="/MARVEL/Video Project 5.mp4" type="video/mp4" />
         </video>

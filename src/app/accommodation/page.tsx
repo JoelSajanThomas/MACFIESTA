@@ -150,7 +150,8 @@ export default function AccommodationPage() {
           preload="auto"
           onPause={(e) => e.currentTarget.play()}
           onEnded={(e) => e.currentTarget.play()}
-          className="w-full h-full object-cover filter brightness-110 contrast-115 scale-[1.02]"
+          className="w-full h-full object-cover object-center filter brightness-110 contrast-115"
+
         >
           <source src="/MARVEL/Video Project 7.mp4" type="video/mp4" />
         </video>
