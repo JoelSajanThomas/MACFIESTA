@@ -79,15 +79,15 @@ const featured = [
 export function FeaturedEvents() {
   return (
     <section className="relative bg-[#05050A] section-padding border-t border-arc-cyan/10 overflow-hidden">
-      {/* Background Marvel 3025924746959430.jpg Wallpaper & Dynamic Overlay */}
+      {/* Background Marvel Image: In a city that never sleeps, I find my... */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <Image
-          src="/MARVEL/3025924746959430.jpg"
-          alt="Featured Missions Marvel Background"
+          src="/MARVEL/In a city that never sleeps, I find my….jpg"
+          alt="Featured Missions Spider-Man Wallpaper Background"
           fill
-          className="object-cover object-center opacity-85 filter brightness-105 contrast-120 scale-105"
+          className="object-cover object-center filter brightness-110 contrast-125 opacity-85 scale-[1.02]"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#05050A]/70 via-[#05050A]/50 to-[#05050A]/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#05050A]/40 via-[#05050A]/60 to-[#05050A]/95" />
       </div>
 
 
