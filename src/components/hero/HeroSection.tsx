@@ -103,15 +103,17 @@ export function HeroSection() {
 
   return (
     <section className="relative w-full min-h-screen flex flex-col justify-between overflow-hidden bg-[#05050A] pt-24 md:pt-32">
-      {/* Background Marvel 3025924746959430.jpg Wallpaper & Dynamic Overlay */}
+      {/* Background Marvel Video Project 6.mp4 Loop & Dynamic Overlay */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <Image
-          src="/MARVEL/3025924746959430.jpg"
-          alt="MacFiesta Homepage Front Background"
-          fill
-          priority
-          className="object-cover object-center opacity-85 scale-[1.02] filter brightness-95 contrast-115 drop-shadow-[0_0_50px_rgba(237,29,36,0.3)]"
-        />
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover filter brightness-110 contrast-115 scale-[1.02] opacity-80"
+        >
+          <source src="/MARVEL/Video Project 6.mp4" type="video/mp4" />
+        </video>
         <div className="absolute inset-0 bg-gradient-to-t from-[#05050A] via-[#05050A]/40 to-[#05050A]/50 z-[1]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(5,5,10,0.85)_90%)] z-[1]" />
 
@@ -126,6 +128,7 @@ export function HeroSection() {
           />
         </div>
       </div>
+
 
       {/* Main Content Area */}
       <div className="relative z-10 flex-grow flex flex-col justify-center max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 md:py-16">
