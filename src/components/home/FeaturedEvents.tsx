@@ -79,19 +79,17 @@ const featured = [
 export function FeaturedEvents() {
   return (
     <section className="relative bg-[#05050A] section-padding border-t border-arc-cyan/10 overflow-hidden">
-      {/* Background Marvel Video Loop (High Visibility) */}
-      <div className="absolute inset-0 z-0 overflow-hidden opacity-75 pointer-events-none">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="w-full h-full object-cover filter brightness-110 contrast-115 scale-105"
-        >
-          <source src="/MARVEL/Video Project 5.mp4" type="video/mp4" />
-        </video>
-        <div className="absolute inset-0 bg-gradient-to-b from-[#05050A]/50 via-[#05050A]/70 to-[#05050A]" />
+      {/* Background Marvel 3025924746959430.jpg Wallpaper & Dynamic Overlay */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <Image
+          src="/MARVEL/3025924746959430.jpg"
+          alt="Featured Missions Marvel Background"
+          fill
+          className="object-cover object-center opacity-85 filter brightness-105 contrast-120 scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#05050A]/70 via-[#05050A]/50 to-[#05050A]/90" />
       </div>
+
 
 
       {/* Ambient Marvel background glow */}
