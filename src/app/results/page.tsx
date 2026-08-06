@@ -67,8 +67,13 @@ export default function ResultsPage() {
   const filtered = resultsData.filter((r) => r.event.toLowerCase().includes(search.toLowerCase()));
 
   return (
-    <div className="bg-[#05050A] min-h-screen pt-28 pb-16 text-white font-mono">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+    <div className="bg-[#05050A] min-h-screen pt-28 pb-16 text-white font-mono relative overflow-hidden">
+      {/* Background ambient Marvel color blurs */}
+      <div className="absolute top-1/4 left-1/4 w-[600px] h-[350px] rounded-full bg-metallic-gold/10 blur-[140px] pointer-events-none z-0" />
+      <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[350px] rounded-full bg-marvel-red/10 blur-[140px] pointer-events-none z-0" />
+
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 relative z-10">
+
         
         {/* Header */}
         <div className="text-center space-y-3">
