@@ -106,14 +106,24 @@ export function HeroSection() {
       {/* Background Marvel Video Project 6.mp4 Loop & Dynamic Overlay */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <video
+          ref={(el) => {
+            if (el) {
+              el.muted = true;
+              el.play().catch(() => {});
+            }
+          }}
           autoPlay
           loop
           muted
           playsInline
-          className="w-full h-full object-cover filter brightness-110 contrast-115 scale-[1.02] opacity-80"
+          preload="auto"
+          src="/MARVEL/Video%20Project%206.mp4"
+          className="w-full h-full object-cover filter brightness-115 contrast-120 scale-[1.02] opacity-90"
         >
+          <source src="/MARVEL/Video%20Project%206.mp4" type="video/mp4" />
           <source src="/MARVEL/Video Project 6.mp4" type="video/mp4" />
         </video>
+
         <div className="absolute inset-0 bg-gradient-to-t from-[#05050A] via-[#05050A]/40 to-[#05050A]/50 z-[1]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(5,5,10,0.85)_90%)] z-[1]" />
 
