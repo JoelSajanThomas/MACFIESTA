@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
+
 import {
   RiHotelBedLine,
   RiMenLine,
@@ -140,32 +142,21 @@ export default function AccommodationPage() {
 
   return (
     <div className="bg-[#05050A] min-h-screen pt-28 pb-20 text-white font-mono relative overflow-hidden">
-      {/* Background Marvel Video Project 7.mp4 Loop (High Visibility) */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-80">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="auto"
-          onPause={(e) => e.currentTarget.play()}
-          onEnded={(e) => e.currentTarget.play()}
-          className="w-full h-full object-cover filter brightness-110 contrast-115 scale-[1.02]"
-        >
-          <source src="/MARVEL/Video Project 7.mp4" type="video/mp4" />
-        </video>
-        <div className="absolute inset-0 bg-gradient-to-b from-[#05050A]/40 via-[#05050A]/60 to-[#05050A]/90" />
+      {/* Background Marvel Captain America /MARVEL/captain.jpg Wallpaper */}
+      <div className="absolute inset-0 z-0 opacity-85 pointer-events-none">
+        <Image
+          src="/MARVEL/captain.jpg"
+          alt="Captain America Accommodation Background"
+          fill
+          priority
+          className="object-cover object-center filter brightness-110 contrast-125 scale-[1.02]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#05050A]/40 via-[#05050A]/65 to-[#05050A]/95 z-[1]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_45%,rgba(5,5,10,0.85)_95%)] z-[1]" />
       </div>
 
-      {/* Background Marvel Neon Ambient Color Blending */}
-      <div className="absolute top-1/4 left-1/4 w-[600px] h-[400px] bg-arc-cyan/10 rounded-full blur-[140px] pointer-events-none z-0" />
-      <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[400px] bg-marvel-red/10 rounded-full blur-[140px] pointer-events-none z-0" />
-      <div className="absolute top-2/3 left-1/3 w-[500px] h-[350px] bg-metallic-gold/10 rounded-full blur-[140px] pointer-events-none z-0" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_45%,rgba(5,5,10,0.85)_95%)] pointer-events-none z-0" />
-
-
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-12">
+
 
         {/* Page Header */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
