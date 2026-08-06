@@ -26,9 +26,9 @@ import { useAuthStore } from "@/lib/authStore";
 import { Event } from "@/types";
 import { downloadEventTicketPDF } from "@/lib/ticketGenerator";
 
-export default function EventDetailClient({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = use(params);
+export default function EventDetailClient({ slug }: { slug: string }) {
   const router = useRouter();
+
   const { user, registrations, registerForEvent } = useAuthStore();
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
