@@ -41,6 +41,138 @@ export default function SignUpPage() {
     );
   }
 
+  const [spotEmail, setSpotEmail] = useState("");
+  const [spotCollege, setSpotCollege] = useState("");
+  const [spotSent, setSpotSent] = useState(false);
+  const [spotSending, setSpotSending] = useState(false);
+
+  const handleSendSpotRequest = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!spotEmail) return;
+    setSpotSending(true);
+    setTimeout(() => {
+      setSpotSending(false);
+      setSpotSent(true);
+    }, 1200);
+  };
+
+  // If Admin closed registration, show the Marvel S.H.I.E.L.D. Lockdown Screen
+  if (!settings.registrationOpen) {
+    return (
+      <div className="bg-[#05050A] min-h-screen pt-28 pb-16 flex items-center justify-center font-mono relative overflow-hidden text-white">
+        {/* Background Alert Pulse */}
+        <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,rgba(237,29,36,0.15),transparent_70%)] animate-pulse pointer-events-none" />
+        
+        {/* Ambient Neon HUD Orbs */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-marvel-red/10 blur-[140px] pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-arc-cyan/10 blur-[140px] pointer-events-none" />
+
+        <div className="max-w-xl w-full mx-auto px-4 relative z-10 space-y-8">
+          
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="stark-panel p-8 md:p-10 rounded-3xl border border-marvel-red/40 bg-black/85 backdrop-blur-xl space-y-8 text-center shadow-[0_0_50px_rgba(237,29,36,0.3)] relative"
+          >
+            {/* Corner HUD Markers */}
+            <div className="absolute -top-1 -left-1 w-5 h-5 border-t-2 border-l-2 border-marvel-red rounded-tl" />
+            <div className="absolute -top-1 -right-1 w-5 h-5 border-t-2 border-r-2 border-marvel-red rounded-tr" />
+            <div className="absolute -bottom-1 -left-1 w-5 h-5 border-b-2 border-l-2 border-arc-cyan rounded-bl" />
+            <div className="absolute -bottom-1 -right-1 w-5 h-5 border-b-2 border-r-2 border-arc-cyan rounded-br" />
+
+            {/* Glowing Lock Reactor Badge */}
+            <div className="relative w-24 h-24 mx-auto flex items-center justify-center">
+              <div className="absolute inset-0 rounded-full border-2 border-marvel-red border-t-transparent animate-spin shadow-[0_0_30px_#ED1D24]" />
+              <div className="w-18 h-18 bg-marvel-red/20 border border-marvel-red rounded-full flex items-center justify-center text-marvel-red text-4xl shadow-[0_0_20px_#ED1D24]">
+                <RiLockLine />
+              </div>
+            </div>
+
+            {/* Directive Title */}
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-marvel-red/50 bg-marvel-red/10 text-marvel-red text-[11px] font-bold tracking-[0.2em] uppercase shadow-[0_0_15px_rgba(237,29,36,0.3)]">
+                PROTOCOL RED • COMMAND LOCKDOWN
+              </div>
+              <h1 className="text-2xl md:text-4xl font-black text-white uppercase tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
+                Recruitment Vault Sealed
+              </h1>
+              <p className="text-xs text-white/60 leading-relaxed max-w-md mx-auto">
+                S.H.I.E.L.D. Admin Command has officially concluded delegate registration for MACFIESTA 2K26. All agent recruitment queues have been locked.
+              </p>
+            </div>
+
+            {/* Telemetry Terminal */}
+            <div className="bg-black/80 border border-white/10 p-4 rounded-2xl text-left space-y-2 text-xs font-mono">
+              <div className="flex justify-between border-b border-white/10 pb-2">
+                <span className="text-white/40 uppercase text-[10px]">Lockdown Directive:</span>
+                <span className="font-bold text-marvel-red">LEVEL 5 PROTOCOL ACTIVE</span>
+              </div>
+              <div className="flex justify-between border-b border-white/10 pb-2">
+                <span className="text-white/40 uppercase text-[10px]">Authorization:</span>
+                <span className="text-metallic-gold font-bold">S.H.I.E.L.D. DIRECTORS ONLY</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-white/40 uppercase text-[10px]">Spot Registration:</span>
+                <span className="text-arc-cyan font-bold">DESK CLEARANCE AT VENUE</span>
+              </div>
+            </div>
+
+            {/* Emergency Priority Beacon Signal Form */}
+            {!spotSent ? (
+              <form onSubmit={handleSendSpotRequest} className="space-y-3 pt-2 text-left">
+                <label className="block text-[11px] font-bold text-arc-cyan uppercase tracking-wider">
+                  Request Emergency Spot Entry Signal:
+                </label>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input
+                    type="email"
+                    required
+                    value={spotEmail}
+                    onChange={(e) => setSpotEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    className="flex-1 px-4 py-2.5 bg-white/5 border border-arc-cyan/30 rounded-xl text-white text-xs focus:border-arc-cyan focus:outline-none"
+                  />
+                  <button
+                    type="submit"
+                    disabled={spotSending}
+                    className="px-5 py-2.5 bg-marvel-red hover:bg-white hover:text-black text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all duration-300 shadow-[0_0_15px_#ED1D24] cursor-pointer shrink-0"
+                    style={{ fontFamily: "var(--font-heading)" }}
+                  >
+                    {spotSending ? "Dispatching..." : "Transmit Signal"}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="p-4 bg-emerald-500/20 border border-emerald-500/40 rounded-2xl text-emerald-400 text-xs font-bold space-y-1">
+                <div>✓ Priority Signal Transmitted to J.A.R.V.I.S. Command Desk!</div>
+                <div className="text-[10px] text-white/60 font-normal">Our team will contact ({spotEmail}) if spot vacancies open.</div>
+              </div>
+            )}
+
+            {/* Actions & Navigation */}
+            <div className="grid grid-cols-2 gap-3 pt-2">
+              <Link
+                href="/events"
+                className="py-3 px-4 bg-white/5 hover:bg-arc-cyan/20 border border-arc-cyan/30 text-arc-cyan rounded-xl text-xs font-bold uppercase tracking-wider transition-all text-center"
+                style={{ fontFamily: "var(--font-heading)" }}
+              >
+                Browse Missions
+              </Link>
+              <Link
+                href="/signin"
+                className="py-3 px-4 bg-metallic-gold hover:bg-white text-black rounded-xl text-xs font-bold uppercase tracking-wider transition-all text-center shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+                style={{ fontFamily: "var(--font-heading)" }}
+              >
+                Agent Sign In
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
   const handleNext = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
@@ -119,7 +251,6 @@ export default function SignUpPage() {
               {errorMsg}
             </div>
           )}
-
 
           <AnimatePresence mode="wait">
             {step === 1 ? (
@@ -271,3 +402,4 @@ export default function SignUpPage() {
     </div>
   );
 }
+
