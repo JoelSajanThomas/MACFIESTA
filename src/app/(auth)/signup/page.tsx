@@ -25,6 +25,11 @@ export default function SignUpPage() {
   const [submitting, setSubmitting] = useState(false);
   const [mounted, setMounted] = useState(false);
 
+  const [spotEmail, setSpotEmail] = useState("");
+  const [spotCollege, setSpotCollege] = useState("");
+  const [spotSent, setSpotSent] = useState(false);
+  const [spotSending, setSpotSending] = useState(false);
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -41,10 +46,6 @@ export default function SignUpPage() {
     );
   }
 
-  const [spotEmail, setSpotEmail] = useState("");
-  const [spotCollege, setSpotCollege] = useState("");
-  const [spotSent, setSpotSent] = useState(false);
-  const [spotSending, setSpotSending] = useState(false);
 
   const handleSendSpotRequest = (e: React.FormEvent) => {
     e.preventDefault();
