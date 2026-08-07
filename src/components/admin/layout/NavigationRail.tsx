@@ -78,17 +78,19 @@ export const MODULES: NavModule[] = [
   {
     id: "website",
     icon: RiGlobalLine,
-    label: "Website CMS",
-    desc: "Visual Page Builder, Banners & Content",
+    label: "Website CMS & Media",
+    desc: "Visual Page Builder, Media Gallery & Banners",
     pages: [
-      { id: "festival.builder", label: "Visual Page Builder", badge: "WYSIWYG", desc: "Drag & drop homepage layout" },
+      { id: "festival.builder", label: "Visual Page Builder & Live Preview", badge: "Live", desc: "Drag & drop layout & multi-device preview" },
       { id: "cms.hero", label: "Homepage Hero & Video Banner", desc: "Headline copy & video loop" },
       { id: "cms.about", label: "About Page Content", desc: "History, vision, mission & team" },
       { id: "cms.sponsors", label: "Sponsor Logos & Links", desc: "Platinum, Gold & Silver partners" },
+      { id: "cms.gallery", label: "Photo & Video Gallery Studio", badge: "Live", desc: "Upload photos & videos separately" },
       { id: "cms.faqs", label: "FAQ Manager", desc: "Frequently asked questions" },
       { id: "cms.contact", label: "Footer & Contact Details", desc: "Campus address, email & social links" },
     ],
   },
+
   {
     id: "participants",
     icon: RiGroupLine,

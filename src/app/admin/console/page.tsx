@@ -40,8 +40,6 @@ import { CMSModule } from "@/components/admin/modules/CMSModule";
 import { AICopilotModule } from "@/components/admin/modules/AICopilotModule";
 import { VolunteerHQModule } from "@/components/admin/modules/VolunteerHQModule";
 import { JudgeCommandModule } from "@/components/admin/modules/JudgeCommandModule";
-import { GalleryModule } from "@/components/admin/modules/GalleryModule";
-
 
 
 
@@ -247,21 +245,16 @@ export default function AdminDashboardPage() {
 
       // 3. Website Workspace
       case "website":
-      case "website.builder":
       case "festival.builder":
         return <HomepageBuilderModule />;
       case "cms":
-      case "website.cms":
       case "cms.hero":
       case "cms.about":
       case "cms.sponsors":
       case "cms.faqs":
       case "cms.contact":
         return <CMSModule activePage={activePage} />;
-      case "gallery":
-      case "website.gallery":
-      case "cms.gallery":
-        return <GalleryModule />;
+
 
       // 4. Participants Workspace
       case "participants":

@@ -18,10 +18,8 @@ import {
   RiCloseLine,
   RiEyeLine,
   RiEyeOffLine,
-  RiGalleryLine,
 } from "react-icons/ri";
 import { useFestivalControl } from "@/lib/festivalStore";
-import { GalleryModule } from "./GalleryModule";
 
 interface SponsorItem {
   id: string;
@@ -38,8 +36,7 @@ interface CMSModuleProps {
 }
 
 export function CMSModule({ activePage }: CMSModuleProps) {
-  const [activeTab, setActiveTab] = useState<"hero" | "about" | "sponsors" | "faqs" | "contact" | "rules" | "gallery">("sponsors");
-  const { settings, sponsors: storeSponsors, faqs: storeFaqs, updateSettings, updateSponsors, updateFaqs } = useFestivalControl();
+  const [activeTab, setActiveTab] = useState<"hero" | "about" | "sponsors" | "faqs" | "contact" | "rules">("sponsors");
 
   useEffect(() => {
     if (!activePage) return;
@@ -49,8 +46,10 @@ export function CMSModule({ activePage }: CMSModuleProps) {
     else if (activePage.endsWith(".faqs")) setActiveTab("faqs");
     else if (activePage.endsWith(".contact")) setActiveTab("contact");
     else if (activePage.endsWith(".rules")) setActiveTab("rules");
-    else if (activePage.endsWith(".gallery") || activePage === "gallery") setActiveTab("gallery");
+    else if (activePage === "cms") setActiveTab("sponsors");
   }, [activePage]);
+
+  const { settings, updateSettings } = useFestivalControl();
 
 
   // About Section CMS
@@ -219,12 +218,10 @@ export function CMSModule({ activePage }: CMSModuleProps) {
           { id: "sponsors", label: "Sponsors & Partners", icon: RiCoupon3Line },
           { id: "hero", label: "Homepage Hero & Video", icon: RiGlobalLine },
           { id: "about", label: "About Page Content", icon: RiFileTextLine },
-          { id: "gallery", label: "Photo & Video Gallery Studio", icon: RiGalleryLine },
           { id: "faqs", label: "FAQs Manager", icon: RiQuestionAnswerLine },
           { id: "contact", label: "Contact Info & Address", icon: RiContactsBookLine },
           { id: "rules", label: "General Conduct Rules", icon: RiShieldLine },
         ].map((tab) => {
-
           const Icon = tab.icon;
           const isSelected = activeTab === tab.id;
           return (
@@ -509,11 +506,7 @@ export function CMSModule({ activePage }: CMSModuleProps) {
         </form>
       )}
 
-      {/* GALLERY & MEDIA STUDIO */}
-      {activeTab === "gallery" && <GalleryModule />}
-
       {/* 4. FAQs Manager CMS */}
-
       {activeTab === "faqs" && (
         <div className="space-y-6 max-w-4xl">
           <form onSubmit={handleAddFaq} className="p-6 rounded-3xl bg-zinc-900/60 border border-zinc-800/80 space-y-4">
