@@ -35,8 +35,10 @@ export default function JudgeDashboardPage() {
     assignedTeams,
     myScores,
     rubric,
+    saveScoreEntry,
     submitScoreEntry,
   } = useJudgeControl();
+
 
   const [activeTab, setActiveTab] = useState<"evaluate" | "leaderboard" | "rubric" | "bulletins">("evaluate");
   const [selectedTeamId, setSelectedTeamId] = useState<string>(assignedTeams[0]?.id || "tm-101");
@@ -46,7 +48,8 @@ export default function JudgeDashboardPage() {
   const [criteriaScores, setCriteriaScores] = useState<Record<string, number>>({});
   const [comments, setComments] = useState("");
 
-  const selectedTeam = assignedTeams.find((t) => t.id === selectedTeamId) || assignedTeams[0];
+  const selectedTeam = assignedTeams.find((t: TeamParticipant) => t.id === selectedTeamId) || assignedTeams[0];
+
   const existingScore = myScores.find((s) => s.teamId === selectedTeamId);
 
   useEffect(() => {
@@ -78,7 +81,8 @@ export default function JudgeDashboardPage() {
 
   const handleSaveScore = (status: "DRAFT" | "SUBMITTED") => {
     if (!selectedTeam) return;
-    submitScoreEntry(selectedTeam.id, criteriaScores, comments, status);
+    saveScoreEntry(selectedTeam.id, criteriaScores, comments, status);
+
     if (status === "SUBMITTED") {
       triggerToast(`✓ Scorecard for ${selectedTeam.teamName} Officially Submitted!`);
     } else {
@@ -233,7 +237,8 @@ export default function JudgeDashboardPage() {
               </h3>
 
               <div className="space-y-2 text-xs">
-                {assignedTeams.map((team) => {
+                {assignedTeams.map((team: TeamParticipant) => {
+
                   const isSelected = selectedTeamId === team.id;
                   const score = myScores.find((s) => s.teamId === team.id);
                   return (
@@ -379,7 +384,8 @@ export default function JudgeDashboardPage() {
             </h3>
 
             <div className="space-y-3 text-xs">
-              {assignedTeams.map((t) => {
+              {assignedTeams.map((t: TeamParticipant) => {
+
                 const score = myScores.find((s) => s.teamId === t.id);
                 return (
                   <div key={t.id} className="p-4 bg-black/40 border border-white/10 rounded-2xl flex items-center justify-between">

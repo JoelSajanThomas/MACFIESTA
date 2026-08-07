@@ -18,7 +18,15 @@ import {
   RiSaveLine,
   RiSparklingLine,
   RiFileChartLine,
+  RiAlertLine,
+  RiTimeLine,
 } from "react-icons/ri";
+import {
+  useJudgeControl,
+  JuryBroadcastMessage,
+  getJuryBroadcasts,
+  saveJuryBroadcasts,
+} from "@/lib/judgeStore";
 
 export interface JudgePermission {
   canEditSubmittedScores: boolean;
@@ -71,19 +79,19 @@ const DEFAULT_JUDGES: JudgeUser[] = [
     judgeCode: "JDG-201",
     name: "Dr. Vikram Sethi",
     photoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
-    designation: "Principal AI Research Scientist",
-    organization: "TCS Innovation Labs",
+    designation: "VP of Artificial Intelligence",
+    organization: "TCS Research Labs",
     email: "vikram.sethi@tcs.com",
     phone: "+91 98470 33001",
     assignedEventId: "ev-1",
     assignedEventName: "Byte & Code Hackathon",
-    category: "Coding & AI",
+    category: "Software & AI",
     status: "ACTIVE",
     permissions: {
-      canEditSubmittedScores: false,
+      canEditSubmittedScores: true,
       canSaveDrafts: true,
       canUploadComments: true,
-      canViewOtherJudgesScores: false,
+      canViewOtherJudgesScores: true,
       canPublishResults: false,
     },
   },
@@ -111,10 +119,10 @@ const DEFAULT_JUDGES: JudgeUser[] = [
 ];
 
 const DEFAULT_CRITERIA: ScoreCriterion[] = [
-  { id: "cr-1", eventId: "ev-1", name: "Technical Complexity & Code Quality", maxPoints: 30, weightPercent: 30 },
-  { id: "cr-2", eventId: "ev-1", name: "Innovation & Problem Solving", maxPoints: 30, weightPercent: 30 },
-  { id: "cr-3", eventId: "ev-1", name: "UI/UX & Presentation", maxPoints: 20, weightPercent: 20 },
-  { id: "cr-4", eventId: "ev-1", name: "Q&A Defense & Architecture", maxPoints: 20, weightPercent: 20 },
+  { id: "cr-1", eventId: "ev-1", name: "Technical Complexity & Architecture", maxPoints: 30, weightPercent: 30 },
+  { id: "cr-2", eventId: "ev-1", name: "Innovation & Original Problem Solving", maxPoints: 30, weightPercent: 30 },
+  { id: "cr-3", eventId: "ev-1", name: "UI/UX & Interactive Design", maxPoints: 20, weightPercent: 20 },
+  { id: "cr-4", eventId: "ev-1", name: "Q&A Defense & Presentation", maxPoints: 20, weightPercent: 20 },
 ];
 
 const DEFAULT_WINNERS: WinnerSelection[] = [
@@ -133,6 +141,8 @@ const DEFAULT_WINNERS: WinnerSelection[] = [
 ];
 
 export function JudgeCommandModule() {
+  const { broadcasts, saveJuryBroadcasts } = useJudgeControl();
+
   const [activeTab, setActiveTab] = useState<"dashboard" | "roster" | "builder" | "results" | "announcements">("dashboard");
   const [judges, setJudges] = useState<JudgeUser[]>(DEFAULT_JUDGES);
   const [criteria, setCriteria] = useState<ScoreCriterion[]>(DEFAULT_CRITERIA);
@@ -140,7 +150,7 @@ export function JudgeCommandModule() {
   const [selectedJudgeId, setSelectedJudgeId] = useState<string>(DEFAULT_JUDGES[0].id);
   const [statusMsg, setStatusMsg] = useState("");
 
-  // Modals
+  // Modals & Forms
   const [showAddJudgeModal, setShowAddJudgeModal] = useState(false);
   const [newJudgeName, setNewJudgeName] = useState("");
   const [newJudgeOrg, setNewJudgeOrg] = useState("");
@@ -150,6 +160,12 @@ export function JudgeCommandModule() {
   // New Score Criterion State
   const [newCritName, setNewCritName] = useState("");
   const [newCritPoints, setNewCritPoints] = useState(25);
+
+  // Jury Broadcast States
+  const [juryAnnTarget, setJuryAnnTarget] = useState("All Jury Members");
+  const [juryAnnUrgency, setJuryAnnUrgency] = useState<"NORMAL" | "HIGH" | "URGENT" | "CRITICAL">("URGENT");
+  const [juryAnnTitle, setJuryAnnTitle] = useState("");
+  const [juryAnnMessage, setJuryAnnMessage] = useState("");
 
   const triggerSaved = (msg: string) => {
     setStatusMsg(msg);
@@ -181,71 +197,99 @@ export function JudgeCommandModule() {
     if (!newJudgeName || !newJudgeEmail) return;
 
     const count = judges.length + 201;
-    const newJdg: JudgeUser = {
+    const newJudge: JudgeUser = {
       id: `jdg-${count}`,
       judgeCode: `JDG-${count}`,
       name: newJudgeName,
       photoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
-      designation: "External Jury Lead",
-      organization: newJudgeOrg || "Industry Jury",
+      designation: "External Industry Evaluator",
+      organization: newJudgeOrg || "Industry Lead",
       email: newJudgeEmail,
-      phone: "+91 94470 00000",
+      phone: "+91 98470 00000",
       assignedEventId: "ev-1",
       assignedEventName: newJudgeEvent,
       category: "General Jury",
       status: "ACTIVE",
       permissions: {
-        canEditSubmittedScores: false,
+        canEditSubmittedScores: true,
         canSaveDrafts: true,
         canUploadComments: true,
-        canViewOtherJudgesScores: false,
+        canViewOtherJudgesScores: true,
         canPublishResults: false,
       },
     };
 
-    setJudges([...judges, newJdg]);
+    setJudges([...judges, newJudge]);
     setNewJudgeName("");
     setNewJudgeEmail("");
     setShowAddJudgeModal(false);
-    triggerSaved(`✓ Judge Account ${newJdg.judgeCode} Created!`);
+    triggerSaved(`✓ Judge ${newJudge.name} (${newJudge.judgeCode}) Emplaced!`);
   };
 
   const handleAddCriterion = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCritName) return;
 
-    const item: ScoreCriterion = {
+    const newCrit: ScoreCriterion = {
       id: `cr-${Date.now()}`,
       eventId: "ev-1",
       name: newCritName,
-      maxPoints: newCritPoints,
-      weightPercent: newCritPoints,
+      maxPoints: Number(newCritPoints),
+      weightPercent: Number(newCritPoints),
     };
-    setCriteria([...criteria, item]);
+
+    setCriteria([...criteria, newCrit]);
     setNewCritName("");
-    triggerSaved("✓ Score Evaluation Criterion Added!");
+    triggerSaved(`✓ Rubric Criterion '${newCrit.name}' Added!`);
   };
 
   const handlePublishWinner = (id: string) => {
-    const updated = winners.map((w) => (w.id === id ? { ...w, status: "PUBLISHED" as const } : w));
-    setWinners(updated);
-    triggerSaved("✓ Winner Scorecard Official Results Published Live!");
+    setWinners((prev) =>
+      prev.map((w) => (w.id === id ? { ...w, status: "PUBLISHED" as const } : w))
+    );
+    triggerSaved("✓ Winner Scorecard Officially Approved & Published Live!");
+  };
+
+  const handleSendJuryBroadcast = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!juryAnnTitle || !juryAnnMessage) return;
+
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const d = new Date();
+    const dateStr = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    const timeStr = d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true });
+
+    const newBc: JuryBroadcastMessage = {
+      id: `bc-${Date.now()}`,
+      targetAudience: juryAnnTarget,
+      urgency: juryAnnUrgency,
+      title: juryAnnTitle,
+      message: juryAnnMessage,
+      timestamp: `${dateStr} @ ${timeStr}`,
+      sender: "Super Admin Command HQ",
+    };
+
+    const current = getJuryBroadcasts();
+    saveJuryBroadcasts([newBc, ...current]);
+    setJuryAnnTitle("");
+    setJuryAnnMessage("");
+    triggerSaved(`✓ Jury Broadcast '${newBc.title}' Dispatched to ${juryAnnTarget}!`);
   };
 
   return (
     <div className="space-y-6 font-mono select-none">
       {/* MODULE HEADER */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-black/90 via-[#0A0D1A] to-[#05050A] border-2 border-arc-cyan/30 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-[0_0_40px_rgba(0,212,255,0.15)]">
+      <div className="p-6 rounded-3xl bg-gradient-to-r from-black/90 via-[#0A0D1A] to-[#05050A] border-2 border-metallic-gold/40 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-[0_0_40px_rgba(212,175,55,0.15)]">
         <div className="space-y-1">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-metallic-gold/10 border border-metallic-gold/30 text-metallic-gold text-[10px] font-bold uppercase tracking-widest">
-            <RiScales3Line />
-            <span>EXECUTIVE JURY & EVALUATION CONTROL</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-metallic-gold/15 border border-metallic-gold/40 text-metallic-gold text-[10px] font-bold uppercase tracking-widest">
+            <RiScales3Line className="animate-pulse" />
+            <span>EXECUTIVE JURY COMMAND & SCORECARD HUB</span>
           </div>
           <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
             Judge Command <span className="marvel-bang-comic-gradient font-black">Studio</span>
           </h2>
           <p className="text-xs text-white/60">
-            Assign judges, construct custom evaluation rubrics, review submitted scorecards & publish winner results.
+            Control jury credentials, score sheet rubrics, winner tie-breakers & official scorecard publishing.
           </p>
         </div>
 
@@ -259,10 +303,10 @@ export function JudgeCommandModule() {
 
           <button
             onClick={() => setShowAddJudgeModal(true)}
-            className="btn-primary py-2.5 px-5 text-xs font-bold uppercase flex items-center gap-2 cursor-pointer shadow-[0_0_15px_#ED1D24]"
+            className="px-4 py-2.5 bg-metallic-gold text-black font-bold text-xs rounded-xl hover:bg-white transition-colors cursor-pointer flex items-center gap-1.5 shadow-[0_0_20px_rgba(212,175,55,0.4)]"
           >
             <RiAddLine className="text-base" />
-            <span>+ Add Judge</span>
+            <span>+ Emplace Judge</span>
           </button>
         </div>
       </div>
@@ -274,7 +318,7 @@ export function JudgeCommandModule() {
           { id: "roster", label: `Judge Directory (${judges.length})`, icon: RiAwardLine },
           { id: "builder", label: "Score Sheet Builder", icon: RiFileTextLine },
           { id: "results", label: "Winner Scorecards & Tie-Breakers", icon: RiTrophyLine },
-          { id: "announcements", label: "Jury Broadcasts", icon: RiMegaphoneLine },
+          { id: "announcements", label: `Jury Broadcasts (${broadcasts.length})`, icon: RiMegaphoneLine },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -338,6 +382,7 @@ export function JudgeCommandModule() {
                     <span className="text-[10px] text-arc-cyan font-bold uppercase">{j.judgeCode} • {j.category}</span>
                     <h3 className="text-base font-bold text-white uppercase">{j.name}</h3>
                     <p className="text-xs text-white/60">{j.designation} at {j.organization}</p>
+                    <p className="text-[10px] text-metallic-gold font-mono">✉️ {j.email}</p>
                   </div>
                 </div>
                 <div className="pt-2 border-t border-white/10 flex justify-between items-center text-xs">
@@ -412,7 +457,6 @@ export function JudgeCommandModule() {
               </div>
             </div>
 
-
             {/* Permissions */}
             <div className="marvel-card p-6 rounded-3xl border border-arc-cyan/30 bg-[#0A0D1A] space-y-4">
               <h4 className="text-xs font-bold text-metallic-gold uppercase tracking-wider flex items-center gap-2">
@@ -457,44 +501,47 @@ export function JudgeCommandModule() {
       {activeTab === "builder" && (
         <div className="marvel-card p-6 md:p-8 rounded-3xl border border-arc-cyan/30 bg-[#0A0D1A] space-y-6">
           <div className="flex items-center justify-between border-b border-white/10 pb-4">
-            <h3 className="text-lg font-bold text-white uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
-              Custom Evaluation Score Sheet Builder
-            </h3>
+            <div>
+              <h3 className="text-lg font-bold text-white uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
+                Score Sheet Rubric Builder
+              </h3>
+              <p className="text-xs text-white/60">Configure rubric criteria points and weighting for hackathons and competitions.</p>
+            </div>
           </div>
 
-          <form onSubmit={handleAddCriterion} className="p-4 bg-black/60 border border-white/10 rounded-2xl space-y-3 text-xs">
-            <h4 className="font-bold text-metallic-gold uppercase tracking-wider">Add Evaluation Criterion</h4>
+          <form onSubmit={handleAddCriterion} className="p-4 bg-black/40 border border-white/10 rounded-2xl space-y-3 text-xs">
+            <h4 className="font-bold text-metallic-gold uppercase">Add Custom Evaluation Criterion</h4>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <input
                 type="text"
-                placeholder="Criterion Name (e.g. Creativity)"
+                placeholder="Criterion Name (e.g. Code Architecture)"
                 value={newCritName}
                 onChange={(e) => setNewCritName(e.target.value)}
                 required
-                className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white"
+                className="sm:col-span-2 px-4 py-2.5 bg-black/60 border border-white/10 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
               />
               <input
                 type="number"
-                placeholder="Max Points (e.g. 25)"
+                placeholder="Max Points"
                 value={newCritPoints}
                 onChange={(e) => setNewCritPoints(Number(e.target.value))}
                 required
-                className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white"
+                className="px-4 py-2.5 bg-black/60 border border-white/10 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
               />
-              <button type="submit" className="px-5 py-2.5 bg-arc-cyan text-black font-bold rounded-xl hover:bg-white transition-colors cursor-pointer">
-                + Add Criterion
-              </button>
             </div>
+            <button type="submit" className="btn-primary py-2 px-5 font-bold uppercase cursor-pointer">
+              + Add Criterion to Rubric
+            </button>
           </form>
 
           <div className="space-y-3 text-xs">
             {criteria.map((c) => (
               <div key={c.id} className="p-4 bg-black/40 border border-white/10 rounded-2xl flex items-center justify-between">
                 <div>
-                  <span className="font-bold text-white text-sm">{c.name}</span>
-                  <span className="text-white/40 ml-3">Weight: {c.weightPercent}%</span>
+                  <h5 className="font-bold text-white text-sm">{c.name}</h5>
+                  <span className="text-white/50 text-[11px]">Weight: {c.weightPercent}% of Total Score</span>
                 </div>
-                <span className="px-3 py-1 bg-metallic-gold/20 text-metallic-gold font-bold rounded-lg text-xs">
+                <span className="px-3 py-1 bg-metallic-gold/20 text-metallic-gold font-bold rounded-xl border border-metallic-gold/40">
                   Max: {c.maxPoints} pts
                 </span>
               </div>
@@ -554,6 +601,127 @@ export function JudgeCommandModule() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* 5. JURY BROADCASTS DISPATCH STUDIO */}
+      {activeTab === "announcements" && (
+        <div className="space-y-6">
+          <div className="marvel-card p-6 md:p-8 rounded-3xl border border-metallic-gold/30 bg-[#0A0D1A] space-y-6">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div>
+                <span className="text-[10px] text-metallic-gold font-bold uppercase tracking-wider block">REAL-TIME JURY DISPATCH STUDIO</span>
+                <h3 className="text-xl font-black text-white uppercase tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
+                  Send Targeted Jury Broadcast
+                </h3>
+              </div>
+              <span className="px-3 py-1 rounded-full bg-metallic-gold/20 border border-metallic-gold/40 text-metallic-gold text-xs font-bold font-mono">
+                ⚡ BroadcastChannel Sync Active
+              </span>
+            </div>
+
+            <form onSubmit={handleSendJuryBroadcast} className="space-y-4 text-xs">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-white/70 font-bold mb-1">Target Jury Audience</label>
+                  <select
+                    value={juryAnnTarget}
+                    onChange={(e) => setJuryAnnTarget(e.target.value)}
+                    className="w-full px-4 py-3 bg-black/60 border border-white/15 rounded-xl text-white focus:border-metallic-gold focus:outline-none"
+                  >
+                    <option value="All Jury Members">All Emplaced Jury Members</option>
+                    <option value="Software & AI Jury">Software & AI Hackathon Jury</option>
+                    <option value="Cultural & Arts Jury">Cultural & Arts Jury</option>
+                    <option value="Gaming & Esports Jury">Esports & Gaming Jury</option>
+                    <option value="Executive Head Judges">Executive Head Judges Only</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-white/70 font-bold mb-1">Urgency Level</label>
+                  <select
+                    value={juryAnnUrgency}
+                    onChange={(e) => setJuryAnnUrgency(e.target.value as any)}
+                    className="w-full px-4 py-3 bg-black/60 border border-white/15 rounded-xl text-white focus:border-metallic-gold focus:outline-none"
+                  >
+                    <option value="NORMAL">NORMAL BRIEFING</option>
+                    <option value="HIGH">HIGH ALERT</option>
+                    <option value="URGENT">URGENT DEADLINE EXTENSION</option>
+                    <option value="CRITICAL">CRITICAL TIE-BREAKER VERDICT</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-white/70 font-bold mb-1">Broadcast Headline & Subject</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Round 2 Evaluation Scorecard Deadline Extended by 15 Mins"
+                  value={juryAnnTitle}
+                  onChange={(e) => setJuryAnnTitle(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 bg-black/60 border border-white/15 rounded-xl text-white focus:border-metallic-gold focus:outline-none font-bold"
+                />
+              </div>
+
+              <div>
+                <label className="block text-white/70 font-bold mb-1">Detailed Broadcast Message Body</label>
+                <textarea
+                  rows={3}
+                  placeholder="Enter specific instructions or scoring guidelines for jury members..."
+                  value={juryAnnMessage}
+                  onChange={(e) => setJuryAnnMessage(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 bg-black/60 border border-white/15 rounded-xl text-white focus:border-metallic-gold focus:outline-none"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="px-6 py-3 bg-metallic-gold text-black font-extrabold text-xs uppercase rounded-xl hover:bg-white transition-all cursor-pointer flex items-center gap-2 shadow-[0_0_25px_rgba(212,175,55,0.4)]"
+              >
+                <RiMegaphoneLine className="text-base" />
+                <span>Dispatch Targeted Jury Broadcast</span>
+              </button>
+            </form>
+          </div>
+
+          {/* Broadcast History Log */}
+          <div className="marvel-card p-6 md:p-8 rounded-3xl border border-metallic-gold/30 bg-[#0A0D1A] space-y-4">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2" style={{ fontFamily: "var(--font-heading)" }}>
+                <RiTimeLine className="text-metallic-gold" />
+                <span>Sent Jury Broadcast History & Delivery Status ({broadcasts.length})</span>
+              </h3>
+              <span className="text-[10px] text-emerald-400 font-bold font-mono">100% Delivery Verified</span>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              {broadcasts.map((bc: JuryBroadcastMessage) => (
+                <div key={bc.id} className="p-5 bg-black/40 border border-white/10 rounded-2xl space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-0.5 rounded bg-metallic-gold/20 text-metallic-gold font-bold text-[9px] uppercase">
+                        {bc.urgency}
+                      </span>
+                      <span className="font-bold text-white text-sm">{bc.title}</span>
+                      <span className="px-2 py-0.5 rounded bg-arc-cyan/20 text-arc-cyan font-bold text-[9px]">
+                        Target: {bc.targetAudience}
+                      </span>
+                    </div>
+                    <span className="text-metallic-gold font-mono font-bold text-[10px]">{bc.timestamp}</span>
+                  </div>
+
+                  <p className="text-white/70">{bc.message}</p>
+
+                  <div className="flex justify-between items-center text-[10px] text-white/40 border-t border-white/10 pt-2">
+                    <span>Dispatched by: {bc.sender || "Super Admin Command HQ"}</span>
+                    <span className="text-emerald-400 font-bold">● Active on Judge Dashboards</span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}

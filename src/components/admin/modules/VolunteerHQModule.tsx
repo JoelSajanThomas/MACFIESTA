@@ -209,14 +209,6 @@ export function VolunteerHQModule() {
           )}
 
           <button
-            onClick={() => setShowTaskModal(true)}
-            className="btn-primary py-2.5 px-4 text-xs font-bold uppercase flex items-center gap-2 cursor-pointer shadow-[0_0_15px_#ED1D24]"
-          >
-            <RiTaskLine className="text-base" />
-            <span>+ Assign Task</span>
-          </button>
-
-          <button
             onClick={() => setShowAddModal(true)}
             className="px-4 py-2.5 bg-arc-cyan text-black font-bold text-xs rounded-xl hover:bg-white transition-colors cursor-pointer flex items-center gap-1.5"
           >
@@ -224,6 +216,7 @@ export function VolunteerHQModule() {
             <span>+ Add Volunteer</span>
           </button>
         </div>
+
       </div>
 
       {/* NAV TAB RAIL */}

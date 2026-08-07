@@ -149,19 +149,13 @@ export function VolunteerManagement() {
 
         <div className="flex items-center gap-3">
           <button
-            onClick={() => setShowTaskModal(true)}
-            className="btn-primary text-xs font-bold uppercase flex items-center gap-1.5 px-4 py-2.5 rounded-xl cursor-pointer shadow-[0_0_15px_#ED1D24]"
-          >
-            <RiTaskLine size={16} /> + Assign Task
-          </button>
-
-          <button
             onClick={() => setShowAddModal(true)}
             className="px-4 py-2.5 bg-arc-cyan text-black font-bold text-xs rounded-xl hover:bg-white transition-colors cursor-pointer flex items-center gap-1.5"
           >
             <RiAddLine size={16} /> + Register Volunteer
           </button>
         </div>
+
       </div>
 
       {/* Volunteers Table */}
