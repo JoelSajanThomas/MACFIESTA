@@ -38,6 +38,10 @@ import { ProfileModule } from "@/components/admin/modules/ProfileModule";
 import { HomepageBuilderModule } from "@/components/admin/modules/HomepageBuilderModule";
 import { CMSModule } from "@/components/admin/modules/CMSModule";
 import { AICopilotModule } from "@/components/admin/modules/AICopilotModule";
+import { VolunteerHQModule } from "@/components/admin/modules/VolunteerHQModule";
+import { JudgeCommandModule } from "@/components/admin/modules/JudgeCommandModule";
+
+
 
 export default function AdminDashboardPage() {
   const { user, logout } = useAuthStore();
@@ -197,10 +201,26 @@ export default function AdminDashboardPage() {
           />
         );
 
+      // Dedicated Volunteer HQ & Judge Command Portals
+      case "volunteers.hq":
+      case "volunteers.hq.dashboard":
+      case "volunteers.hq.roster":
+      case "volunteers.hq.tasks":
+      case "volunteers.hq.attendance":
+        return <VolunteerHQModule />;
+
+      case "judges.command":
+      case "judges.command.dashboard":
+      case "judges.command.roster":
+      case "judges.command.builder":
+      case "judges.command.results":
+        return <JudgeCommandModule />;
+
       // 2. Festival Workspace
       case "festival":
       case "festival.master":
         return <FestivalManagement />;
+
       case "events":
       case "events.list":
       case "events.create":

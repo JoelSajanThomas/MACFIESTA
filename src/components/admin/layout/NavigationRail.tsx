@@ -10,6 +10,8 @@ import {
   RiMegaphoneLine,
   RiFileChartLine,
   RiSettings3Line,
+  RiUserHeartLine,
+  RiScales3Line,
 } from "react-icons/ri";
 
 export interface NavPage {
@@ -35,6 +37,31 @@ export const MODULES: NavModule[] = [
     desc: "Command Center & Live Telemetry",
     pages: [],
   },
+  {
+    id: "volunteers.hq",
+    icon: RiUserHeartLine,
+    label: "Volunteer HQ",
+    desc: "Complete Volunteer Control, Shift & Duty Roster",
+    pages: [
+      { id: "volunteers.hq.dashboard", label: "Volunteer Operations Hub", badge: "Live", desc: "Duty telemetry & live tracking" },
+      { id: "volunteers.hq.roster", label: "Volunteer Staff Roster", desc: "Manage accounts & RBAC permissions" },
+      { id: "volunteers.hq.tasks", label: "Task & Duty Assignments", desc: "Assign events, venues & checklists" },
+      { id: "volunteers.hq.attendance", label: "Attendance & Duty Log", desc: "Clock in/out logs & total hours" },
+    ],
+  },
+  {
+    id: "judges.command",
+    icon: RiScales3Line,
+    label: "Judge Command",
+    desc: "Judge Allocation, Scorecard Builder & Results",
+    pages: [
+      { id: "judges.command.dashboard", label: "Judge Command Center", badge: "Live", desc: "Judging status & scorecard telemetry" },
+      { id: "judges.command.roster", label: "Judge Directory & Profiles", desc: "Manage judge credentials & events" },
+      { id: "judges.command.builder", label: "Score Sheet Builder", desc: "Custom evaluation criteria & weights" },
+      { id: "judges.command.results", label: "Result Review & Approval", desc: "Approve winner scorecards & ties" },
+    ],
+  },
+
   {
     id: "festival",
     icon: RiCompass3Line,
