@@ -45,7 +45,8 @@ const socialIcons: Record<string, React.ComponentType<{ size?: number }>> = {
 export function Footer() {
   const { settings } = useFestivalControl();
   const pathname = usePathname();
-  if (pathname?.startsWith("/admin")) return null;
+  if (pathname?.startsWith("/admin") || pathname?.startsWith("/volunteer") || pathname?.startsWith("/volunteers")) return null;
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };

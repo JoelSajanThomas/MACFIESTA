@@ -41,6 +41,10 @@ export function Navbar() {
   const { settings } = useFestivalControl();
   const pathname = usePathname();
   const isAdminPage = pathname?.startsWith("/admin");
+  const isStandalonePage = pathname?.startsWith("/admin") || pathname?.startsWith("/volunteer") || pathname?.startsWith("/volunteers");
+
+
+
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -77,7 +81,8 @@ export function Navbar() {
 
   const closeMobile = useCallback(() => setMobileMenuOpen(false), []);
 
-  if (isAdminPage) return null;
+  if (isStandalonePage) return null;
+
 
   return (
     <>
