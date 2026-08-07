@@ -12,7 +12,9 @@ import {
   RiSparklingLine,
   RiArrowLeftSLine,
   RiArrowRightSLine,
+  RiDownloadCloud2Line,
 } from "react-icons/ri";
+
 import { useGalleryItems, GalleryItem } from "@/lib/galleryStore";
 
 export default function GalleryPage() {
@@ -231,9 +233,9 @@ export default function GalleryPage() {
 
             {/* Central Media Content Box */}
             <div className="max-w-5xl w-full glass p-6 rounded-3xl border border-white/20 bg-[#0A0D1A] space-y-4 relative flex flex-col justify-between max-h-[90vh]">
-              {/* Media Title Header & Item Counter */}
-              <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                <div className="flex items-center gap-2 truncate pr-12">
+              {/* Media Title Header & Download Action & Item Counter */}
+              <div className="flex items-center justify-between border-b border-white/10 pb-3 gap-2">
+                <div className="flex items-center gap-2 truncate pr-2">
                   <span
                     className={`px-3 py-0.5 rounded-full text-[10px] font-black uppercase ${
                       activeItem.type === "image"
@@ -248,12 +250,47 @@ export default function GalleryPage() {
                   </h3>
                 </div>
 
-                <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-metallic-gold font-bold shrink-0">
-                  {selectedIndex + 1} / {filteredMedia.length}
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={async () => {
+                      const cleanTitle = activeItem.title.replace(/[^a-zA-Z0-9_-]/g, "_") || "macfiesta_media";
+                      const ext = activeItem.type === "video" ? ".mp4" : ".jpg";
+                      try {
+                        const res = await fetch(activeItem.url);
+                        const blob = await res.blob();
+                        const blobUrl = URL.createObjectURL(blob);
+                        const a = document.createElement("a");
+                        a.href = blobUrl;
+                        a.download = `${cleanTitle}${ext}`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
+                      } catch {
+                        const a = document.createElement("a");
+                        a.href = activeItem.url;
+                        a.download = `${cleanTitle}${ext}`;
+                        a.target = "_blank";
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                      }
+                    }}
+                    className="px-3.5 py-1.5 rounded-xl bg-metallic-gold text-black font-extrabold text-xs uppercase hover:bg-white transition-all cursor-pointer flex items-center gap-1.5 shadow-[0_0_15px_#FFD700]"
+                    title="Download Media Asset to Device"
+                  >
+                    <RiDownloadCloud2Line className="text-sm" />
+                    <span>Download {activeItem.type === "video" ? "Video" : "Photo"}</span>
+                  </button>
+
+                  <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-metallic-gold font-bold">
+                    {selectedIndex + 1} / {filteredMedia.length}
+                  </div>
                 </div>
               </div>
 
               {/* Media Display Container */}
+              <div className="aspect-video w-full bg-black rounded-2xl overflow-hidden relative border border-white/10 flex items-center justify-center">
                 {activeItem.type === "image" ? (
                   <img
                     src={encodeURI(activeItem.url)}
@@ -280,7 +317,7 @@ export default function GalleryPage() {
                     Your browser does not support playing this video format directly.
                   </video>
                 )}
-
+              </div>
 
               {/* Navigation Hint Footer */}
               <div className="flex items-center justify-between text-[11px] text-white/50 pt-2 border-t border-white/10">
@@ -292,6 +329,7 @@ export default function GalleryPage() {
                   Press <kbd className="px-2 py-0.5 bg-black/60 border border-white/20 rounded text-white font-mono">Esc</kbd> to exit
                 </button>
               </div>
+
             </div>
           </motion.div>
         )}
