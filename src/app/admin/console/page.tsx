@@ -207,14 +207,15 @@ export default function AdminDashboardPage() {
       case "volunteers.hq.roster":
       case "volunteers.hq.tasks":
       case "volunteers.hq.attendance":
-        return <VolunteerHQModule />;
+        return <VolunteerHQModule activePage={activePage} />;
 
       case "judges.command":
       case "judges.command.dashboard":
       case "judges.command.roster":
       case "judges.command.builder":
       case "judges.command.results":
-        return <JudgeCommandModule />;
+        return <JudgeCommandModule activePage={activePage} />;
+
 
       // 2. Festival Workspace
       case "festival":
