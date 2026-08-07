@@ -12,9 +12,7 @@ import {
   RiSparklingLine,
   RiArrowLeftSLine,
   RiArrowRightSLine,
-  RiDownloadCloud2Line,
 } from "react-icons/ri";
-
 import { useGalleryItems, GalleryItem } from "@/lib/galleryStore";
 
 export default function GalleryPage() {
@@ -94,11 +92,10 @@ export default function GalleryPage() {
                   setFilterType(tab.id);
                   setSelectedIndex(null);
                 }}
-                className={`px-5 py-2.5 rounded-2xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer border ${
-                  filterType === tab.id
+                className={`px-5 py-2.5 rounded-2xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer border ${filterType === tab.id
                     ? "bg-marvel-red text-white border-marvel-red shadow-[0_0_20px_#ED1D24]"
                     : "bg-black/60 text-white/60 hover:text-white border-white/10 hover:bg-white/5"
-                }`}
+                  }`}
                 style={{ fontFamily: "var(--font-heading)" }}
               >
                 {tab.label}
@@ -115,11 +112,10 @@ export default function GalleryPage() {
                   setFilterCategory(cat);
                   setSelectedIndex(null);
                 }}
-                className={`px-4 py-2 rounded-full text-[11px] font-bold uppercase tracking-widest whitespace-nowrap transition-all cursor-pointer ${
-                  filterCategory === cat
+                className={`px-4 py-2 rounded-full text-[11px] font-bold uppercase tracking-widest whitespace-nowrap transition-all cursor-pointer ${filterCategory === cat
                     ? "bg-metallic-gold text-black font-extrabold shadow-[0_0_15px_#FFD700]"
                     : "bg-white/5 text-white/60 hover:text-white border border-white/10"
-                }`}
+                  }`}
                 style={{ fontFamily: "var(--font-heading)" }}
               >
                 {cat}
@@ -142,20 +138,18 @@ export default function GalleryPage() {
                 className="relative aspect-video overflow-hidden rounded-3xl border border-white/10 group shadow-2xl cursor-pointer bg-black/80"
               >
                 <img
-                  src={encodeURI(item.type === "image" ? item.url : item.thumbnailUrl || item.url)}
+                  src={item.type === "image" ? item.url : item.thumbnailUrl || item.url}
                   alt={item.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
 
-
                 {/* Media Badges */}
                 <div className="absolute top-3 left-3 z-10 flex gap-2">
                   <span
-                    className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase border ${
-                      item.type === "image"
+                    className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase border ${item.type === "image"
                         ? "bg-arc-cyan/20 border-arc-cyan/40 text-arc-cyan"
                         : "bg-marvel-red/20 border-marvel-red/40 text-marvel-red"
-                    }`}
+                      }`}
                   >
                     {item.type === "image" ? "📷 PHOTO" : "🎥 VIDEO"}
                   </span>
@@ -233,15 +227,14 @@ export default function GalleryPage() {
 
             {/* Central Media Content Box */}
             <div className="max-w-5xl w-full glass p-6 rounded-3xl border border-white/20 bg-[#0A0D1A] space-y-4 relative flex flex-col justify-between max-h-[90vh]">
-              {/* Media Title Header & Download Action & Item Counter */}
-              <div className="flex items-center justify-between border-b border-white/10 pb-3 gap-2">
-                <div className="flex items-center gap-2 truncate pr-2">
+              {/* Media Title Header & Item Counter */}
+              <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                <div className="flex items-center gap-2 truncate pr-12">
                   <span
-                    className={`px-3 py-0.5 rounded-full text-[10px] font-black uppercase ${
-                      activeItem.type === "image"
+                    className={`px-3 py-0.5 rounded-full text-[10px] font-black uppercase ${activeItem.type === "image"
                         ? "bg-arc-cyan/20 border border-arc-cyan/40 text-arc-cyan"
                         : "bg-marvel-red/20 border border-marvel-red/40 text-marvel-red"
-                    }`}
+                      }`}
                   >
                     {activeItem.type.toUpperCase()} · {activeItem.category}
                   </span>
@@ -250,42 +243,8 @@ export default function GalleryPage() {
                   </h3>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
-                  <button
-                    onClick={async () => {
-                      const cleanTitle = activeItem.title.replace(/[^a-zA-Z0-9_-]/g, "_") || "macfiesta_media";
-                      const ext = activeItem.type === "video" ? ".mp4" : ".jpg";
-                      try {
-                        const res = await fetch(activeItem.url);
-                        const blob = await res.blob();
-                        const blobUrl = URL.createObjectURL(blob);
-                        const a = document.createElement("a");
-                        a.href = blobUrl;
-                        a.download = `${cleanTitle}${ext}`;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
-                      } catch {
-                        const a = document.createElement("a");
-                        a.href = activeItem.url;
-                        a.download = `${cleanTitle}${ext}`;
-                        a.target = "_blank";
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                      }
-                    }}
-                    className="px-3.5 py-1.5 rounded-xl bg-metallic-gold text-black font-extrabold text-xs uppercase hover:bg-white transition-all cursor-pointer flex items-center gap-1.5 shadow-[0_0_15px_#FFD700]"
-                    title="Download Media Asset to Device"
-                  >
-                    <RiDownloadCloud2Line className="text-sm" />
-                    <span>Download {activeItem.type === "video" ? "Video" : "Photo"}</span>
-                  </button>
-
-                  <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-metallic-gold font-bold">
-                    {selectedIndex + 1} / {filteredMedia.length}
-                  </div>
+                <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-metallic-gold font-bold shrink-0">
+                  {selectedIndex + 1} / {filteredMedia.length}
                 </div>
               </div>
 
@@ -293,29 +252,17 @@ export default function GalleryPage() {
               <div className="aspect-video w-full bg-black rounded-2xl overflow-hidden relative border border-white/10 flex items-center justify-center">
                 {activeItem.type === "image" ? (
                   <img
-                    src={encodeURI(activeItem.url)}
+                    src={activeItem.url}
                     alt={activeItem.title}
                     className="w-full h-full object-contain"
                   />
-                ) : activeItem.url.includes("youtube.com/embed/") ? (
-                  <iframe
-                    src={activeItem.url}
-                    className="w-full h-full border-0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
                 ) : (
                   <video
-                    key={activeItem.url}
+                    src={activeItem.url}
                     controls
                     autoPlay
-                    playsInline
-                    className="w-full h-full object-contain bg-black"
-                  >
-                    <source src={encodeURI(activeItem.url)} />
-                    <source src={activeItem.url} />
-                    Your browser does not support playing this video format directly.
-                  </video>
+                    className="w-full h-full object-contain"
+                  />
                 )}
               </div>
 
@@ -329,7 +276,6 @@ export default function GalleryPage() {
                   Press <kbd className="px-2 py-0.5 bg-black/60 border border-white/20 rounded text-white font-mono">Esc</kbd> to exit
                 </button>
               </div>
-
             </div>
           </motion.div>
         )}

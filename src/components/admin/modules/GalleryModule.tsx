@@ -15,6 +15,8 @@ import {
   RiStarLine,
   RiStarFill,
   RiUploadCloud2Line,
+  RiImageEditLine,
+  RiSaveLine,
 } from "react-icons/ri";
 import { useGalleryItems, GalleryItem, normalizeMediaPath } from "@/lib/galleryStore";
 
@@ -35,8 +37,14 @@ export function GalleryModule() {
   const [itemThumbUrl, setItemThumbUrl] = useState("");
   const [isFeatured, setIsFeatured] = useState(false);
 
-  // File Upload Ref
+  // Edit Cover Modal State
+  const [editingCoverItem, setEditingCoverItem] = useState<GalleryItem | null>(null);
+  const [editCoverUrl, setEditCoverUrl] = useState("");
+
+  // File Upload Refs
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const coverFileInputRef = useRef<HTMLInputElement | null>(null);
+  const editCoverFileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Preview Modal
   const [previewItem, setPreviewItem] = useState<GalleryItem | null>(null);
@@ -56,7 +64,7 @@ export function GalleryModule() {
     return matchType && matchCat && matchSearch;
   });
 
-  // Native File Picker Handler
+  // Native File Picker Handler for Main Media
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -74,7 +82,37 @@ export function GalleryModule() {
           const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
           setItemTitle(nameWithoutExt);
         }
-        triggerToast(`✓ Loaded '${file.name}' from device!`);
+        triggerToast(`✓ Loaded '${file.name}' from system folder!`);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Native Cover Image File Picker Handler for Add Modal
+  const handleCoverFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      if (dataUrl) {
+        setItemThumbUrl(dataUrl);
+        triggerToast(`✓ Loaded cover image '${file.name}'!`);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Native Cover Image File Picker Handler for Edit Cover Modal
+  const handleEditCoverFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      if (dataUrl) {
+        setEditCoverUrl(dataUrl);
+        triggerToast(`✓ Selected cover image '${file.name}'!`);
       }
     };
     reader.readAsDataURL(file);
@@ -85,17 +123,18 @@ export function GalleryModule() {
     if (!itemTitle || !itemUrl) return;
 
     const normalizedUrl = normalizeMediaPath(itemUrl);
+    const normalizedCover = itemThumbUrl ? normalizeMediaPath(itemThumbUrl) : (itemType === "image" ? normalizedUrl : "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=800");
 
     addItem({
       type: itemType,
       title: itemTitle,
       category: itemCategory,
       url: normalizedUrl,
-      thumbnailUrl: itemThumbUrl ? normalizeMediaPath(itemThumbUrl) : (itemType === "image" ? normalizedUrl : "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=800"),
+      thumbnailUrl: normalizedCover,
       featured: isFeatured,
     });
 
-    triggerToast(`✓ New ${itemType === "image" ? "Photo" : "Video"} Published & Synchronized Live!`);
+    triggerToast(`✓ New ${itemType === "image" ? "Photo" : "Video"} Published Live!`);
 
     // Reset Form
     setItemTitle("");
@@ -103,6 +142,21 @@ export function GalleryModule() {
     setItemThumbUrl("");
     setIsFeatured(false);
     setShowAddModal(false);
+  };
+
+  // Change Cover Image Handler for Existing Item
+  const handleSaveCoverImage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingCoverItem || !editCoverUrl) return;
+
+    const cleanCover = normalizeMediaPath(editCoverUrl);
+    const updated = items.map((i) =>
+      i.id === editingCoverItem.id ? { ...i, thumbnailUrl: cleanCover } : i
+    );
+    saveItems(updated);
+    triggerToast(`✓ Cover Image Updated for '${editingCoverItem.title}'!`);
+    setEditingCoverItem(null);
+    setEditCoverUrl("");
   };
 
   const handleToggleFeatured = (id: string) => {
@@ -139,7 +193,7 @@ export function GalleryModule() {
             Media Gallery <span className="marvel-bang-comic-gradient font-black">Manager</span>
           </h2>
           <p className="text-xs text-white/50">
-            Upload photos and videos directly from your computer or URL, and publish live to public website.
+            Add downloaded videos & photos from system folders, change cover images, and publish live.
           </p>
         </div>
 
@@ -280,7 +334,7 @@ export function GalleryModule() {
                 </span>
               </div>
 
-              <div className="absolute top-2 right-2">
+              <div className="absolute top-2 right-2 flex items-center gap-1">
                 <button
                   onClick={() => handleToggleFeatured(item.id)}
                   className={`p-1.5 rounded-lg border transition-all cursor-pointer ${
@@ -294,12 +348,25 @@ export function GalleryModule() {
                 </button>
               </div>
 
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+              {/* Hover Actions: Play & Change Cover Image */}
+              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                 <button
                   onClick={() => setPreviewItem(item)}
                   className="p-3 rounded-full bg-arc-cyan text-black font-bold text-sm hover:scale-110 transition-transform cursor-pointer shadow-lg"
+                  title="Play / View Asset"
                 >
                   {item.type === "video" ? <RiPlayLine /> : <RiEyeLine />}
+                </button>
+
+                <button
+                  onClick={() => {
+                    setEditingCoverItem(item);
+                    setEditCoverUrl(item.thumbnailUrl || item.url);
+                  }}
+                  className="p-3 rounded-full bg-metallic-gold text-black font-bold text-sm hover:scale-110 transition-transform cursor-pointer shadow-lg"
+                  title="Change Cover Image"
+                >
+                  <RiImageEditLine />
                 </button>
               </div>
             </div>
@@ -309,7 +376,16 @@ export function GalleryModule() {
               <p className="text-[10px] text-white/40 font-mono truncate">{item.url}</p>
 
               <div className="pt-2 border-t border-white/10 flex items-center justify-between">
-                <span className="text-[9px] text-white/40">{item.date}</span>
+                <button
+                  onClick={() => {
+                    setEditingCoverItem(item);
+                    setEditCoverUrl(item.thumbnailUrl || item.url);
+                  }}
+                  className="text-[10px] text-arc-cyan font-bold hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  <RiImageEditLine size={12} />
+                  <span>Change Cover</span>
+                </button>
 
                 <button
                   onClick={() => handleDelete(item.id, item.title)}
@@ -324,10 +400,10 @@ export function GalleryModule() {
         ))}
       </div>
 
-      {/* ADD MEDIA MODAL WITH NATIVE FILE PICKER */}
+      {/* ADD MEDIA MODAL WITH NATIVE FILE PICKER & CUSTOM COVER OPTION */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="max-w-md w-full glass p-6 rounded-3xl border border-arc-cyan/40 bg-[#0A0D1A] space-y-4">
+          <div className="max-w-md w-full glass p-6 rounded-3xl border border-arc-cyan/40 bg-[#0A0D1A] space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
                 {itemType === "image" ? <RiImageAddLine className="text-arc-cyan" /> : <RiMovieLine className="text-marvel-red" />}
@@ -339,6 +415,7 @@ export function GalleryModule() {
             </div>
 
             <form onSubmit={handleAddItem} className="space-y-3 text-xs">
+              {/* Media File Picker */}
               <input
                 ref={fileInputRef}
                 type="file"
@@ -353,11 +430,12 @@ export function GalleryModule() {
                 className="w-full py-3 px-4 rounded-xl bg-white/10 hover:bg-arc-cyan hover:text-black border border-dashed border-arc-cyan/50 text-arc-cyan font-bold transition-all cursor-pointer flex items-center justify-center gap-2 shadow-inner"
               >
                 <RiUploadCloud2Line className="text-lg" />
-                <span>📁 Upload File from Computer / Device</span>
+                <span>📁 Select Downloaded Video/Photo File</span>
               </button>
 
-              <div className="text-center text-[10px] text-white/40 font-mono">OR Enter URL / Local System Path Below</div>
+              <div className="text-center text-[10px] text-white/40 font-mono">OR Enter System Path / URL Below</div>
 
+              {/* Media Type Selector */}
               <div>
                 <label className="block text-white/70 font-bold mb-1">Asset Category Type</label>
                 <div className="grid grid-cols-2 gap-2">
@@ -428,6 +506,36 @@ export function GalleryModule() {
                 />
               </div>
 
+              {/* Cover Image Customizer Field */}
+              <div className="pt-2 border-t border-white/10 space-y-2">
+                <label className="block text-metallic-gold font-bold">Custom Cover Image (Optional)</label>
+
+                <input
+                  ref={coverFileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleCoverFileUpload}
+                  className="hidden"
+                />
+
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Paste Cover Image URL / Path or click Upload"
+                    value={itemThumbUrl}
+                    onChange={(e) => setItemThumbUrl(e.target.value)}
+                    className="flex-1 px-3 py-2 bg-black/60 border border-white/10 rounded-xl text-white font-mono text-xs focus:border-metallic-gold focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => coverFileInputRef.current?.click()}
+                    className="px-3 py-2 rounded-xl bg-metallic-gold/20 text-metallic-gold border border-metallic-gold/40 text-xs font-bold hover:bg-metallic-gold hover:text-black transition-colors cursor-pointer shrink-0"
+                  >
+                    📁 Cover
+                  </button>
+                </div>
+              </div>
+
               <div className="flex justify-end gap-2 pt-3 border-t border-white/10">
                 <button
                   type="button"
@@ -441,6 +549,80 @@ export function GalleryModule() {
                   className="px-5 py-2 rounded-xl bg-arc-cyan text-black font-bold uppercase cursor-pointer shadow-[0_0_15px_#00D4FF]"
                 >
                   Publish Asset Live
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* EDIT COVER IMAGE MODAL FOR EXISTING ITEMS */}
+      {editingCoverItem && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="max-w-md w-full glass p-6 rounded-3xl border border-metallic-gold/40 bg-[#0A0D1A] space-y-4">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <h3 className="text-sm font-bold text-metallic-gold uppercase tracking-wider flex items-center gap-2">
+                <RiImageEditLine size={18} />
+                <span>Change Cover Image: {editingCoverItem.title}</span>
+              </h3>
+              <button onClick={() => setEditingCoverItem(null)} className="p-1 text-white/40 hover:text-white cursor-pointer">
+                <RiCloseLine size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveCoverImage} className="space-y-4 text-xs">
+              <input
+                ref={editCoverFileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleEditCoverFileUpload}
+                className="hidden"
+              />
+
+              <button
+                type="button"
+                onClick={() => editCoverFileInputRef.current?.click()}
+                className="w-full py-3 px-4 rounded-xl bg-metallic-gold/10 hover:bg-metallic-gold hover:text-black border border-dashed border-metallic-gold/50 text-metallic-gold font-bold transition-all cursor-pointer flex items-center justify-center gap-2 shadow-inner"
+              >
+                <RiUploadCloud2Line className="text-lg" />
+                <span>📁 Select New Cover Image from Computer</span>
+              </button>
+
+              <div className="text-center text-[10px] text-white/40 font-mono">OR Enter Cover Image URL / Path Below</div>
+
+              <div>
+                <label className="block text-white/70 font-bold mb-1">Cover Image URL / System Path</label>
+                <input
+                  type="text"
+                  placeholder="https://... or C:\...\cover.jpg"
+                  value={editCoverUrl}
+                  onChange={(e) => setEditCoverUrl(e.target.value)}
+                  required
+                  className="w-full px-4 py-2.5 bg-black/60 border border-white/10 rounded-xl text-white font-mono focus:border-metallic-gold focus:outline-none"
+                />
+              </div>
+
+              {/* Cover Image Preview */}
+              {editCoverUrl && (
+                <div className="aspect-video w-full bg-black rounded-xl overflow-hidden relative border border-white/10">
+                  <img src={encodeURI(normalizeMediaPath(editCoverUrl))} alt="Cover Preview" className="w-full h-full object-cover" />
+                </div>
+              )}
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setEditingCoverItem(null)}
+                  className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 font-bold cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-metallic-gold text-black font-bold uppercase cursor-pointer shadow-[0_0_15px_#FFD700] flex items-center gap-1.5"
+                >
+                  <RiSaveLine className="text-base" />
+                  <span>Update Cover Image</span>
                 </button>
               </div>
             </form>
