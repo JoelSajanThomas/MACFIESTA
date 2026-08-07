@@ -25,6 +25,8 @@ import {
   RiBuilding2Line,
 } from "react-icons/ri";
 import { getVolunteersList, VolunteerUser } from "@/lib/volunteerStore";
+import { recordUserLogin } from "@/lib/auditLogStore";
+
 
 export default function VolunteerLoginPage() {
   const router = useRouter();
@@ -70,6 +72,13 @@ export default function VolunteerLoginPage() {
 
       if (matched) {
         setAuthenticatedSuccess(true);
+        recordUserLogin(
+          "VOLUNTEER",
+          matched.name,
+          matched.volunteerCode,
+          matched.email,
+          `Volunteer Portal Authentication Login (${matched.department})`
+        );
         if (typeof window !== "undefined") {
           localStorage.setItem("macfiesta_active_volunteer_id", matched.id);
           localStorage.setItem(
@@ -77,6 +86,7 @@ export default function VolunteerLoginPage() {
             JSON.stringify({ token: "vol-jwt-token", user: matched })
           );
         }
+
         setTimeout(() => {
           router.replace("/volunteer/dashboard");
         }, 800);

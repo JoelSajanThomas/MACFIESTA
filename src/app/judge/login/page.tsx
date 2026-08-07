@@ -23,6 +23,8 @@ import {
   RiSparklingLine,
 } from "react-icons/ri";
 import { getJudgesList, JudgeUser } from "@/lib/judgeStore";
+import { recordUserLogin } from "@/lib/auditLogStore";
+
 
 export default function JudgeLoginPage() {
   const router = useRouter();
@@ -68,6 +70,13 @@ export default function JudgeLoginPage() {
 
       if (matched) {
         setAuthenticatedSuccess(true);
+        recordUserLogin(
+          "JUDGE",
+          matched.name,
+          matched.judgeCode,
+          matched.email,
+          `Executive Jury Portal Authentication Login (${matched.assignedEventName})`
+        );
         if (typeof window !== "undefined") {
           localStorage.setItem("macfiesta_active_judge_id", matched.id);
           localStorage.setItem(
@@ -75,6 +84,7 @@ export default function JudgeLoginPage() {
             JSON.stringify({ token: "jdg-jwt-token", user: matched })
           );
         }
+
         setTimeout(() => {
           router.replace("/judge/dashboard");
         }, 800);

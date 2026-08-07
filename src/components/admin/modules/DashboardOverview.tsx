@@ -23,6 +23,8 @@ import {
   RiSparklingLine,
 } from "react-icons/ri";
 
+import { useAuditLogs } from "@/lib/auditLogStore";
+
 interface DashboardOverviewProps {
   metrics: {
     totalUsers: number;
@@ -49,6 +51,8 @@ export function DashboardOverview({
   onSelectTab,
   onOpenQuickAction,
 }: DashboardOverviewProps) {
+  const { logs: storeLogs } = useAuditLogs();
+
   const totalRegs = registrations.length || 1240;
 
   return (
@@ -193,24 +197,19 @@ export function DashboardOverview({
         </div>
 
         <div className="divide-y divide-white/10">
-          {(auditLogs.length > 0
-            ? auditLogs.slice(0, 5)
-            : [
-                { id: "1", action: "Agent Verified", details: "Rahul K. (CET) confirmed for Iron Man Code Warfare", time: "2m ago" },
-                { id: "2", action: "Result Broadcasted", details: "Thor Gaming Arena finals leaderboard published live", time: "14m ago" },
-                { id: "3", action: "Quarters Allocated", details: "Block A - Room 104 allocated for 4 delegates", time: "30m ago" },
-                { id: "4", action: "Schedule Synchronized", details: "Doctor Strange Cultural Pro-Show timings verified", time: "50m ago" },
-              ]
-          ).map((item: any) => (
-            <div key={item.id || item._id} className="p-4 px-6 flex items-center justify-between gap-4 hover:bg-white/5 transition-colors">
+          {storeLogs.slice(0, 6).map((item: any) => (
+            <div key={item.id} className="p-4 px-6 flex items-center justify-between gap-4 hover:bg-white/5 transition-colors">
               <div className="flex items-center gap-3 min-w-0">
-                <span className="w-2.5 h-2.5 rounded-full bg-arc-cyan shadow-[0_0_8px_#00D4FF] shrink-0" />
+                <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${item.role === "VOLUNTEER" ? "bg-arc-cyan shadow-[0_0_8px_#00D4FF]" : item.role === "JUDGE" ? "bg-metallic-gold shadow-[0_0_8px_#D4AF37]" : item.role === "ADMIN" ? "bg-marvel-red shadow-[0_0_8px_#ED1D24]" : "bg-emerald-400 shadow-[0_0_8px_#10B981]"}`} />
                 <div className="min-w-0">
-                  <p className="text-xs font-bold text-white uppercase truncate">{item.action}</p>
-                  <p className="text-[11px] text-white/60 truncate">{item.details}</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-white uppercase truncate">{item.userName} ({item.role})</span>
+                    <span className="text-[9px] text-arc-cyan font-mono">✉️ {item.email}</span>
+                  </div>
+                  <p className="text-[11px] text-white/60 truncate">{item.action}</p>
                 </div>
               </div>
-              <span className="text-[10px] text-arc-cyan font-mono font-bold shrink-0">{item.time || "Just now"}</span>
+              <span className="text-[10px] text-metallic-gold font-mono font-bold shrink-0">{item.timestamp}</span>
             </div>
           ))}
         </div>
@@ -218,4 +217,5 @@ export function DashboardOverview({
     </div>
   );
 }
+
 
