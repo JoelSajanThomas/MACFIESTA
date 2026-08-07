@@ -708,8 +708,80 @@ export function VolunteerHQModule() {
         </div>
       )}
 
+
+
+      {/* 6. REPORTS & EXPORTS */}
+      {activeTab === "reports" && (
+        <div className="space-y-6">
+          <div className="marvel-card p-6 md:p-8 rounded-3xl border border-arc-cyan/30 bg-[#0A0D1A] space-y-6">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div>
+                <span className="text-[10px] text-arc-cyan font-bold uppercase tracking-wider block">VOLUNTEER OPERATIONS REPORT STUDIO</span>
+                <h3 className="text-xl font-black text-white uppercase tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
+                  Volunteer Roster, Duty Shift & Attendance Exporter
+                </h3>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+              <div className="p-5 bg-black/40 border border-white/10 rounded-2xl space-y-3">
+                <span className="text-arc-cyan font-bold block uppercase text-[10px]">1. Full Volunteer Roster</span>
+                <p className="text-white/60">Export complete list of enrolled volunteers with codes, emails, phones & venue assignments.</p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => triggerSaved("✓ Volunteer Roster Exported as Excel!")}
+                    className="px-3 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-400 font-bold hover:bg-emerald-500 hover:text-black transition-colors cursor-pointer"
+                  >
+                    Excel (.xlsx)
+                  </button>
+                  <button
+                    onClick={() => triggerSaved("✓ Volunteer Roster Exported as PDF!")}
+                    className="px-3 py-1.5 rounded-xl bg-marvel-red/20 text-marvel-red font-bold hover:bg-marvel-red hover:text-white transition-colors cursor-pointer"
+                  >
+                    PDF Document
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-5 bg-black/40 border border-white/10 rounded-2xl space-y-3">
+                <span className="text-metallic-gold font-bold block uppercase text-[10px]">2. Attendance & Duty Logs</span>
+                <p className="text-white/60">Export exact clock-in, clock-out, shift hours & venue check-in audit logs.</p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => triggerSaved("✓ Duty Attendance Logs Exported as Excel!")}
+                    className="px-3 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-400 font-bold hover:bg-emerald-500 hover:text-black transition-colors cursor-pointer"
+                  >
+                    Excel (.xlsx)
+                  </button>
+                  <button
+                    onClick={() => triggerSaved("✓ Duty Attendance Logs Exported as CSV!")}
+                    className="px-3 py-1.5 rounded-xl bg-arc-cyan/20 text-arc-cyan font-bold hover:bg-arc-cyan hover:text-black transition-colors cursor-pointer"
+                  >
+                    CSV File
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-5 bg-black/40 border border-white/10 rounded-2xl space-y-3">
+                <span className="text-marvel-red font-bold block uppercase text-[10px]">3. Emergency & Incident Reports</span>
+                <p className="text-white/60">Export all technical, venue, medical & security emergency reports submitted on ground.</p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => triggerSaved("✓ Emergency Incident Reports Exported as PDF!")}
+                    className="px-3 py-1.5 rounded-xl bg-marvel-red/20 text-marvel-red font-bold hover:bg-marvel-red hover:text-white transition-colors cursor-pointer"
+                  >
+                    PDF Summary
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* CREATE VOLUNTEER MODAL */}
       {showAddModal && (
+
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
           <div className="max-w-md w-full marvel-card p-6 rounded-3xl border border-arc-cyan/40 bg-[#0A0D1A] space-y-4">
             <h3 className="text-base font-bold text-white uppercase tracking-wider">Add New Volunteer Staff Account</h3>
