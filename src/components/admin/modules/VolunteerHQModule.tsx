@@ -42,7 +42,17 @@ interface VolunteerHQModuleProps {
 export function VolunteerHQModule({ activePage }: VolunteerHQModuleProps) {
   const { volunteers, assignedTasks, issues, attendanceLogs } = useVolunteerControl();
 
-  const [activeTab, setActiveTab] = useState<"dashboard" | "roster" | "tasks" | "attendance" | "announcements" | "reports">("dashboard");
+  const getInitialTab = () => {
+    if (!activePage) return "dashboard";
+    if (activePage.endsWith(".roster")) return "roster";
+    if (activePage.endsWith(".tasks")) return "tasks";
+    if (activePage.endsWith(".attendance")) return "attendance";
+    if (activePage.endsWith(".announcements")) return "announcements";
+    if (activePage.endsWith(".reports")) return "reports";
+    return "dashboard";
+  };
+
+  const [activeTab, setActiveTab] = useState<"dashboard" | "roster" | "tasks" | "attendance" | "announcements" | "reports">(getInitialTab);
 
   useEffect(() => {
     if (!activePage) return;
@@ -51,7 +61,7 @@ export function VolunteerHQModule({ activePage }: VolunteerHQModuleProps) {
     else if (activePage.endsWith(".attendance")) setActiveTab("attendance");
     else if (activePage.endsWith(".announcements")) setActiveTab("announcements");
     else if (activePage.endsWith(".reports")) setActiveTab("reports");
-    else if (activePage.endsWith(".dashboard") || activePage === "volunteers.hq") setActiveTab("dashboard");
+    else if (activePage.endsWith(".dashboard")) setActiveTab("dashboard");
   }, [activePage]);
 
   const [volList, setVolList] = useState<VolunteerUser[]>(volunteers);
@@ -59,7 +69,6 @@ export function VolunteerHQModule({ activePage }: VolunteerHQModuleProps) {
   const [selectedDeptFilter, setSelectedDeptFilter] = useState("ALL");
   const [selectedVolId, setSelectedVolId] = useState<string>(volunteers[0]?.id || "v-101");
   const [statusMsg, setStatusMsg] = useState("");
-
 
   // Modal States
   const [showAddModal, setShowAddModal] = useState(false);
@@ -251,11 +260,10 @@ export function VolunteerHQModule({ activePage }: VolunteerHQModuleProps) {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
-                isActive
+              className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center gap-2 whitespace-nowrap cursor-pointer ${isActive
                   ? "bg-marvel-red text-white shadow-[0_0_15px_#ED1D24]"
                   : "text-white/60 hover:text-white hover:bg-white/5"
-              }`}
+                }`}
               style={{ fontFamily: "var(--font-heading)" }}
             >
               <Icon />
@@ -364,11 +372,10 @@ export function VolunteerHQModule({ activePage }: VolunteerHQModuleProps) {
                   <div
                     key={vol.id}
                     onClick={() => setSelectedVolId(vol.id)}
-                    className={`p-4 rounded-2xl border transition-all cursor-pointer space-y-1 ${
-                      isSelected
+                    className={`p-4 rounded-2xl border transition-all cursor-pointer space-y-1 ${isSelected
                         ? "bg-marvel-red/15 border-marvel-red text-white shadow-[0_0_15px_rgba(237,29,36,0.3)]"
                         : "bg-black/40 border-white/10 text-white/70 hover:border-white/30"
-                    }`}
+                      }`}
                   >
                     <div className="flex justify-between items-center text-xs">
                       <span className="font-bold text-white text-sm">{vol.name}</span>
@@ -455,11 +462,10 @@ export function VolunteerHQModule({ activePage }: VolunteerHQModuleProps) {
                       <div
                         key={item.key}
                         onClick={() => handleTogglePermission(permKey)}
-                        className={`p-3.5 rounded-2xl border flex items-center justify-between cursor-pointer transition-all ${
-                          isEnabled
+                        className={`p-3.5 rounded-2xl border flex items-center justify-between cursor-pointer transition-all ${isEnabled
                             ? "bg-emerald-500/10 border-emerald-500/40 text-emerald-400"
                             : "bg-black/40 border-white/10 text-white/40 hover:border-white/20"
-                        }`}
+                          }`}
                       >
                         <span className="font-bold text-[11px]">{item.label}</span>
                         <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${isEnabled ? "bg-emerald-500 text-black" : "bg-white/10 text-white/40"}`}>
@@ -563,11 +569,10 @@ export function VolunteerHQModule({ activePage }: VolunteerHQModuleProps) {
                 return (
                   <div
                     key={vol.id}
-                    className={`p-4 rounded-2xl border flex items-center justify-between gap-3 ${
-                      isCheckedIn
+                    className={`p-4 rounded-2xl border flex items-center justify-between gap-3 ${isCheckedIn
                         ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
                         : "bg-black/40 border-white/10 text-white/60"
-                    }`}
+                      }`}
                   >
                     <div>
                       <div className="font-bold text-white text-xs">{vol.name} ({vol.volunteerCode})</div>
@@ -582,11 +587,10 @@ export function VolunteerHQModule({ activePage }: VolunteerHQModuleProps) {
                         toggleVolunteerClockDuty(vol.id);
                         triggerSaved(`✓ Duty Status updated for ${vol.name}!`);
                       }}
-                      className={`px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase transition-all cursor-pointer ${
-                        isCheckedIn
+                      className={`px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase transition-all cursor-pointer ${isCheckedIn
                           ? "bg-amber-500/20 text-amber-400 border border-amber-500/40 hover:bg-amber-500 hover:text-black"
                           : "bg-emerald-500 text-black hover:bg-white"
-                      }`}
+                        }`}
                     >
                       {isCheckedIn ? "Clock-Out" : "Clock-In"}
                     </button>
@@ -649,11 +653,10 @@ export function VolunteerHQModule({ activePage }: VolunteerHQModuleProps) {
                       </td>
                       <td className="py-3 px-3 text-right">
                         <span
-                          className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase border ${
-                            log.status === "CHECKED_IN"
+                          className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase border ${log.status === "CHECKED_IN"
                               ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40"
                               : "bg-white/10 text-white/50 border-white/20"
-                          }`}
+                            }`}
                         >
                           ● {log.status}
                         </span>

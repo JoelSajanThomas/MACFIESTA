@@ -116,13 +116,12 @@ export function HomepageBuilderModule() {
               <div
                 key={sec.id}
                 onClick={() => setSelectedSectionId(sec.id)}
-                className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 transition-all cursor-pointer ${
-                  selectedSectionId === sec.id
+                className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 transition-all cursor-pointer ${selectedSectionId === sec.id
                     ? "bg-[#F5B301]/10 border-[#F5B301]/40 text-white shadow-md"
                     : sec.visible
-                    ? "bg-white/5 border-white/10 text-white/80 hover:bg-white/10"
-                    : "bg-zinc-900/40 border-white/5 text-white/30"
-                }`}
+                      ? "bg-white/5 border-white/10 text-white/80 hover:bg-white/10"
+                      : "bg-zinc-900/40 border-white/5 text-white/30"
+                  }`}
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <span className="text-xs font-mono font-bold text-white/40 w-5">{idx + 1}.</span>
@@ -151,11 +150,10 @@ export function HomepageBuilderModule() {
                   <button
                     type="button"
                     onClick={() => handleToggleVisibility(sec.id)}
-                    className={`p-1.5 rounded-lg transition-colors ${
-                      sec.visible
+                    className={`p-1.5 rounded-lg transition-colors ${sec.visible
                         ? "text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20"
                         : "text-zinc-500 bg-zinc-800"
-                    }`}
+                      }`}
                     title={sec.visible ? "Hide Section" : "Show Section"}
                   >
                     {sec.visible ? <RiEyeLine size={14} /> : <RiEyeOffLine size={14} />}
@@ -245,9 +243,8 @@ export function HomepageBuilderModule() {
                     <button
                       key={d.id}
                       onClick={() => setPreviewDevice(d.id as any)}
-                      className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                        previewDevice === d.id ? "bg-[#F5B301] text-zinc-950" : "text-white/50 hover:text-white"
-                      }`}
+                      className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${previewDevice === d.id ? "bg-[#F5B301] text-zinc-950" : "text-white/50 hover:text-white"
+                        }`}
                     >
                       <Icon size={14} />
                       <span>{d.label}</span>
@@ -265,28 +262,34 @@ export function HomepageBuilderModule() {
             </div>
 
             {/* Device Viewport Wrapper */}
-            <div className="flex-1 bg-zinc-950/80 p-4 sm:p-6 flex flex-col items-center justify-center overflow-hidden relative">
+            <div className="flex-1 bg-zinc-950/80 p-6 flex items-center justify-center overflow-auto">
               <div
-                className={`bg-[#05050A] border-2 border-arc-cyan/40 rounded-2xl shadow-[0_0_50px_rgba(0,212,255,0.2)] overflow-hidden transition-all duration-300 relative ${
-                  previewDevice === "desktop"
+                className={`bg-[#09090b] border border-white/20 rounded-2xl shadow-2xl overflow-y-auto transition-all duration-300 ${previewDevice === "desktop"
                     ? "w-full h-full"
                     : previewDevice === "tablet"
-                    ? "w-[768px] h-[95%]"
-                    : "w-[375px] h-[95%]"
-                }`}
+                      ? "w-[768px] h-[90%]"
+                      : "w-[375px] h-[90%]"
+                  }`}
               >
-                {/* Live Website Frame */}
-                <iframe
-                  src="/"
-                  className="w-full h-full border-0 bg-[#05050A]"
-                  title="MacFiesta Live Website Preview"
-                />
+                <div className="p-6 space-y-6 text-center">
+                  <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[#F5B301] text-xs font-bold">
+                    ★ Simulated Preview of macfiesta.macfast.org ({previewDevice.toUpperCase()})
+                  </div>
+
+                  {sections
+                    .filter((s) => s.visible)
+                    .map((sec) => (
+                      <div key={sec.id} className="p-8 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+                        <h4 className="text-sm font-extrabold text-white uppercase tracking-wider">{sec.title}</h4>
+                        <p className="text-xs text-white/40 font-mono">[{sec.id} component active]</p>
+                      </div>
+                    ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
       )}
-
     </div>
   );
 }

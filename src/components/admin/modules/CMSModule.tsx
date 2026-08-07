@@ -33,19 +33,19 @@ interface SponsorItem {
 
 export function CMSModule() {
   const [activeTab, setActiveTab] = useState<"hero" | "about" | "sponsors" | "faqs" | "contact" | "rules">("sponsors");
-  const { settings, sponsors: storeSponsors, faqs: storeFaqs, updateSettings, updateSponsors, updateFaqs } = useFestivalControl();
+  const { settings, updateSettings } = useFestivalControl();
 
   // About Section CMS
   const [aboutHeading, setAboutHeading] = useState("About MacFiesta");
-  const [aboutBody, setAboutBody] = useState(settings.aboutText || "Earth's premier college festival at MACFAST.");
+  const [aboutBody, setAboutBody] = useState(settings.aboutText);
 
   // Ultimate Sponsors State
-  const sponsors = storeSponsors && storeSponsors.length > 0 ? storeSponsors : [
+  const [sponsors, setSponsors] = useState<SponsorItem[]>([
     { id: "sp-1", name: "Red Bull", tier: "Title Sponsor", logoUrl: "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=150", website: "https://redbull.com", amount: 100000, active: true },
     { id: "sp-2", name: "Monster Energy", tier: "Platinum Partner", logoUrl: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=150", website: "https://monsterenergy.com", amount: 75000, active: true },
     { id: "sp-3", name: "KFC Kerala", tier: "Gold Partner", logoUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=150", website: "https://kfc.in", amount: 50000, active: true },
     { id: "sp-4", name: "Spotify", tier: "Audio Partner", logoUrl: "https://images.unsplash.com/photo-1614680376593-902f749f7051?w=150", website: "https://spotify.com", amount: 40000, active: true },
-  ];
+  ]);
 
   // Sponsor Modal State
   const [showSponsorModal, setShowSponsorModal] = useState(false);
@@ -57,10 +57,10 @@ export function CMSModule() {
   const [spAmount, setSpAmount] = useState<number>(25000);
 
   // FAQs State
-  const faqs = storeFaqs && storeFaqs.length > 0 ? storeFaqs : [
+  const [faqs, setFaqs] = useState([
     { id: "faq-1", question: "Who is eligible to participate in MacFiesta?", answer: "Any student currently enrolled in an accredited college or university with a valid ID card." },
     { id: "faq-2", question: "Is accommodation provided for outstation delegates?", answer: "Yes, hostel accommodations in Block A (Girls) and Block B/C (Boys) are available on booking." },
-  ];
+  ]);
   const [newQuestion, setNewQuestion] = useState("");
   const [newAnswer, setNewAnswer] = useState("");
 
@@ -102,11 +102,11 @@ export function CMSModule() {
     e.preventDefault();
     if (!spName) return;
 
-    let updated: SponsorItem[];
     if (editingSponsor) {
-      updated = sponsors.map((s) =>
-        s.id === editingSponsor.id
-          ? {
+      setSponsors((prev) =>
+        prev.map((s) =>
+          s.id === editingSponsor.id
+            ? {
               ...s,
               name: spName,
               tier: spTier,
@@ -114,9 +114,10 @@ export function CMSModule() {
               website: spWeb,
               amount: Number(spAmount) || 0,
             }
-          : s
+            : s
+        )
       );
-      triggerSaved("✓ Sponsor Details Updated & Synchronized Live!");
+      triggerSaved("✓ Sponsor Details Updated & Synchronized!");
     } else {
       const newItem: SponsorItem = {
         id: `sp-${Date.now()}`,
@@ -127,23 +128,22 @@ export function CMSModule() {
         amount: Number(spAmount) || 0,
         active: true,
       };
-      updated = [...sponsors, newItem];
+      setSponsors((prev) => [...prev, newItem]);
       triggerSaved("✓ New Sponsor Added to Public Website!");
     }
-    updateSponsors(updated as any);
     setShowSponsorModal(false);
   };
 
   const toggleSponsorActive = (id: string) => {
-    const updated = sponsors.map((s) => (s.id === id ? { ...s, active: !s.active } : s));
-    updateSponsors(updated as any);
+    setSponsors((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, active: !s.active } : s))
+    );
     triggerSaved("✓ Sponsor Visibility Toggled!");
   };
 
   const deleteSponsor = (id: string) => {
     if (confirm("Are you sure you want to remove this sponsor?")) {
-      const updated = sponsors.filter((s) => s.id !== id);
-      updateSponsors(updated as any);
+      setSponsors((prev) => prev.filter((s) => s.id !== id));
       triggerSaved("✓ Sponsor Removed!");
     }
   };
@@ -151,11 +151,13 @@ export function CMSModule() {
   const handleAddFaq = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newQuestion || !newAnswer) return;
-    const updated = [...faqs, { id: `faq-${Date.now()}`, question: newQuestion, answer: newAnswer }];
-    updateFaqs(updated as any);
+    setFaqs((prev) => [
+      ...prev,
+      { id: `faq-${Date.now()}`, question: newQuestion, answer: newAnswer },
+    ]);
     setNewQuestion("");
     setNewAnswer("");
-    triggerSaved("✓ New FAQ Added to Website!");
+    triggerSaved();
   };
 
   const handleAddRule = (e: React.FormEvent) => {
@@ -163,9 +165,8 @@ export function CMSModule() {
     if (!newRule) return;
     setGeneralRules((prev) => [...prev, newRule]);
     setNewRule("");
-    triggerSaved("✓ General Conduct Rule Updated!");
+    triggerSaved();
   };
-
 
   return (
     <div className="space-y-6">
@@ -211,8 +212,8 @@ export function CMSModule() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
               className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-extrabold transition-all cursor-pointer ${isSelected
-                  ? "bg-[#F5B301] text-zinc-950 shadow-md"
-                  : "bg-zinc-800/60 text-zinc-300 hover:bg-zinc-700 hover:text-white"
+                ? "bg-[#F5B301] text-zinc-950 shadow-md"
+                : "bg-zinc-800/60 text-zinc-300 hover:bg-zinc-700 hover:text-white"
                 }`}
             >
               <Icon size={16} />
@@ -249,8 +250,8 @@ export function CMSModule() {
               <div
                 key={sp.id}
                 className={`p-4 rounded-3xl border space-y-3 transition-all ${sp.active
-                    ? "bg-zinc-900/60 border-zinc-800/80 hover:border-[#F5B301]/40"
-                    : "bg-zinc-950/60 border-zinc-800/40 opacity-60"
+                  ? "bg-zinc-900/60 border-zinc-800/80 hover:border-[#F5B301]/40"
+                  : "bg-zinc-950/60 border-zinc-800/40 opacity-60"
                   }`}
               >
                 <div className="flex items-center justify-between">
@@ -530,11 +531,7 @@ export function CMSModule() {
                   <p className="font-bold text-white text-xs">{faq.question}</p>
                   <button
                     type="button"
-                    onClick={() => {
-                      const updated = faqs.filter((f: any) => f.id !== faq.id);
-                      updateFaqs(updated as any);
-                      triggerSaved("✓ FAQ Item Removed!");
-                    }}
+                    onClick={() => setFaqs((prev) => prev.filter((f) => f.id !== faq.id))}
                     className="p-1 rounded text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer"
                   >
                     <RiDeleteBinLine size={14} />
@@ -543,7 +540,6 @@ export function CMSModule() {
                 <p className="text-xs text-zinc-400">{faq.answer}</p>
               </div>
             ))}
-
           </div>
         </div>
       )}

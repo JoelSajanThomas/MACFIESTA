@@ -79,7 +79,7 @@ export function Sidebar({
           return (
             <div
               key={hub.id}
-              className="relative group w-full flex justify-center"
+              className="relative group w-full flex flex-col items-center"
               onMouseEnter={() => collapsed && setHoveredHubId(hub.id)}
               onMouseLeave={() => collapsed && setHoveredHubId(null)}
             >
@@ -92,6 +92,8 @@ export function Sidebar({
                     if (collapsed) {
                       setActiveHubId(activeHubId === hub.id ? null : hub.id);
                     } else {
+                      // Toggle accordion or select first page
+                      setActiveHubId(activeHubId === hub.id ? null : hub.id);
                       onSelectPage(hub.pages[0].id);
                     }
                   }
@@ -121,9 +123,37 @@ export function Sidebar({
                   <span className="absolute -left-2 top-1/2 -translate-y-1/2 w-1.5 h-4 bg-[#F5B301] rounded-r-full shadow-[0_0_10px_#F5B301]" />
                 )}
               </button>
+
+              {/* Expanded Mode Sub-Menu Accordion */}
+              {!collapsed && hub.pages.length > 0 && isSelected && (
+                <div className="w-full pl-6 pr-1 pt-1 pb-1 space-y-1 my-1 border-l-2 border-[#F5B301]/30 ml-2">
+                  {hub.pages.map((p) => {
+                    const isSubActive = activePage === p.id;
+                    return (
+                      <button
+                        key={p.id}
+                        onClick={() => onSelectPage(p.id)}
+                        className={`w-full text-left px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer flex items-center justify-between ${
+                          isSubActive
+                            ? "bg-[#F5B301] text-zinc-950 shadow-md"
+                            : "text-zinc-400 hover:text-white hover:bg-zinc-800/60"
+                        }`}
+                      >
+                        <span className="truncate">{p.label}</span>
+                        {p.badge && (
+                          <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">
+                            {p.badge}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           );
         })}
+
       </nav>
 
       {/* Floating Popover in Collapsed Mode */}

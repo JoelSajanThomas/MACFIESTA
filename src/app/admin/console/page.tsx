@@ -207,15 +207,14 @@ export default function AdminDashboardPage() {
       case "volunteers.hq.roster":
       case "volunteers.hq.tasks":
       case "volunteers.hq.attendance":
-        return <VolunteerHQModule activePage={activePage} />;
+        return <VolunteerHQModule />;
 
       case "judges.command":
       case "judges.command.dashboard":
       case "judges.command.roster":
       case "judges.command.builder":
       case "judges.command.results":
-        return <JudgeCommandModule activePage={activePage} />;
-
+        return <JudgeCommandModule />;
 
       // 2. Festival Workspace
       case "festival":
@@ -274,7 +273,7 @@ export default function AdminDashboardPage() {
               try {
                 await api.post("/admin/qr-checkin", { passCode });
                 refreshData();
-              } catch {}
+              } catch { }
             }}
           />
         );
@@ -326,7 +325,7 @@ export default function AdminDashboardPage() {
               try {
                 await api.post("/admin/announcements", { title: t, message: m, type: tp });
                 refreshData();
-              } catch {}
+              } catch { }
             }}
           />
         );

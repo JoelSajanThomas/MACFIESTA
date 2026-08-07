@@ -148,7 +148,16 @@ interface JudgeCommandModuleProps {
 export function JudgeCommandModule({ activePage }: JudgeCommandModuleProps) {
   const { broadcasts, saveJuryBroadcasts } = useJudgeControl();
 
-  const [activeTab, setActiveTab] = useState<"dashboard" | "roster" | "builder" | "results" | "announcements">("dashboard");
+  const getInitialTab = () => {
+    if (!activePage) return "dashboard";
+    if (activePage.endsWith(".roster")) return "roster";
+    if (activePage.endsWith(".builder")) return "builder";
+    if (activePage.endsWith(".results")) return "results";
+    if (activePage.endsWith(".announcements")) return "announcements";
+    return "dashboard";
+  };
+
+  const [activeTab, setActiveTab] = useState<"dashboard" | "roster" | "builder" | "results" | "announcements">(getInitialTab);
 
   useEffect(() => {
     if (!activePage) return;
@@ -156,7 +165,7 @@ export function JudgeCommandModule({ activePage }: JudgeCommandModuleProps) {
     else if (activePage.endsWith(".builder")) setActiveTab("builder");
     else if (activePage.endsWith(".results")) setActiveTab("results");
     else if (activePage.endsWith(".announcements")) setActiveTab("announcements");
-    else if (activePage.endsWith(".dashboard") || activePage === "judges.command") setActiveTab("dashboard");
+    else if (activePage.endsWith(".dashboard")) setActiveTab("dashboard");
   }, [activePage]);
 
   const [judges, setJudges] = useState<JudgeUser[]>(DEFAULT_JUDGES);
@@ -342,11 +351,10 @@ export function JudgeCommandModule({ activePage }: JudgeCommandModuleProps) {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
-                isActive
+              className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center gap-2 whitespace-nowrap cursor-pointer ${isActive
                   ? "bg-marvel-red text-white shadow-[0_0_15px_#ED1D24]"
                   : "text-white/60 hover:text-white hover:bg-white/5"
-              }`}
+                }`}
               style={{ fontFamily: "var(--font-heading)" }}
             >
               <Icon />
@@ -427,11 +435,10 @@ export function JudgeCommandModule({ activePage }: JudgeCommandModuleProps) {
                   <div
                     key={j.id}
                     onClick={() => setSelectedJudgeId(j.id)}
-                    className={`p-4 rounded-2xl border transition-all cursor-pointer space-y-1 ${
-                      isSelected
+                    className={`p-4 rounded-2xl border transition-all cursor-pointer space-y-1 ${isSelected
                         ? "bg-metallic-gold/15 border-metallic-gold text-white shadow-[0_0_15px_rgba(212,175,55,0.3)]"
                         : "bg-black/40 border-white/10 text-white/70 hover:border-white/30"
-                    }`}
+                      }`}
                   >
                     <div className="flex justify-between items-center text-xs">
                       <span className="font-bold text-white text-sm">{j.name}</span>
@@ -494,11 +501,10 @@ export function JudgeCommandModule({ activePage }: JudgeCommandModuleProps) {
                     <div
                       key={item.key}
                       onClick={() => handleToggleJudgePermission(permKey)}
-                      className={`p-3.5 rounded-2xl border flex items-center justify-between cursor-pointer transition-all ${
-                        isEnabled
+                      className={`p-3.5 rounded-2xl border flex items-center justify-between cursor-pointer transition-all ${isEnabled
                           ? "bg-emerald-500/10 border-emerald-500/40 text-emerald-400"
                           : "bg-black/40 border-white/10 text-white/40 hover:border-white/20"
-                      }`}
+                        }`}
                     >
                       <span className="font-bold text-[11px]">{item.label}</span>
                       <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${isEnabled ? "bg-emerald-500 text-black" : "bg-white/10 text-white/40"}`}>
