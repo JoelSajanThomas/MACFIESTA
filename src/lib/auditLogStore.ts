@@ -9,9 +9,33 @@ export interface SystemAuditLog {
   userCode: string;
   email: string;
   action: string;
-  timestamp: string; // Date & Time
+  timestamp: string; // Exact Date, Time & Seconds
+  exactTime: string; // ISO / High precision local time string
   ipAddress: string;
   status: "SUCCESS" | "FAILED" | "WARNING";
+}
+
+function formatExactTimestamp(date = new Date()): { full: string; exact: string } {
+  const pad = (n: number) => String(n).padStart(2, "0");
+
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1);
+  const day = pad(date.getDate());
+
+  const hours24 = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+  const seconds = pad(date.getSeconds());
+
+  // 12 hour format
+  let hours12 = date.getHours();
+  const ampm = hours12 >= 12 ? "PM" : "AM";
+  hours12 = hours12 % 12 || 12;
+  const hours12Str = pad(hours12);
+
+  const full = `${year}-${month}-${day} @ ${hours24}:${minutes}:${seconds} (${hours12Str}:${minutes}:${seconds} ${ampm})`;
+  const exact = `${year}-${month}-${day} ${hours24}:${minutes}:${seconds}`;
+
+  return { full, exact };
 }
 
 const DEFAULT_AUDIT_LOGS: SystemAuditLog[] = [
@@ -22,7 +46,8 @@ const DEFAULT_AUDIT_LOGS: SystemAuditLog[] = [
     userCode: "VOL-101",
     email: "kiran.vol@macfast.org",
     action: "Volunteer Duty Check-In & Auth Login",
-    timestamp: "2026-08-07 08:30:15 AM",
+    timestamp: "2026-08-07 @ 08:30:15 (08:30:15 AM)",
+    exactTime: "2026-08-07 08:30:15",
     ipAddress: "192.168.1.104",
     status: "SUCCESS",
   },
@@ -33,7 +58,8 @@ const DEFAULT_AUDIT_LOGS: SystemAuditLog[] = [
     userCode: "JDG-201",
     email: "vikram.sethi@tcs.com",
     action: "Executive Jury Portal Scorecard Authentication",
-    timestamp: "2026-08-07 09:15:42 AM",
+    timestamp: "2026-08-07 @ 09:15:42 (09:15:42 AM)",
+    exactTime: "2026-08-07 09:15:42",
     ipAddress: "192.168.1.188",
     status: "SUCCESS",
   },
@@ -44,7 +70,8 @@ const DEFAULT_AUDIT_LOGS: SystemAuditLog[] = [
     userCode: "DELE-9021",
     email: "rohan@cet.ac.in",
     action: "Participant Portal QR Pass Access",
-    timestamp: "2026-08-07 10:05:00 AM",
+    timestamp: "2026-08-07 @ 10:05:00 (10:05:00 AM)",
+    exactTime: "2026-08-07 10:05:00",
     ipAddress: "172.16.4.12",
     status: "SUCCESS",
   },
@@ -55,7 +82,8 @@ const DEFAULT_AUDIT_LOGS: SystemAuditLog[] = [
     userCode: "ADMIN-01",
     email: "admin@macfast.org",
     action: "Super Admin Command Console Session",
-    timestamp: "2026-08-07 11:20:10 AM",
+    timestamp: "2026-08-07 @ 11:20:10 (11:20:10 AM)",
+    exactTime: "2026-08-07 11:20:10",
     ipAddress: "10.0.0.1",
     status: "SUCCESS",
   },
@@ -106,9 +134,7 @@ export function recordUserLogin(
   action: string,
   status: SystemAuditLog["status"] = "SUCCESS"
 ) {
-  const now = new Date();
-  const dateStr = now.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
-  const timeStr = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true });
+  const { full, exact } = formatExactTimestamp(new Date());
 
   const newLog: SystemAuditLog = {
     id: `log-${Date.now()}`,
@@ -117,7 +143,8 @@ export function recordUserLogin(
     userCode: userCode || "CODE-00",
     email: email || "unknown@macfast.org",
     action: action || "User Login Session",
-    timestamp: `${dateStr} ${timeStr}`,
+    timestamp: full,
+    exactTime: exact,
     ipAddress: "192.168.1." + Math.floor(Math.random() * 200 + 10),
     status,
   };
