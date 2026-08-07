@@ -103,44 +103,32 @@ export function HeroSection() {
 
   return (
     <section className="relative w-full min-h-screen flex flex-col justify-between overflow-hidden bg-[#05050A] pt-24 md:pt-32">
-      {/* Dynamic Background Media (Video vs Image) */}
+      {/* Background Marvel 3025924746959430.jpg Wallpaper & Dynamic Overlay */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        {settings.bgType === "video" ? (
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="auto"
-            className="w-full h-full object-cover object-center filter brightness-110 contrast-115"
-          >
-            <source src={settings.videoBgUrl || "/MARVEL/Video Project 4.mp4"} type="video/mp4" />
-          </video>
-        ) : (
-          <Image
-            src={settings.wallpaperUrl || "/MARVEL/3025924746959430.jpg"}
-            alt="Welcome to MacFiesta Marvel Wallpaper Background"
-            fill
-            priority
-            className="object-cover object-center filter brightness-110 contrast-125 opacity-90 scale-[1.02]"
-          />
-        )}
+        <Image
+          src="/MARVEL/3025924746959430.jpg"
+          alt="Welcome to MacFiesta Marvel Wallpaper Background"
+          fill
+          priority
+          className="object-cover object-center filter brightness-110 contrast-125 opacity-90 scale-[1.02]"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-[#05050A] via-[#05050A]/30 to-[#05050A]/40 z-[1]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_50%,rgba(5,5,10,0.8)_95%)] z-[1]" />
 
+
+
         {/* Floating Iron Man Overlay Graphic */}
-        {settings.floatingIronManEnabled && (
-          <div className="absolute top-10 right-8 opacity-35 hidden xl:block pointer-events-none z-[2]">
-            <Image
-              src="/MARVEL/ironman.png"
-              alt="Iron Man"
-              width={360}
-              height={360}
-              className="object-contain animate-float drop-shadow-[0_0_30px_rgba(237,29,36,0.7)]"
-            />
-          </div>
-        )}
+        <div className="absolute top-10 right-8 opacity-35 hidden xl:block pointer-events-none z-[2]">
+          <Image
+            src="/MARVEL/ironman.png"
+            alt="Iron Man"
+            width={360}
+            height={360}
+            className="object-contain animate-float drop-shadow-[0_0_30px_rgba(237,29,36,0.7)]"
+          />
+        </div>
       </div>
+
 
       {/* Main Content Area */}
       <div className="relative z-10 flex-grow flex flex-col justify-center max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 md:py-16">
@@ -163,17 +151,17 @@ export function HeroSection() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
-                className="text-hero tracking-tight space-y-1"
+                className="text-hero tracking-tight"
                 style={{ fontFamily: "var(--font-heading)" }}
               >
-                <span className="block text-2xl sm:text-3xl lg:text-4xl font-black uppercase font-mono tracking-[0.3em] text-transparent bg-clip-text bg-gradient-to-r from-arc-cyan via-white to-arc-cyan drop-shadow-[0_0_15px_rgba(0,212,255,0.8)]">
-                  {settings.heroTitle || "WELCOME TO"}
+                <span className="block text-white text-3xl sm:text-4xl lg:text-5xl font-black uppercase font-mono tracking-widest text-arc-cyan">
+                  WELCOME TO
                 </span>
-                <span className="block uppercase text-6xl sm:text-8xl lg:text-9xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#FFE600] via-[#ED1D24] to-[#00D4FF] drop-shadow-[0_0_40px_rgba(237,29,36,0.95)] drop-shadow-[0_0_20px_rgba(212,175,55,0.8)] filter brightness-125 contrast-125 my-1">
-                  {settings.name ? settings.name.toUpperCase() : "MACFIESTA"}
+                <span className="block marvel-bang-comic-gradient uppercase pr-4 text-5xl sm:text-7xl lg:text-8xl tracking-tight">
+                  {settings.name.toUpperCase()}
                 </span>
-                <span className="block text-2xl sm:text-4xl lg:text-5xl font-black uppercase tracking-[0.25em] font-mono text-transparent bg-clip-text bg-gradient-to-r from-[#ED1D24] via-[#FF2D35] to-[#7B2FBE] drop-shadow-[0_0_25px_#ED1D24]">
-                  {settings.heroSubtitle || "MARVELVERSE"}
+                <span className="block text-marvel-red text-2xl sm:text-4xl lg:text-5xl font-black uppercase tracking-[0.2em] font-mono mt-1 drop-shadow-[0_0_20px_#ED1D24]">
+                  MARVELVERSE
                 </span>
               </motion.h1>
 
@@ -183,24 +171,24 @@ export function HeroSection() {
                 transition={{ duration: 0.8, delay: 0.3 }}
                 className="text-subtitle font-medium text-white/80 max-w-xl mx-auto lg:mx-0 font-mono"
               >
-                {settings.heroDesc || `"Every Hero Has A Mission." — Earth's premier college festival at MACFAST. Prepare your suit, verify your squad, and assemble for victory across 26 high-level missions.`}
+                "Every Hero Has A Mission." — Earth's premier college festival at MACFAST. Prepare your suit, verify your squad, and assemble for victory across 26 high-level missions.
               </motion.p>
             </div>
 
-            {/* Dynamic CTAs */}
+            {/* CTAs */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
               className="flex flex-wrap justify-center lg:justify-start gap-4 pt-4 w-full"
             >
-              <Link href={settings.ctaPrimaryUrl || "/signup"} className="btn-primary group shadow-[0_0_25px_#ED1D24]">
-                <span>{settings.registrationOpen ? (settings.ctaPrimaryText || "Join Mission Now") : "Registration Closed"}</span>
-                <RiPlayLine className="text-lg group-hover:translate-x-1 transition-transform" />
+              <Link href="/signup" className="btn-primary group shadow-[0_0_25px_#ED1D24]">
+                <span>{settings.registrationOpen ? "Register Now" : "Registration Closed"}</span>
+                <RiPlayLine className="group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link href={settings.ctaSecondaryUrl || "/schedule"} className="btn-outline border-arc-cyan text-white hover:bg-arc-cyan/20">
+              <Link href="/events" className="btn-outline border-arc-cyan text-white hover:bg-arc-cyan/20">
                 <RiCompass3Line className="text-arc-cyan" />
-                <span>{settings.ctaSecondaryText || "Explore Schedule"}</span>
+                <span>View Events</span>
               </Link>
             </motion.div>
           </div>

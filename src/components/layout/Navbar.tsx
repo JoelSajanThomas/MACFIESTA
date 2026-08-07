@@ -38,14 +38,9 @@ const dropdownNavItems = [
 
 export function Navbar() {
   const { initialize, user, logout } = useAuthStore();
-  const { settings, navbar } = useFestivalControl();
+  const { settings } = useFestivalControl();
   const pathname = usePathname();
   const isAdminPage = pathname?.startsWith("/admin");
-
-  const activeNavItems = (navbar?.items || [])
-    .filter((item) => item.visible)
-    .sort((a, b) => a.order - b.order);
-
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -125,11 +120,11 @@ export function Navbar() {
 
           {/* Desktop HUD Navigation */}
           <div className="hidden xl:flex justify-center items-center gap-1 flex-initial bg-black/40 border border-white/10 rounded-full px-3 py-1.5 backdrop-blur-md">
-            {activeNavItems.map((item) => {
+            {mainNavItems.map((item) => {
               const isActive = pathname === item.href;
               return (
                 <Link
-                  key={item.id || item.href}
+                  key={item.href}
                   href={item.href}
                   className={`relative px-3.5 py-1.5 text-[11px] font-bold tracking-widest uppercase transition-all duration-300 rounded-full ${isActive
                     ? "bg-marvel-red text-white shadow-[0_0_15px_#ED1D24]"
@@ -141,7 +136,6 @@ export function Navbar() {
                 </Link>
               );
             })}
-
 
             {/* Dropdown Menu */}
             <div className="relative group py-1">
