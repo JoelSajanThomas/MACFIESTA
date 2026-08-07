@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-
+import { useState, useEffect, useRef } from "react";
 import {
   RiUserHeartLine,
   RiShieldFlashLine,
@@ -22,7 +21,10 @@ import {
   RiCheckLine,
   RiCloseLine,
   RiSparklingLine,
+  RiArrowLeftSLine,
+  RiArrowRightSLine,
 } from "react-icons/ri";
+
 import {
   useVolunteerControl,
   VolunteerUser,
@@ -35,35 +37,13 @@ import {
   toggleVolunteerClockDuty,
 } from "@/lib/volunteerStore";
 
-interface VolunteerHQModuleProps {
-  activePage?: string;
-}
-
-export function VolunteerHQModule({ activePage }: VolunteerHQModuleProps) {
+export function VolunteerHQModule() {
   const { volunteers, assignedTasks, issues, attendanceLogs } = useVolunteerControl();
+  const tabRailRef = useRef<HTMLDivElement>(null);
 
-  const getInitialTab = () => {
-    if (!activePage) return "dashboard";
-    if (activePage.endsWith(".roster")) return "roster";
-    if (activePage.endsWith(".tasks")) return "tasks";
-    if (activePage.endsWith(".attendance")) return "attendance";
-    if (activePage.endsWith(".announcements")) return "announcements";
-    if (activePage.endsWith(".reports")) return "reports";
-    return "dashboard";
-  };
 
-  const [activeTab, setActiveTab] = useState<"dashboard" | "roster" | "tasks" | "attendance" | "announcements" | "reports">(getInitialTab);
 
-  useEffect(() => {
-    if (!activePage) return;
-    if (activePage.endsWith(".roster")) setActiveTab("roster");
-    else if (activePage.endsWith(".tasks")) setActiveTab("tasks");
-    else if (activePage.endsWith(".attendance")) setActiveTab("attendance");
-    else if (activePage.endsWith(".announcements")) setActiveTab("announcements");
-    else if (activePage.endsWith(".reports")) setActiveTab("reports");
-    else if (activePage.endsWith(".dashboard")) setActiveTab("dashboard");
-  }, [activePage]);
-
+  const [activeTab, setActiveTab] = useState<"dashboard" | "roster" | "tasks" | "attendance" | "announcements" | "reports">("dashboard");
   const [volList, setVolList] = useState<VolunteerUser[]>(volunteers);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDeptFilter, setSelectedDeptFilter] = useState("ALL");
@@ -244,34 +224,57 @@ export function VolunteerHQModule({ activePage }: VolunteerHQModuleProps) {
 
       </div>
 
-      {/* NAV TAB RAIL */}
-      <div className="flex bg-black/60 p-1.5 rounded-2xl border border-white/10 overflow-x-auto scrollbar-none gap-1">
-        {[
-          { id: "dashboard" as const, label: "Operations Telemetry", icon: RiShieldFlashLine },
-          { id: "roster" as const, label: `Staff Roster (${volList.length})`, icon: RiUserHeartLine },
-          { id: "tasks" as const, label: `Task Assignments (${allTasks.length})`, icon: RiTaskLine },
-          { id: "attendance" as const, label: "Attendance & Duty Logs", icon: RiTimeLine },
-          { id: "announcements" as const, label: "Targeted Broadcasts", icon: RiMegaphoneLine },
-          { id: "reports" as const, label: "Reports & Exports", icon: RiFileChartLine },
-        ].map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center gap-2 whitespace-nowrap cursor-pointer ${isActive
-                  ? "bg-marvel-red text-white shadow-[0_0_15px_#ED1D24]"
-                  : "text-white/60 hover:text-white hover:bg-white/5"
+      {/* NAV TAB RAIL WITH HORIZONTAL SCROLL BUTTONS */}
+      <div className="relative flex items-center bg-black/60 p-1.5 rounded-2xl border border-white/10 group">
+        <button
+          onClick={() => tabRailRef.current?.scrollBy({ left: -220, behavior: "smooth" })}
+          className="p-2 rounded-xl bg-white/5 hover:bg-marvel-red text-white transition-all cursor-pointer z-10 shrink-0 border border-white/10"
+          title="Scroll Left"
+        >
+          <RiArrowLeftSLine size={18} />
+        </button>
+
+        <div
+          ref={tabRailRef}
+          className="flex-1 flex overflow-x-auto scrollbar-none gap-1 px-2 scroll-smooth"
+        >
+          {[
+            { id: "dashboard" as const, label: "Operations Telemetry", icon: RiShieldFlashLine },
+            { id: "roster" as const, label: `Staff Roster (${volList.length})`, icon: RiUserHeartLine },
+            { id: "tasks" as const, label: `Task Assignments (${allTasks.length})`, icon: RiTaskLine },
+            { id: "attendance" as const, label: "Attendance & Duty Logs", icon: RiTimeLine },
+            { id: "announcements" as const, label: "Targeted Broadcasts", icon: RiMegaphoneLine },
+            { id: "reports" as const, label: "Reports & Exports", icon: RiFileChartLine },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                  isActive
+                    ? "bg-marvel-red text-white shadow-[0_0_15px_#ED1D24]"
+                    : "text-white/60 hover:text-white hover:bg-white/5"
                 }`}
-              style={{ fontFamily: "var(--font-heading)" }}
-            >
-              <Icon />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
+                style={{ fontFamily: "var(--font-heading)" }}
+              >
+                <Icon />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        <button
+          onClick={() => tabRailRef.current?.scrollBy({ left: 220, behavior: "smooth" })}
+          className="p-2 rounded-xl bg-white/5 hover:bg-marvel-red text-white transition-all cursor-pointer z-10 shrink-0 border border-white/10"
+          title="Scroll Right"
+        >
+          <RiArrowRightSLine size={18} />
+        </button>
       </div>
+
 
       {/* 1. OPERATIONS TELEMETRY DASHBOARD */}
       {activeTab === "dashboard" && (

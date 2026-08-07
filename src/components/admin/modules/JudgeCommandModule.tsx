@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-
+import { useState, useEffect, useRef } from "react";
 import {
   RiScales3Line,
   RiShieldFlashLine,
@@ -21,7 +20,10 @@ import {
   RiFileChartLine,
   RiAlertLine,
   RiTimeLine,
+  RiArrowLeftSLine,
+  RiArrowRightSLine,
 } from "react-icons/ri";
+
 import {
   useJudgeControl,
   JuryBroadcastMessage,
@@ -141,39 +143,16 @@ const DEFAULT_WINNERS: WinnerSelection[] = [
   },
 ];
 
-interface JudgeCommandModuleProps {
-  activePage?: string;
-}
-
-export function JudgeCommandModule({ activePage }: JudgeCommandModuleProps) {
+export function JudgeCommandModule() {
   const { broadcasts, saveJuryBroadcasts } = useJudgeControl();
+  const tabRailRef = useRef<HTMLDivElement>(null);
 
-  const getInitialTab = () => {
-    if (!activePage) return "dashboard";
-    if (activePage.endsWith(".roster")) return "roster";
-    if (activePage.endsWith(".builder")) return "builder";
-    if (activePage.endsWith(".results")) return "results";
-    if (activePage.endsWith(".announcements")) return "announcements";
-    return "dashboard";
-  };
-
-  const [activeTab, setActiveTab] = useState<"dashboard" | "roster" | "builder" | "results" | "announcements">(getInitialTab);
-
-  useEffect(() => {
-    if (!activePage) return;
-    if (activePage.endsWith(".roster")) setActiveTab("roster");
-    else if (activePage.endsWith(".builder")) setActiveTab("builder");
-    else if (activePage.endsWith(".results")) setActiveTab("results");
-    else if (activePage.endsWith(".announcements")) setActiveTab("announcements");
-    else if (activePage.endsWith(".dashboard")) setActiveTab("dashboard");
-  }, [activePage]);
-
+  const [activeTab, setActiveTab] = useState<"dashboard" | "roster" | "builder" | "results" | "announcements">("dashboard");
   const [judges, setJudges] = useState<JudgeUser[]>(DEFAULT_JUDGES);
   const [criteria, setCriteria] = useState<ScoreCriterion[]>(DEFAULT_CRITERIA);
   const [winners, setWinners] = useState<WinnerSelection[]>(DEFAULT_WINNERS);
   const [selectedJudgeId, setSelectedJudgeId] = useState<string>(DEFAULT_JUDGES[0].id);
   const [statusMsg, setStatusMsg] = useState("");
-
 
   // Modals & Forms
   const [showAddJudgeModal, setShowAddJudgeModal] = useState(false);
@@ -336,33 +315,56 @@ export function JudgeCommandModule({ activePage }: JudgeCommandModuleProps) {
         </div>
       </div>
 
-      {/* TAB NAVIGATION RAIL */}
-      <div className="flex bg-black/60 p-1.5 rounded-2xl border border-white/10 overflow-x-auto scrollbar-none gap-1">
-        {[
-          { id: "dashboard", label: "Judging Telemetry", icon: RiScales3Line },
-          { id: "roster", label: `Judge Directory (${judges.length})`, icon: RiAwardLine },
-          { id: "builder", label: "Score Sheet Builder", icon: RiFileTextLine },
-          { id: "results", label: "Winner Scorecards & Tie-Breakers", icon: RiTrophyLine },
-          { id: "announcements", label: `Jury Broadcasts (${broadcasts.length})`, icon: RiMegaphoneLine },
-        ].map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center gap-2 whitespace-nowrap cursor-pointer ${isActive
-                  ? "bg-marvel-red text-white shadow-[0_0_15px_#ED1D24]"
-                  : "text-white/60 hover:text-white hover:bg-white/5"
+      {/* TAB NAVIGATION RAIL WITH HORIZONTAL SCROLL BUTTONS */}
+      <div className="relative flex items-center bg-black/60 p-1.5 rounded-2xl border border-white/10 group">
+        <button
+          onClick={() => tabRailRef.current?.scrollBy({ left: -220, behavior: "smooth" })}
+          className="p-2 rounded-xl bg-white/5 hover:bg-metallic-gold hover:text-black text-white transition-all cursor-pointer z-10 shrink-0 border border-white/10"
+          title="Scroll Left"
+        >
+          <RiArrowLeftSLine size={18} />
+        </button>
+
+        <div
+          ref={tabRailRef}
+          className="flex-1 flex overflow-x-auto scrollbar-none gap-1 px-2 scroll-smooth"
+        >
+          {[
+            { id: "dashboard", label: "Judging Telemetry", icon: RiScales3Line },
+            { id: "roster", label: `Judge Directory (${judges.length})`, icon: RiAwardLine },
+            { id: "builder", label: "Score Sheet Builder", icon: RiFileTextLine },
+            { id: "results", label: "Winner Scorecards & Tie-Breakers", icon: RiTrophyLine },
+            { id: "announcements", label: `Jury Broadcasts (${broadcasts.length})`, icon: RiMegaphoneLine },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                  isActive
+                    ? "bg-marvel-red text-white shadow-[0_0_15px_#ED1D24]"
+                    : "text-white/60 hover:text-white hover:bg-white/5"
                 }`}
-              style={{ fontFamily: "var(--font-heading)" }}
-            >
-              <Icon />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
+                style={{ fontFamily: "var(--font-heading)" }}
+              >
+                <Icon />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        <button
+          onClick={() => tabRailRef.current?.scrollBy({ left: 220, behavior: "smooth" })}
+          className="p-2 rounded-xl bg-white/5 hover:bg-metallic-gold hover:text-black text-white transition-all cursor-pointer z-10 shrink-0 border border-white/10"
+          title="Scroll Right"
+        >
+          <RiArrowRightSLine size={18} />
+        </button>
       </div>
+
 
       {/* 1. DASHBOARD TELEMETRY */}
       {activeTab === "dashboard" && (
