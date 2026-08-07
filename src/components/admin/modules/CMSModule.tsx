@@ -393,7 +393,7 @@ export function CMSModule({ activePage }: CMSModuleProps) {
               />
             </div>
 
-            <div>
+            <div className="md:col-span-2">
               <label className="block text-white/70 font-bold mb-1">Subtitle Motto (e.g. Legends Cup 2026)</label>
               <input
                 type="text"
@@ -404,22 +404,6 @@ export function CMSModule({ activePage }: CMSModuleProps) {
               />
             </div>
 
-            <div>
-              <label className="block text-white/70 font-bold mb-1">Registration Gate Status</label>
-              <div className="flex items-center gap-2 pt-1">
-                <button
-                  type="button"
-                  onClick={() => setRegOpen(!regOpen)}
-                  className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase transition-all cursor-pointer border ${
-                    regOpen
-                      ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.3)]"
-                      : "bg-rose-500/20 text-rose-400 border-rose-500/50"
-                  }`}
-                >
-                  {regOpen ? "● REGISTRATION OPEN LIVE" : "○ REGISTRATION CLOSED"}
-                </button>
-              </div>
-            </div>
 
             <div className="md:col-span-2">
               <label className="block text-white/70 font-bold mb-1">Homepage Promo Video Loop URL (MP4 / Direct Link)</label>
