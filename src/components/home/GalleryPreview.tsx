@@ -5,18 +5,17 @@ import Link from "next/link";
 import Image from "next/image";
 import { RiArrowRightLine, RiImageLine, RiFlashlightLine } from "react-icons/ri";
 
-import { useGalleryStore } from "@/lib/galleryStore";
+import { useGalleryItems } from "@/lib/galleryStore";
 
 export function GalleryPreview() {
-  const { items } = useGalleryStore();
-  const activeItems = items.filter((i) => i.active !== false).slice(0, 4);
+  const { items } = useGalleryItems();
+  const photos = items.slice(0, 4);
 
   return (
     <section className="relative bg-[#05050A] section-padding border-t border-vibranium-purple/20 overflow-hidden font-mono">
       {/* Ambient Color Blending */}
       <div className="absolute top-1/2 left-1/4 w-96 h-96 rounded-full bg-vibranium-purple/10 blur-[130px] pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-arc-cyan/10 blur-[130px] pointer-events-none" />
-
 
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
@@ -59,17 +58,17 @@ export function GalleryPreview() {
 
         {/* Masonry-like grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-          {activeItems.map((photo, idx) => (
+          {photos.map((photo, idx) => (
             <motion.div
               key={photo.id || idx}
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: idx * 0.1 }}
-              className="relative aspect-square md:aspect-[3/4] overflow-hidden rounded-2xl border border-white/5 group shadow-lg"
+              className="relative aspect-square md:aspect-[3/4] overflow-hidden rounded-2xl border border-white/5 group shadow-lg bg-black"
             >
               <img
-                src={photo.type === "video" ? (photo.thumbnailUrl || photo.url) : photo.url}
+                src={photo.type === "image" ? photo.url : photo.thumbnailUrl || photo.url}
                 alt={photo.title}
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
               />
@@ -79,13 +78,13 @@ export function GalleryPreview() {
                   {photo.title}
                 </span>
                 <span className="p-2 rounded-full bg-metallic-gold text-black text-xs font-bold">
-                  {photo.type === "video" ? "🎥" : "🖼️"}
+                  {photo.type === "video" ? "🎥" : "📷"}
                 </span>
               </div>
             </motion.div>
           ))}
-
         </div>
+
       </div>
     </section>
   );

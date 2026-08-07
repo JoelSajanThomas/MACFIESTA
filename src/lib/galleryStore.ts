@@ -2,97 +2,90 @@
 
 import { useState, useEffect } from "react";
 
-export interface GalleryMediaItem {
+export interface GalleryItem {
   id: string;
   type: "image" | "video";
   title: string;
-  category: "gaming" | "cultural" | "technical" | "general";
+  category: "gaming" | "cultural" | "technical" | "general" | "pro-show";
   url: string;
   thumbnailUrl?: string;
-  album: string;
   date: string;
-  active: boolean;
+  featured: boolean;
 }
 
-const DEFAULT_GALLERY_ITEMS: GalleryMediaItem[] = [
+export const DEFAULT_GALLERY: GalleryItem[] = [
   {
-    id: "img-1",
+    id: "gal-1",
     type: "image",
     category: "gaming",
-    title: "Thor Gaming Arena Esports Finals",
-    album: "Esports Tournament",
+    title: "Thor Gaming Arena Valorant Finals",
     url: "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=800&auto=format&fit=crop",
     date: "2026-08-07",
-    active: true,
+    featured: true,
   },
   {
-    id: "img-2",
+    id: "gal-2",
     type: "image",
     category: "cultural",
-    title: "Choreo Dance & Dusk 'N Dawn Live Pro Show",
-    album: "Cultural Pro Night",
+    title: "Dusk 'N Dawn Live Pro Night",
     url: "https://images.unsplash.com/photo-1506157786151-b8491531f063?q=80&w=800&auto=format&fit=crop",
     date: "2026-08-07",
-    active: true,
+    featured: true,
   },
   {
-    id: "img-3",
+    id: "gal-3",
     type: "image",
     category: "technical",
-    title: "Byte & Code Hackathon Dev Labs",
-    album: "Tech Hackathon",
+    title: "Byte & Code 24-Hour Hackathon",
     url: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=800&auto=format&fit=crop",
     date: "2026-08-07",
-    active: true,
+    featured: true,
   },
   {
-    id: "vid-1",
+    id: "gal-4",
     type: "video",
-    category: "cultural",
+    category: "pro-show",
     title: "MacFiesta Official Teaser Video",
-    album: "Fest Highlights",
-    url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    url: "https://www.w3schools.com/html/mov_bbb.mp4",
     thumbnailUrl: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=800&auto=format&fit=crop",
     date: "2026-08-07",
-    active: true,
+    featured: true,
   },
   {
-    id: "img-4",
+    id: "gal-5",
+    type: "video",
+    category: "cultural",
+    title: "Choreo Dance Battle Highlights",
+    url: "https://www.w3schools.com/html/mov_bbb.mp4",
+    thumbnailUrl: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=800&auto=format&fit=crop",
+    date: "2026-08-07",
+    featured: false,
+  },
+  {
+    id: "gal-6",
     type: "image",
     category: "general",
-    title: "Inauguration Lighting Ceremony",
-    album: "Opening Ceremony",
+    title: "Legends Cup Medal Ceremony",
     url: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=800&auto=format&fit=crop",
     date: "2026-08-07",
-    active: true,
-  },
-  {
-    id: "vid-2",
-    type: "video",
-    category: "gaming",
-    title: "Valorant Tournament Winning Moments",
-    album: "Esports Tournament",
-    url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-    thumbnailUrl: "https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=800&auto=format&fit=crop",
-    date: "2026-08-07",
-    active: true,
+    featured: false,
   },
 ];
 
+let galleryListeners: Array<() => void> = [];
 let syncChannel: BroadcastChannel | null = null;
-let listeners: Array<() => void> = [];
 
 if (typeof window !== "undefined" && "BroadcastChannel" in window) {
   try {
     syncChannel = new BroadcastChannel("macfiesta_gallery_sync");
     syncChannel.onmessage = () => {
-      notifyListeners();
+      galleryListeners.forEach((l) => l());
     };
   } catch {}
 }
 
-function notifyListeners() {
-  listeners.forEach((l) => l());
+function notifyGalleryListeners() {
+  galleryListeners.forEach((l) => l());
   if (syncChannel) {
     try {
       syncChannel.postMessage("updated");
@@ -100,53 +93,42 @@ function notifyListeners() {
   }
 }
 
-export function getGalleryItems(): GalleryMediaItem[] {
-  if (typeof window === "undefined") return DEFAULT_GALLERY_ITEMS;
+export function getGalleryItems(): GalleryItem[] {
+  if (typeof window === "undefined") return DEFAULT_GALLERY;
   try {
     const saved = localStorage.getItem("macfiesta_gallery_items");
-    return saved ? JSON.parse(saved) : DEFAULT_GALLERY_ITEMS;
+    return saved ? JSON.parse(saved) : DEFAULT_GALLERY;
   } catch {
-    return DEFAULT_GALLERY_ITEMS;
+    return DEFAULT_GALLERY;
   }
 }
 
-export function saveGalleryItems(items: GalleryMediaItem[]): GalleryMediaItem[] {
+export function saveGalleryItems(items: GalleryItem[]): void {
   try {
     localStorage.setItem("macfiesta_gallery_items", JSON.stringify(items));
   } catch {}
-  notifyListeners();
-  return items;
+  notifyGalleryListeners();
 }
 
-export function addGalleryItem(item: Omit<GalleryMediaItem, "id" | "date" | "active">): GalleryMediaItem {
+export function addGalleryItem(item: Omit<GalleryItem, "id" | "date">): GalleryItem {
   const current = getGalleryItems();
-  const newItem: GalleryMediaItem = {
+  const newItem: GalleryItem = {
     ...item,
-    id: `${item.type}-${Date.now()}`,
-    date: new Date().toISOString().slice(0, 10),
-    active: true,
+    id: `gal-${Date.now()}`,
+    date: new Date().toISOString().split("T")[0],
   };
-  const updated = [newItem, ...current];
-  saveGalleryItems(updated);
+  saveGalleryItems([newItem, ...current]);
   return newItem;
 }
 
-export function toggleGalleryItemActive(id: string): GalleryMediaItem[] {
+export function deleteGalleryItem(id: string): void {
   const current = getGalleryItems();
-  const updated = current.map((item) => (item.id === id ? { ...item, active: !item.active } : item));
+  const updated = current.filter((i) => i.id !== id);
   saveGalleryItems(updated);
-  return updated;
 }
 
-export function deleteGalleryItem(id: string): GalleryMediaItem[] {
-  const current = getGalleryItems();
-  const updated = current.filter((item) => item.id !== id);
-  saveGalleryItems(updated);
-  return updated;
-}
-
-export function useGalleryStore() {
-  const [items, setItems] = useState<GalleryMediaItem[]>([]);
+export function useGalleryItems() {
+  const [items, setItems] = useState<GalleryItem[]>(DEFAULT_GALLERY);
 
   const refresh = () => {
     setItems(getGalleryItems());
@@ -155,11 +137,13 @@ export function useGalleryStore() {
   useEffect(() => {
     refresh();
 
-    const handleChange = () => refresh();
-    listeners.push(handleChange);
+    const handleUpdate = () => refresh();
+    galleryListeners.push(handleUpdate);
 
     const handleStorage = (e: StorageEvent) => {
-      if (e.key === "macfiesta_gallery_items") handleChange();
+      if (e.key === "macfiesta_gallery_items") {
+        refresh();
+      }
     };
 
     if (typeof window !== "undefined") {
@@ -167,7 +151,7 @@ export function useGalleryStore() {
     }
 
     return () => {
-      listeners = listeners.filter((l) => l !== handleChange);
+      galleryListeners = galleryListeners.filter((l) => l !== handleUpdate);
       if (typeof window !== "undefined") {
         window.removeEventListener("storage", handleStorage);
       }
@@ -176,10 +160,8 @@ export function useGalleryStore() {
 
   return {
     items,
-    images: items.filter((i) => i.type === "image"),
-    videos: items.filter((i) => i.type === "video"),
+    refresh,
     addItem: addGalleryItem,
-    toggleActive: toggleGalleryItemActive,
     deleteItem: deleteGalleryItem,
     saveItems: saveGalleryItems,
   };
