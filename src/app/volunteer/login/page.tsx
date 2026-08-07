@@ -217,22 +217,31 @@ export default function VolunteerLoginPage() {
                 </p>
               </div>
 
-              {/* Status & Error Alerts */}
-              {error && (
-                <div className="p-3 bg-red-500/20 border border-red-500/50 text-red-400 text-xs font-bold rounded-xl text-center animate-pulse">
-                  {error}
+              <div className="p-3 bg-white/5 border border-white/10 rounded-2xl space-y-1.5 text-xs">
+                <span className="text-[10px] text-arc-cyan font-bold uppercase tracking-wider block">⚡ 1-Click Quick Demo Accounts</span>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => { setVolunteerCode("VOL-101"); setPassword("vol2026"); }}
+                    className="p-2 rounded-xl bg-black/60 hover:bg-arc-cyan/20 border border-white/10 hover:border-arc-cyan text-left text-[11px] transition-colors cursor-pointer"
+                  >
+                    <span className="font-bold text-white block">Kiran (MCA)</span>
+                    <span className="text-white/40 text-[9px]">Code: VOL-101</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setVolunteerCode("VOL-102"); setPassword("vol2026"); }}
+                    className="p-2 rounded-xl bg-black/60 hover:bg-arc-cyan/20 border border-white/10 hover:border-arc-cyan text-left text-[11px] transition-colors cursor-pointer"
+                  >
+                    <span className="font-bold text-white block">Sneha (MBA)</span>
+                    <span className="text-white/40 text-[9px]">Code: VOL-102</span>
+                  </button>
                 </div>
-              )}
-
-              {authenticatedSuccess && (
-                <div className="p-4 bg-emerald-500/20 border border-emerald-500/60 text-emerald-400 text-xs font-bold rounded-xl text-center flex items-center justify-center gap-2 animate-bounce">
-                  <RiCheckDoubleLine className="text-lg" />
-                  <span>Authenticated! Loading Volunteer Dashboard...</span>
-                </div>
-              )}
+              </div>
 
               {/* LOGIN FORM */}
               <form onSubmit={handleLogin} className="space-y-4 text-xs">
+
                 <div>
                   <label className="block text-white/70 font-bold mb-1.5 uppercase tracking-wider">
                     Volunteer ID Code or Email
