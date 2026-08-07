@@ -379,6 +379,20 @@ export function JudgeCommandModule() {
                       </span>
                     </div>
                     <div className="text-[11px] text-white/50">{j.organization}</div>
+                    <div className="text-[10px] text-metallic-gold font-mono flex items-center gap-1">
+                      <span>✉️ {j.email}</span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigator.clipboard.writeText(j.email);
+                          triggerSaved(`✓ Judge Email '${j.email}' copied to clipboard!`);
+                        }}
+                        className="text-white/40 hover:text-white text-[9px] underline cursor-pointer"
+                      >
+                        [Copy]
+                      </button>
+                    </div>
                     <div className="text-[10px] text-arc-cyan font-bold">Assigned: {j.assignedEventName}</div>
                   </div>
                 );
@@ -390,8 +404,14 @@ export function JudgeCommandModule() {
             <div className="marvel-card p-6 rounded-3xl border border-arc-cyan/30 bg-[#0A0D1A] space-y-2">
               <div className="text-xs text-metallic-gold font-bold uppercase">{selectedJudge.judgeCode} • {selectedJudge.category}</div>
               <h3 className="text-xl font-black text-white uppercase" style={{ fontFamily: "var(--font-heading)" }}>{selectedJudge.name}</h3>
-              <p className="text-xs text-white/60">{selectedJudge.designation} ({selectedJudge.organization})</p>
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <span className="px-2.5 py-1 rounded-xl bg-metallic-gold/15 border border-metallic-gold/40 text-metallic-gold font-mono font-bold text-xs">
+                  ✉️ Email: {selectedJudge.email}
+                </span>
+                <span className="text-xs text-white/60">{selectedJudge.designation} ({selectedJudge.organization})</span>
+              </div>
             </div>
+
 
             {/* Permissions */}
             <div className="marvel-card p-6 rounded-3xl border border-arc-cyan/30 bg-[#0A0D1A] space-y-4">

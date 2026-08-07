@@ -365,6 +365,20 @@ export function VolunteerHQModule() {
                       </span>
                     </div>
                     <div className="text-[11px] text-white/50">{vol.department}</div>
+                    <div className="text-[10px] text-arc-cyan font-mono flex items-center gap-1">
+                      <span>✉️ {vol.email}</span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigator.clipboard.writeText(vol.email);
+                          triggerSaved(`✓ Email '${vol.email}' copied to clipboard!`);
+                        }}
+                        className="text-white/40 hover:text-white text-[9px] underline cursor-pointer"
+                      >
+                        [Copy]
+                      </button>
+                    </div>
                     <div className="flex justify-between items-center text-[10px] pt-1 border-t border-white/10">
                       <span className="text-metallic-gold font-bold">Venue: {vol.assignedVenue}</span>
                       <span className={vol.status === "CHECKED_IN" ? "text-emerald-400 font-bold" : "text-white/40"}>
@@ -386,8 +400,15 @@ export function VolunteerHQModule() {
                   <h3 className="text-xl font-black text-white uppercase tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
                     {selectedVol.name}
                   </h3>
-                  <div className="text-xs text-white/60">Phone: {selectedVol.phone} | Venue: {selectedVol.assignedVenue}</div>
+                  <div className="text-xs text-white/70 space-x-2 pt-1">
+                    <span className="px-2 py-1 rounded bg-arc-cyan/10 border border-arc-cyan/30 text-arc-cyan font-mono font-bold">
+                      ✉️ {selectedVol.email}
+                    </span>
+                    <span className="text-white/60">Phone: {selectedVol.phone}</span>
+                    <span className="text-metallic-gold">Venue: {selectedVol.assignedVenue}</span>
+                  </div>
                 </div>
+
 
                 <button
                   onClick={() => openTaskAssignModalForVol(selectedVol.id)}
