@@ -29,6 +29,7 @@ import {
   VolunteerIssueReport,
   saveVolunteersList,
   saveVolunteerTasks,
+  getVolunteerTasks,
 } from "@/lib/volunteerStore";
 
 export function VolunteerHQModule() {
@@ -44,6 +45,8 @@ export function VolunteerHQModule() {
   // Modal States
   const [showAddModal, setShowAddModal] = useState(false);
   const [showTaskModal, setShowTaskModal] = useState(false);
+
+  // New Volunteer States
   const [newName, setNewName] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [newPhone, setNewPhone] = useState("");
@@ -51,10 +54,13 @@ export function VolunteerHQModule() {
   const [newVenue, setNewVenue] = useState("Main Auditorium");
 
   // New Task States
+  const [assigneeVolId, setAssigneeVolId] = useState<string>(selectedVolId);
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDesc, setTaskDesc] = useState("");
   const [taskDeadline, setTaskDeadline] = useState("11:30 AM");
   const [taskPriority, setTaskPriority] = useState<"LOW" | "MEDIUM" | "HIGH" | "URGENT">("HIGH");
+  const [taskChecklist1, setTaskChecklist1] = useState("Verify equipment readiness");
+  const [taskChecklist2, setTaskChecklist2] = useState("Check-in with Department Lead");
 
   // Broadcast Announcement State
   const [annTarget, setAnnTarget] = useState("ALL");
@@ -67,6 +73,7 @@ export function VolunteerHQModule() {
   };
 
   const selectedVol = volList.find((v) => v.id === selectedVolId) || volList[0];
+  const allTasks = getVolunteerTasks();
 
   const filteredVolunteers = volList.filter((v) => {
     const matchesSearch = v.name.toLowerCase().includes(searchQuery.toLowerCase()) || v.volunteerCode.toLowerCase().includes(searchQuery.toLowerCase());
@@ -91,7 +98,6 @@ export function VolunteerHQModule() {
     setVolList(updated);
     saveVolunteersList(updated);
     triggerSaved(`✓ Permission '${String(permKey)}' updated for ${selectedVol.name}`);
-
   };
 
   const handleAddVolunteer = (e: React.FormEvent) => {
@@ -132,28 +138,33 @@ export function VolunteerHQModule() {
 
   const handleAssignTask = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!taskTitle || !selectedVol) return;
+    if (!taskTitle) return;
+
+    const targetVolId = assigneeVolId || selectedVolId;
+    const targetVol = volList.find((v) => v.id === targetVolId) || selectedVol;
 
     const newTask: VolunteerTask = {
       id: `tsk-${Date.now()}`,
-      volunteerId: selectedVol.id,
+      volunteerId: targetVolId,
       title: taskTitle,
       description: taskDesc || "Execute assigned duty task as instructed.",
       deadline: taskDeadline,
       priority: taskPriority,
       status: "PENDING",
       checklist: [
-        { id: `ck-${Date.now()}-1`, text: "Verify equipment readiness", completed: false },
-        { id: `ck-${Date.now()}-2`, text: "Check-in with Department Lead", completed: false },
+        { id: `ck-${Date.now()}-1`, text: taskChecklist1 || "Verify equipment readiness", completed: false },
+        { id: `ck-${Date.now()}-2`, text: taskChecklist2 || "Check-in with Department Lead", completed: false },
       ],
       createdAt: new Date().toLocaleString(),
     };
 
-    saveVolunteerTasks([...assignedTasks, newTask]);
+    const existingTasks = getVolunteerTasks();
+    saveVolunteerTasks([...existingTasks, newTask]);
+
     setTaskTitle("");
     setTaskDesc("");
     setShowTaskModal(false);
-    triggerSaved(`✓ Duty Task Assigned to ${selectedVol.name}!`);
+    triggerSaved(`✓ Duty Task Assigned to ${targetVol?.name || "Volunteer"}!`);
   };
 
   const handleSendAnnouncement = (e: React.FormEvent) => {
@@ -162,6 +173,11 @@ export function VolunteerHQModule() {
     setAnnTitle("");
     setAnnMessage("");
     triggerSaved(`✓ Targeted Announcement Dispatched to ${annTarget} Volunteers!`);
+  };
+
+  const openTaskAssignModalForVol = (volId: string) => {
+    setAssigneeVolId(volId);
+    setShowTaskModal(true);
   };
 
   return (
@@ -190,8 +206,16 @@ export function VolunteerHQModule() {
           )}
 
           <button
+            onClick={() => setShowTaskModal(true)}
+            className="btn-primary py-2.5 px-4 text-xs font-bold uppercase flex items-center gap-2 cursor-pointer shadow-[0_0_15px_#ED1D24]"
+          >
+            <RiTaskLine className="text-base" />
+            <span>+ Assign Task</span>
+          </button>
+
+          <button
             onClick={() => setShowAddModal(true)}
-            className="btn-primary py-2.5 px-5 text-xs font-bold uppercase flex items-center gap-2 cursor-pointer shadow-[0_0_15px_#ED1D24]"
+            className="px-4 py-2.5 bg-arc-cyan text-black font-bold text-xs rounded-xl hover:bg-white transition-colors cursor-pointer flex items-center gap-1.5"
           >
             <RiAddLine className="text-base" />
             <span>+ Add Volunteer</span>
@@ -204,7 +228,7 @@ export function VolunteerHQModule() {
         {[
           { id: "dashboard" as const, label: "Operations Telemetry", icon: RiShieldFlashLine },
           { id: "roster" as const, label: `Staff Roster (${volList.length})`, icon: RiUserHeartLine },
-          { id: "tasks" as const, label: `Task Assignments (${assignedTasks.length})`, icon: RiTaskLine },
+          { id: "tasks" as const, label: `Task Assignments (${allTasks.length})`, icon: RiTaskLine },
           { id: "attendance" as const, label: "Attendance & Duty Logs", icon: RiTimeLine },
           { id: "announcements" as const, label: "Targeted Broadcasts", icon: RiMegaphoneLine },
           { id: "reports" as const, label: "Reports & Exports", icon: RiFileChartLine },
@@ -258,8 +282,8 @@ export function VolunteerHQModule() {
             <div className="p-5 rounded-2xl bg-black/40 border border-arc-cyan/30 space-y-1">
               <span className="text-white/50 text-[10px] uppercase font-bold">Task Completion Rate</span>
               <div className="text-3xl font-black text-arc-cyan">
-                {assignedTasks.length > 0
-                  ? Math.round((assignedTasks.filter((t: VolunteerTask) => t.status === "COMPLETED").length / assignedTasks.length) * 100)
+                {allTasks.length > 0
+                  ? Math.round((allTasks.filter((t: VolunteerTask) => t.status === "COMPLETED").length / allTasks.length) * 100)
                   : 100}%
               </div>
               <span className="text-arc-cyan text-[10px]">Live Dispatch Metrics</span>
@@ -366,11 +390,11 @@ export function VolunteerHQModule() {
                 </div>
 
                 <button
-                  onClick={() => setShowTaskModal(true)}
+                  onClick={() => openTaskAssignModalForVol(selectedVol.id)}
                   className="px-4 py-2.5 bg-arc-cyan text-black font-bold text-xs rounded-xl hover:bg-white transition-colors cursor-pointer flex items-center gap-1.5"
                 >
-                  <RiAddLine className="text-base" />
-                  <span>Assign New Task</span>
+                  <RiTaskLine className="text-base" />
+                  <span>Assign Task to {selectedVol.name.split(" ")[0]}</span>
                 </button>
               </div>
 
@@ -423,7 +447,7 @@ export function VolunteerHQModule() {
         <div className="marvel-card p-6 md:p-8 rounded-3xl border border-arc-cyan/30 bg-[#0A0D1A] space-y-6">
           <div className="flex items-center justify-between border-b border-white/10 pb-4">
             <h3 className="text-lg font-bold text-white uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
-              Active Duty Tasks & Checklists
+              Active Duty Tasks & Checklists ({allTasks.length})
             </h3>
             <button onClick={() => setShowTaskModal(true)} className="btn-primary py-2.5 px-6 text-xs flex items-center gap-2 cursor-pointer shadow-[0_0_15px_#ED1D24]">
               <RiAddLine />
@@ -432,18 +456,26 @@ export function VolunteerHQModule() {
           </div>
 
           <div className="space-y-4 text-xs">
-            {assignedTasks.map((t: VolunteerTask) => (
-              <div key={t.id} className="p-5 bg-black/40 border border-white/10 rounded-2xl space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-0.5 rounded bg-marvel-red/20 text-marvel-red font-bold text-[9px] uppercase">{t.priority}</span>
-                    <span className="font-bold text-white text-sm">{t.title}</span>
+            {allTasks.map((t: VolunteerTask) => {
+              const assignee = volList.find((v) => v.id === t.volunteerId);
+              return (
+                <div key={t.id} className="p-5 bg-black/40 border border-white/10 rounded-2xl space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-0.5 rounded bg-marvel-red/20 text-marvel-red font-bold text-[9px] uppercase">{t.priority}</span>
+                      <span className="font-bold text-white text-sm">{t.title}</span>
+                      {assignee && (
+                        <span className="px-2 py-0.5 rounded bg-arc-cyan/20 text-arc-cyan font-bold text-[9px]">
+                          Assigned to: {assignee.name} ({assignee.volunteerCode})
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-arc-cyan font-bold text-[10px]">Deadline: {t.deadline}</span>
                   </div>
-                  <span className="text-arc-cyan font-bold text-[10px]">Deadline: {t.deadline}</span>
+                  <p className="text-white/60">{t.description}</p>
                 </div>
-                <p className="text-white/60">{t.description}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
@@ -544,6 +576,124 @@ export function VolunteerHQModule() {
                 </button>
                 <button type="submit" className="btn-primary py-2 px-5 font-bold uppercase cursor-pointer">
                   Create Account
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ASSIGN TASK MODAL DIALOG */}
+      {showTaskModal && (
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="max-w-lg w-full marvel-card p-6 md:p-8 rounded-3xl border-2 border-marvel-red/40 bg-[#0A0D1A] space-y-4 shadow-[0_0_50px_rgba(237,29,36,0.3)] relative">
+            <button
+              onClick={() => setShowTaskModal(false)}
+              className="absolute top-5 right-5 text-white/40 hover:text-white p-1"
+            >
+              <RiCloseLine className="text-xl" />
+            </button>
+
+            <h3 className="text-lg font-bold text-white uppercase tracking-wider flex items-center gap-2" style={{ fontFamily: "var(--font-heading)" }}>
+              <RiTaskLine className="text-marvel-red" />
+              <span>Assign Duty Task to Volunteer</span>
+            </h3>
+
+            <form onSubmit={handleAssignTask} className="space-y-4 text-xs">
+              <div>
+                <label className="block text-white/70 font-bold mb-1">Select Assignee Volunteer</label>
+                <select
+                  value={assigneeVolId}
+                  onChange={(e) => setAssigneeVolId(e.target.value)}
+                  className="w-full px-4 py-3 bg-black/60 border border-white/15 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
+                >
+                  {volList.map((v) => (
+                    <option key={v.id} value={v.id}>
+                      {v.name} ({v.volunteerCode}) — {v.department}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-white/70 font-bold mb-1">Duty Task Title</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Verify QR Passes at Auditorium Gate 2"
+                  value={taskTitle}
+                  onChange={(e) => setTaskTitle(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 bg-black/60 border border-white/15 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-white/70 font-bold mb-1">Priority Level</label>
+                  <select
+                    value={taskPriority}
+                    onChange={(e) => setTaskPriority(e.target.value as any)}
+                    className="w-full px-4 py-3 bg-black/60 border border-white/15 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
+                  >
+                    <option value="URGENT">URGENT</option>
+                    <option value="HIGH">HIGH</option>
+                    <option value="MEDIUM">MEDIUM</option>
+                    <option value="LOW">LOW</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-white/70 font-bold mb-1">Reporting Deadline</label>
+                  <input
+                    type="text"
+                    placeholder="11:30 AM"
+                    value={taskDeadline}
+                    onChange={(e) => setTaskDeadline(e.target.value)}
+                    required
+                    className="w-full px-4 py-3 bg-black/60 border border-white/15 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-white/70 font-bold mb-1">Task Instructions & Description</label>
+                <textarea
+                  rows={2}
+                  placeholder="Specific duty instructions for the volunteer..."
+                  value={taskDesc}
+                  onChange={(e) => setTaskDesc(e.target.value)}
+                  className="w-full px-4 py-3 bg-black/60 border border-white/15 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-white/70 font-bold">Verification Checklist Items</label>
+                <input
+                  type="text"
+                  placeholder="Checklist Item 1"
+                  value={taskChecklist1}
+                  onChange={(e) => setTaskChecklist1(e.target.value)}
+                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-xs mb-2"
+                />
+                <input
+                  type="text"
+                  placeholder="Checklist Item 2"
+                  value={taskChecklist2}
+                  onChange={(e) => setTaskChecklist2(e.target.value)}
+                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-xs"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-3 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setShowTaskModal(false)}
+                  className="px-5 py-2.5 bg-white/10 text-white font-bold rounded-xl hover:bg-white/20 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn-primary py-2.5 px-6 font-bold uppercase cursor-pointer shadow-[0_0_20px_#ED1D24]">
+                  Assign Duty Task
                 </button>
               </div>
             </form>
