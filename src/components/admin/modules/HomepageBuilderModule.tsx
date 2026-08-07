@@ -265,35 +265,28 @@ export function HomepageBuilderModule() {
             </div>
 
             {/* Device Viewport Wrapper */}
-            <div className="flex-1 bg-zinc-950/80 p-6 flex items-center justify-center overflow-auto">
+            <div className="flex-1 bg-zinc-950/80 p-4 sm:p-6 flex flex-col items-center justify-center overflow-hidden relative">
               <div
-                className={`bg-[#09090b] border border-white/20 rounded-2xl shadow-2xl overflow-y-auto transition-all duration-300 ${
+                className={`bg-[#05050A] border-2 border-arc-cyan/40 rounded-2xl shadow-[0_0_50px_rgba(0,212,255,0.2)] overflow-hidden transition-all duration-300 relative ${
                   previewDevice === "desktop"
                     ? "w-full h-full"
                     : previewDevice === "tablet"
-                    ? "w-[768px] h-[90%]"
-                    : "w-[375px] h-[90%]"
+                    ? "w-[768px] h-[95%]"
+                    : "w-[375px] h-[95%]"
                 }`}
               >
-                <div className="p-6 space-y-6 text-center">
-                  <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[#F5B301] text-xs font-bold">
-                    ★ Simulated Preview of macfiesta.macfast.org ({previewDevice.toUpperCase()})
-                  </div>
-
-                  {sections
-                    .filter((s) => s.visible)
-                    .map((sec) => (
-                      <div key={sec.id} className="p-8 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                        <h4 className="text-sm font-extrabold text-white uppercase tracking-wider">{sec.title}</h4>
-                        <p className="text-xs text-white/40 font-mono">[{sec.id} component active]</p>
-                      </div>
-                    ))}
-                </div>
+                {/* Live Website Frame */}
+                <iframe
+                  src="/"
+                  className="w-full h-full border-0 bg-[#05050A]"
+                  title="MacFiesta Live Website Preview"
+                />
               </div>
             </div>
           </div>
         </div>
       )}
+
     </div>
   );
 }

@@ -33,19 +33,19 @@ interface SponsorItem {
 
 export function CMSModule() {
   const [activeTab, setActiveTab] = useState<"hero" | "about" | "sponsors" | "faqs" | "contact" | "rules">("sponsors");
-  const { settings, updateSettings } = useFestivalControl();
+  const { settings, sponsors: storeSponsors, faqs: storeFaqs, updateSettings, updateSponsors, updateFaqs } = useFestivalControl();
 
   // About Section CMS
   const [aboutHeading, setAboutHeading] = useState("About MacFiesta");
-  const [aboutBody, setAboutBody] = useState(settings.aboutText);
+  const [aboutBody, setAboutBody] = useState(settings.aboutText || "Earth's premier college festival at MACFAST.");
 
   // Ultimate Sponsors State
-  const [sponsors, setSponsors] = useState<SponsorItem[]>([
+  const sponsors = storeSponsors && storeSponsors.length > 0 ? storeSponsors : [
     { id: "sp-1", name: "Red Bull", tier: "Title Sponsor", logoUrl: "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=150", website: "https://redbull.com", amount: 100000, active: true },
     { id: "sp-2", name: "Monster Energy", tier: "Platinum Partner", logoUrl: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=150", website: "https://monsterenergy.com", amount: 75000, active: true },
     { id: "sp-3", name: "KFC Kerala", tier: "Gold Partner", logoUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=150", website: "https://kfc.in", amount: 50000, active: true },
     { id: "sp-4", name: "Spotify", tier: "Audio Partner", logoUrl: "https://images.unsplash.com/photo-1614680376593-902f749f7051?w=150", website: "https://spotify.com", amount: 40000, active: true },
-  ]);
+  ];
 
   // Sponsor Modal State
   const [showSponsorModal, setShowSponsorModal] = useState(false);
@@ -57,10 +57,10 @@ export function CMSModule() {
   const [spAmount, setSpAmount] = useState<number>(25000);
 
   // FAQs State
-  const [faqs, setFaqs] = useState([
+  const faqs = storeFaqs && storeFaqs.length > 0 ? storeFaqs : [
     { id: "faq-1", question: "Who is eligible to participate in MacFiesta?", answer: "Any student currently enrolled in an accredited college or university with a valid ID card." },
     { id: "faq-2", question: "Is accommodation provided for outstation delegates?", answer: "Yes, hostel accommodations in Block A (Girls) and Block B/C (Boys) are available on booking." },
-  ]);
+  ];
   const [newQuestion, setNewQuestion] = useState("");
   const [newAnswer, setNewAnswer] = useState("");
 
@@ -102,11 +102,11 @@ export function CMSModule() {
     e.preventDefault();
     if (!spName) return;
 
+    let updated: SponsorItem[];
     if (editingSponsor) {
-      setSponsors((prev) =>
-        prev.map((s) =>
-          s.id === editingSponsor.id
-            ? {
+      updated = sponsors.map((s) =>
+        s.id === editingSponsor.id
+          ? {
               ...s,
               name: spName,
               tier: spTier,
@@ -114,10 +114,9 @@ export function CMSModule() {
               website: spWeb,
               amount: Number(spAmount) || 0,
             }
-            : s
-        )
+          : s
       );
-      triggerSaved("✓ Sponsor Details Updated & Synchronized!");
+      triggerSaved("✓ Sponsor Details Updated & Synchronized Live!");
     } else {
       const newItem: SponsorItem = {
         id: `sp-${Date.now()}`,
@@ -128,22 +127,23 @@ export function CMSModule() {
         amount: Number(spAmount) || 0,
         active: true,
       };
-      setSponsors((prev) => [...prev, newItem]);
+      updated = [...sponsors, newItem];
       triggerSaved("✓ New Sponsor Added to Public Website!");
     }
+    updateSponsors(updated as any);
     setShowSponsorModal(false);
   };
 
   const toggleSponsorActive = (id: string) => {
-    setSponsors((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, active: !s.active } : s))
-    );
+    const updated = sponsors.map((s) => (s.id === id ? { ...s, active: !s.active } : s));
+    updateSponsors(updated as any);
     triggerSaved("✓ Sponsor Visibility Toggled!");
   };
 
   const deleteSponsor = (id: string) => {
     if (confirm("Are you sure you want to remove this sponsor?")) {
-      setSponsors((prev) => prev.filter((s) => s.id !== id));
+      const updated = sponsors.filter((s) => s.id !== id);
+      updateSponsors(updated as any);
       triggerSaved("✓ Sponsor Removed!");
     }
   };
@@ -151,13 +151,11 @@ export function CMSModule() {
   const handleAddFaq = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newQuestion || !newAnswer) return;
-    setFaqs((prev) => [
-      ...prev,
-      { id: `faq-${Date.now()}`, question: newQuestion, answer: newAnswer },
-    ]);
+    const updated = [...faqs, { id: `faq-${Date.now()}`, question: newQuestion, answer: newAnswer }];
+    updateFaqs(updated as any);
     setNewQuestion("");
     setNewAnswer("");
-    triggerSaved();
+    triggerSaved("✓ New FAQ Added to Website!");
   };
 
   const handleAddRule = (e: React.FormEvent) => {
@@ -165,8 +163,9 @@ export function CMSModule() {
     if (!newRule) return;
     setGeneralRules((prev) => [...prev, newRule]);
     setNewRule("");
-    triggerSaved();
+    triggerSaved("✓ General Conduct Rule Updated!");
   };
+
 
   return (
     <div className="space-y-6">
@@ -531,7 +530,11 @@ export function CMSModule() {
                   <p className="font-bold text-white text-xs">{faq.question}</p>
                   <button
                     type="button"
-                    onClick={() => setFaqs((prev) => prev.filter((f) => f.id !== faq.id))}
+                    onClick={() => {
+                      const updated = faqs.filter((f: any) => f.id !== faq.id);
+                      updateFaqs(updated as any);
+                      triggerSaved("✓ FAQ Item Removed!");
+                    }}
                     className="p-1 rounded text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer"
                   >
                     <RiDeleteBinLine size={14} />
@@ -540,6 +543,7 @@ export function CMSModule() {
                 <p className="text-xs text-zinc-400">{faq.answer}</p>
               </div>
             ))}
+
           </div>
         </div>
       )}
