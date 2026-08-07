@@ -28,13 +28,10 @@ import {
   RiGalleryLine,
   RiImageAddLine,
   RiVideoLine,
-  RiUploadCloud2Line,
   RiRefreshLine,
 } from "react-icons/ri";
-
 import { useFestivalControl } from "@/lib/festivalStore";
-import { useGalleryItems, normalizeMediaPath } from "@/lib/galleryStore";
-
+import { useGalleryItems } from "@/lib/galleryStore";
 
 interface SponsorItem {
   id: string;
@@ -166,13 +163,13 @@ export function CMSModule({ activePage }: CMSModuleProps) {
       updated = sponsors.map((s) =>
         s.id === editingSponsor.id
           ? {
-              ...s,
-              name: spName,
-              tier: spTier,
-              logoUrl: spLogo || "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=150",
-              website: spWeb,
-              amount: Number(spAmount) || 0,
-            }
+            ...s,
+            name: spName,
+            tier: spTier,
+            logoUrl: spLogo || "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=150",
+            website: spWeb,
+            amount: Number(spAmount) || 0,
+          }
           : s
       );
       triggerSaved("✓ Sponsor Details Updated & Synchronized Live!");
@@ -207,22 +204,18 @@ export function CMSModule({ activePage }: CMSModuleProps) {
     }
   };
 
-  const heroVideoFileRef = useRef<HTMLInputElement | null>(null);
-
   // Hero Submit
   const handleSaveHero = (e: React.FormEvent) => {
     e.preventDefault();
-    const cleanBannerUrl = normalizeMediaPath(heroBannerUrl);
     updateSettings({
       name: heroTitle,
       tagline: heroTagline,
       motto: heroMotto,
-      homepageBanner: cleanBannerUrl,
+      homepageBanner: heroBannerUrl,
       registrationOpen: regOpen,
     });
-    triggerSaved("✓ Hero Banner Copy & Video Settings Updated Live!");
+    triggerSaved("✓ Hero Banner Copy & Registration Settings Updated!");
   };
-
 
   // About Submit
   const handleSaveAbout = (e: React.FormEvent) => {
@@ -337,11 +330,10 @@ export function CMSModule({ activePage }: CMSModuleProps) {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
-                  isActive
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center gap-2 whitespace-nowrap cursor-pointer ${isActive
                     ? "bg-marvel-red text-white shadow-[0_0_15px_#ED1D24]"
                     : "text-white/60 hover:text-white hover:bg-white/5"
-                }`}
+                  }`}
                 style={{ fontFamily: "var(--font-heading)" }}
               >
                 <Icon />
@@ -400,7 +392,7 @@ export function CMSModule({ activePage }: CMSModuleProps) {
               />
             </div>
 
-            <div className="md:col-span-2">
+            <div>
               <label className="block text-white/70 font-bold mb-1">Subtitle Motto (e.g. Legends Cup 2026)</label>
               <input
                 type="text"
@@ -411,49 +403,32 @@ export function CMSModule({ activePage }: CMSModuleProps) {
               />
             </div>
 
-
-            <div className="md:col-span-2 space-y-2">
-              <label className="block text-white/70 font-bold">Homepage Promo Video Loop URL (MP4 / Direct Link)</label>
-
-              <input
-                ref={heroVideoFileRef}
-                type="file"
-                accept="video/*,image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (!file) return;
-                  const reader = new FileReader();
-                  reader.onload = (event) => {
-                    const dataUrl = event.target?.result as string;
-                    if (dataUrl) {
-                      setHeroBannerUrl(dataUrl);
-                      triggerSaved(`✓ Selected video file '${file.name}'! Click Save Hero Changes to apply.`);
-                    }
-                  };
-                  reader.readAsDataURL(file);
-                }}
-                className="hidden"
-              />
-
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={heroBannerUrl}
-                  onChange={(e) => setHeroBannerUrl(e.target.value)}
-                  placeholder="Paste URL, Windows Path (e.g. C:\...\video.mp4), or click Upload"
-                  className="flex-1 px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white font-mono focus:border-arc-cyan focus:outline-none"
-                />
+            <div>
+              <label className="block text-white/70 font-bold mb-1">Registration Gate Status</label>
+              <div className="flex items-center gap-2 pt-1">
                 <button
                   type="button"
-                  onClick={() => heroVideoFileRef.current?.click()}
-                  className="px-4 py-3 rounded-xl bg-white/10 hover:bg-arc-cyan hover:text-black border border-arc-cyan/40 text-arc-cyan font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0"
+                  onClick={() => setRegOpen(!regOpen)}
+                  className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase transition-all cursor-pointer border ${regOpen
+                      ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+                      : "bg-rose-500/20 text-rose-400 border-rose-500/50"
+                    }`}
                 >
-                  <RiUploadCloud2Line className="text-base" />
-                  <span>📁 Upload File</span>
+                  {regOpen ? "● REGISTRATION OPEN LIVE" : "○ REGISTRATION CLOSED"}
                 </button>
               </div>
             </div>
 
+            <div className="md:col-span-2">
+              <label className="block text-white/70 font-bold mb-1">Homepage Promo Video Loop URL (MP4 / Direct Link)</label>
+              <input
+                type="text"
+                value={heroBannerUrl}
+                onChange={(e) => setHeroBannerUrl(e.target.value)}
+                placeholder="https://domain.com/trailer.mp4"
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white font-mono focus:border-arc-cyan focus:outline-none"
+              />
+            </div>
           </div>
         </form>
       )}
@@ -524,9 +499,8 @@ export function CMSModule({ activePage }: CMSModuleProps) {
               {sponsors.map((sp) => (
                 <div
                   key={sp.id}
-                  className={`p-5 rounded-2xl border space-y-3 transition-all ${
-                    sp.active ? "bg-black/60 border-white/10 hover:border-marvel-red" : "bg-black/20 border-white/5 opacity-50"
-                  }`}
+                  className={`p-5 rounded-2xl border space-y-3 transition-all ${sp.active ? "bg-black/60 border-white/10 hover:border-marvel-red" : "bg-black/20 border-white/5 opacity-50"
+                    }`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-marvel-red/20 text-marvel-red border border-marvel-red/40">
@@ -882,9 +856,8 @@ export function CMSModule({ activePage }: CMSModuleProps) {
                     <button
                       key={d.id}
                       onClick={() => setPreviewDevice(d.id)}
-                      className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                        previewDevice === d.id ? "bg-arc-cyan text-black shadow-[0_0_10px_#00D4FF]" : "text-white/50 hover:text-white"
-                      }`}
+                      className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${previewDevice === d.id ? "bg-arc-cyan text-black shadow-[0_0_10px_#00D4FF]" : "text-white/50 hover:text-white"
+                        }`}
                     >
                       <Icon size={14} />
                       <span>{d.label}</span>
@@ -909,13 +882,12 @@ export function CMSModule({ activePage }: CMSModuleProps) {
             {/* Frame Viewport Container */}
             <div className="flex-1 bg-black/90 p-4 flex items-center justify-center overflow-hidden relative">
               <div
-                className={`bg-[#05050A] border-2 border-arc-cyan/40 rounded-2xl shadow-[0_0_50px_rgba(0,212,255,0.25)] overflow-hidden transition-all duration-300 relative ${
-                  previewDevice === "desktop"
+                className={`bg-[#05050A] border-2 border-arc-cyan/40 rounded-2xl shadow-[0_0_50px_rgba(0,212,255,0.25)] overflow-hidden transition-all duration-300 relative ${previewDevice === "desktop"
                     ? "w-full h-full"
                     : previewDevice === "tablet"
-                    ? "w-[768px] h-[95%]"
-                    : "w-[375px] h-[95%]"
-                }`}
+                      ? "w-[768px] h-[95%]"
+                      : "w-[375px] h-[95%]"
+                  }`}
               >
                 <iframe
                   key={iframeKey}

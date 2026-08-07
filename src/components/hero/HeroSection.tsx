@@ -158,10 +158,10 @@ export function HeroSection() {
                   WELCOME TO
                 </span>
                 <span className="block marvel-bang-comic-gradient uppercase pr-4 text-5xl sm:text-7xl lg:text-8xl tracking-tight">
-                  {(settings.name || "MACFIESTA").toUpperCase()}
+                  {settings.name.toUpperCase()}
                 </span>
                 <span className="block text-marvel-red text-2xl sm:text-4xl lg:text-5xl font-black uppercase tracking-[0.2em] font-mono mt-1 drop-shadow-[0_0_20px_#ED1D24]">
-                  {(settings.motto || "LEGENDS CUP").toUpperCase()}
+                  MARVELVERSE
                 </span>
               </motion.h1>
 
@@ -171,9 +171,8 @@ export function HeroSection() {
                 transition={{ duration: 0.8, delay: 0.3 }}
                 className="text-subtitle font-medium text-white/80 max-w-xl mx-auto lg:mx-0 font-mono"
               >
-                "{settings.tagline || "Earth's premier college festival hosted at MACFAST."}" Prepare your suit, verify your squad, and assemble for victory across 26 high-level missions.
+                "Every Hero Has A Mission." — Earth's premier college festival at MACFAST. Prepare your suit, verify your squad, and assemble for victory across 26 high-level missions.
               </motion.p>
-
             </div>
 
             {/* CTAs */}

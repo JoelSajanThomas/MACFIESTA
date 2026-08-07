@@ -13,44 +13,6 @@ export interface GalleryItem {
   featured: boolean;
 }
 
-export function normalizeMediaPath(rawPath: string): string {
-  if (!rawPath) return "";
-  let clean = rawPath.trim();
-
-  // If data URL, blob URL or http/https, return directly
-  if (
-    clean.startsWith("data:") ||
-    clean.startsWith("blob:") ||
-    clean.startsWith("http://") ||
-    clean.startsWith("https://")
-  ) {
-    return clean;
-  }
-
-  // Convert Windows backslashes \ to /
-  clean = clean.replace(/\\/g, "/");
-
-  // Strip file:// prefix
-  if (clean.startsWith("file:///")) {
-    clean = clean.slice(7);
-  } else if (clean.startsWith("file://")) {
-    clean = clean.slice(6);
-  }
-
-  // If path contains /public/, extract relative web path after /public
-  if (clean.toLowerCase().includes("/public/")) {
-    const publicIdx = clean.toLowerCase().indexOf("/public/");
-    clean = clean.slice(publicIdx + "/public".length);
-  }
-
-  // Ensure leading slash for relative paths (e.g. "MARVEL/Video.mp4" -> "/MARVEL/Video.mp4")
-  if (!clean.startsWith("/") && !/^[a-zA-Z]:\//.test(clean)) {
-    clean = `/${clean}`;
-  }
-
-  return clean;
-}
-
 export const DEFAULT_GALLERY: GalleryItem[] = [
   {
     id: "gal-1",
@@ -119,7 +81,7 @@ if (typeof window !== "undefined" && "BroadcastChannel" in window) {
     syncChannel.onmessage = () => {
       galleryListeners.forEach((l) => l());
     };
-  } catch {}
+  } catch { }
 }
 
 function notifyGalleryListeners() {
@@ -127,7 +89,7 @@ function notifyGalleryListeners() {
   if (syncChannel) {
     try {
       syncChannel.postMessage("updated");
-    } catch {}
+    } catch { }
   }
 }
 
@@ -142,14 +104,9 @@ export function getGalleryItems(): GalleryItem[] {
 }
 
 export function saveGalleryItems(items: GalleryItem[]): void {
-  const normalized = items.map((i) => ({
-    ...i,
-    url: normalizeMediaPath(i.url),
-    thumbnailUrl: i.thumbnailUrl ? normalizeMediaPath(i.thumbnailUrl) : undefined,
-  }));
   try {
-    localStorage.setItem("macfiesta_gallery_items", JSON.stringify(normalized));
-  } catch {}
+    localStorage.setItem("macfiesta_gallery_items", JSON.stringify(items));
+  } catch { }
   notifyGalleryListeners();
 }
 
@@ -157,8 +114,6 @@ export function addGalleryItem(item: Omit<GalleryItem, "id" | "date">): GalleryI
   const current = getGalleryItems();
   const newItem: GalleryItem = {
     ...item,
-    url: normalizeMediaPath(item.url),
-    thumbnailUrl: item.thumbnailUrl ? normalizeMediaPath(item.thumbnailUrl) : undefined,
     id: `gal-${Date.now()}`,
     date: new Date().toISOString().split("T")[0],
   };
