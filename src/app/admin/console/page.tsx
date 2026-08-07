@@ -35,8 +35,8 @@ import { FestivalManagement } from "@/components/admin/modules/FestivalManagemen
 import { SystemLogsModule } from "@/components/admin/modules/SystemLogsModule";
 import { MediaModule } from "@/components/admin/modules/MediaModule";
 import { ProfileModule } from "@/components/admin/modules/ProfileModule";
-import { HomepageBuilderModule } from "@/components/admin/modules/HomepageBuilderModule";
 import { CMSModule } from "@/components/admin/modules/CMSModule";
+
 import { AICopilotModule } from "@/components/admin/modules/AICopilotModule";
 import { VolunteerHQModule } from "@/components/admin/modules/VolunteerHQModule";
 import { JudgeCommandModule } from "@/components/admin/modules/JudgeCommandModule";
@@ -247,7 +247,6 @@ export default function AdminDashboardPage() {
       // 3. Website Workspace
       case "website":
       case "festival.builder":
-        return <HomepageBuilderModule />;
       case "cms":
       case "cms.hero":
       case "cms.about":
@@ -255,6 +254,7 @@ export default function AdminDashboardPage() {
       case "cms.faqs":
       case "cms.contact":
         return <CMSModule activePage={activePage} />;
+
 
 
       // 4. Participants Workspace
