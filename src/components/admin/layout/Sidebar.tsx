@@ -76,12 +76,10 @@ export function Sidebar({
             activePage === hub.id ||
             hub.pages.some((p) => p.id === activePage);
 
-          const isExpanded = activeHubId === hub.id || isSelected;
-
           return (
             <div
               key={hub.id}
-              className="relative group w-full flex flex-col items-center"
+              className="relative group w-full flex justify-center"
               onMouseEnter={() => collapsed && setHoveredHubId(hub.id)}
               onMouseLeave={() => collapsed && setHoveredHubId(null)}
             >
@@ -91,12 +89,7 @@ export function Sidebar({
                     onSelectPage(hub.id);
                     setActiveHubId(null);
                   } else {
-                    if (collapsed) {
-                      setActiveHubId(activeHubId === hub.id ? null : hub.id);
-                    } else {
-                      setActiveHubId(activeHubId === hub.id ? null : hub.id);
-                      onSelectPage(hub.pages[0].id);
-                    }
+                    onSelectPage(hub.pages[0].id);
                   }
                 }}
                 className={`
@@ -124,36 +117,10 @@ export function Sidebar({
                   <span className="absolute -left-2 top-1/2 -translate-y-1/2 w-1.5 h-4 bg-[#F5B301] rounded-r-full shadow-[0_0_10px_#F5B301]" />
                 )}
               </button>
-
-              {/* Sub-Pages List in Expanded Sidebar */}
-              {!collapsed && hub.pages.length > 0 && isExpanded && (
-                <div className="w-full pl-8 pr-1 py-1 space-y-1">
-                  {hub.pages.map((p) => {
-                    const isPageActive = activePage === p.id;
-                    return (
-                      <button
-                        key={p.id}
-                        onClick={() => onSelectPage(p.id)}
-                        className={`w-full text-left px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all flex items-center justify-between cursor-pointer ${
-                          isPageActive
-                            ? "bg-[#F5B301] text-zinc-950 shadow-md"
-                            : "text-zinc-400 hover:text-white hover:bg-zinc-800/50"
-                        }`}
-                      >
-                        <span className="truncate">{p.label}</span>
-                        {p.badge && (
-                          <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-400 font-extrabold">
-                            {p.badge}
-                          </span>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
             </div>
           );
         })}
+
 
       </nav>
 
