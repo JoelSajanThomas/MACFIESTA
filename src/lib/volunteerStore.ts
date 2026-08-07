@@ -57,10 +57,15 @@ export interface VolunteerTask {
 export interface DutyAttendanceRecord {
   id: string;
   volunteerId: string;
+  volunteerCode: string;
+  volunteerName: string;
+  department: string;
+  venue: string;
   clockInTime: string;
-  clockOutTime?: string;
-  totalMinutes: number;
-  status: "ACTIVE" | "COMPLETED";
+  clockOutTime: string;
+  totalHours: string;
+  status: "CHECKED_IN" | "OFF_DUTY" | "LATE_ARRIVAL";
+  timestamp: string;
 }
 
 // ── 4. Reported Issues & Emergencies ──────────────────────────────────
@@ -147,6 +152,35 @@ const DEFAULT_VOLUNTEERS: VolunteerUser[] = [
       canUploadProof: true,
       canUpdateVenueStatus: false,
     },
+  },
+];
+
+const DEFAULT_ATTENDANCE: DutyAttendanceRecord[] = [
+  {
+    id: "att-101",
+    volunteerId: "v-101",
+    volunteerCode: "VOL-101",
+    volunteerName: "Kiran Kumar",
+    department: "Computer Applications (MCA)",
+    venue: "Lab 3 & Auditorium",
+    clockInTime: "2026-08-07 @ 08:30:15 (08:30:15 AM)",
+    clockOutTime: "Active On-Duty",
+    totalHours: "5 hrs 15 mins (Ongoing)",
+    status: "CHECKED_IN",
+    timestamp: "2026-08-07 @ 08:30:15 (08:30:15 AM)",
+  },
+  {
+    id: "att-102",
+    volunteerId: "v-102",
+    volunteerCode: "VOL-102",
+    volunteerName: "Sneha Roy",
+    department: "Management Studies (MBA)",
+    venue: "Seminar Hall B",
+    clockInTime: "2026-08-07 @ 09:00:00 (09:00:00 AM)",
+    clockOutTime: "2026-08-07 @ 13:30:00 (01:30:00 PM)",
+    totalHours: "4 hrs 30 mins",
+    status: "OFF_DUTY",
+    timestamp: "2026-08-07 @ 09:00:00 (09:00:00 AM)",
   },
 ];
 
@@ -241,6 +275,23 @@ function notifyListeners() {
   }
 }
 
+function formatExactTime(d = new Date()) {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const year = d.getFullYear();
+  const month = pad(d.getMonth() + 1);
+  const day = pad(d.getDate());
+  const hours24 = pad(d.getHours());
+  const minutes = pad(d.getMinutes());
+  const seconds = pad(d.getSeconds());
+
+  let h12 = d.getHours();
+  const ampm = h12 >= 12 ? "PM" : "AM";
+  h12 = h12 % 12 || 12;
+  const h12Str = pad(h12);
+
+  return `${year}-${month}-${day} @ ${hours24}:${minutes}:${seconds} (${h12Str}:${minutes}:${seconds} ${ampm})`;
+}
+
 // ── GETTERS AND SETTERS ──────────────────────────────────────────────
 export function getVolunteersList(): VolunteerUser[] {
   if (typeof window === "undefined") return DEFAULT_VOLUNTEERS;
@@ -258,6 +309,24 @@ export function saveVolunteersList(list: VolunteerUser[]) {
   } catch {}
   notifyListeners();
   return list;
+}
+
+export function getAttendanceLogs(): DutyAttendanceRecord[] {
+  if (typeof window === "undefined") return DEFAULT_ATTENDANCE;
+  try {
+    const saved = localStorage.getItem("macfiesta_volunteer_attendance");
+    return saved ? JSON.parse(saved) : DEFAULT_ATTENDANCE;
+  } catch {
+    return DEFAULT_ATTENDANCE;
+  }
+}
+
+export function saveAttendanceLogs(logs: DutyAttendanceRecord[]) {
+  try {
+    localStorage.setItem("macfiesta_volunteer_attendance", JSON.stringify(logs));
+  } catch {}
+  notifyListeners();
+  return logs;
 }
 
 export function getVolunteerTasks(): VolunteerTask[] {
@@ -324,12 +393,84 @@ export function getSharedFiles(): SharedVolunteerFile[] {
   }
 }
 
+// ── CLOCK DUTY SYNC FUNCTION ─────────────────────────────────────────
+export function toggleVolunteerClockDuty(volId: string) {
+  const currentVolunteers = getVolunteersList();
+  const currentAttendance = getAttendanceLogs();
+  const target = currentVolunteers.find((v) => v.id === volId);
+
+  if (!target) return;
+
+  const nextStatus: "CHECKED_IN" | "OFF_DUTY" = target.status === "CHECKED_IN" ? "OFF_DUTY" : "CHECKED_IN";
+
+  // 1. Update volunteer list status
+  const updatedVolList = currentVolunteers.map((v) => (v.id === volId ? { ...v, status: nextStatus } : v));
+  saveVolunteersList(updatedVolList);
+
+  // 2. Update or create attendance record with exact timestamp
+  const nowStr = formatExactTime(new Date());
+  const existingIndex = currentAttendance.findIndex((a) => a.volunteerId === volId && a.clockOutTime === "Active On-Duty");
+
+  let updatedAttendance: DutyAttendanceRecord[];
+
+  if (nextStatus === "CHECKED_IN") {
+    // New Clock-In
+    const newRecord: DutyAttendanceRecord = {
+      id: `att-${Date.now()}`,
+      volunteerId: target.id,
+      volunteerCode: target.volunteerCode,
+      volunteerName: target.name,
+      department: target.department,
+      venue: target.assignedVenue,
+      clockInTime: nowStr,
+      clockOutTime: "Active On-Duty",
+      totalHours: "Ongoing Shift",
+      status: "CHECKED_IN",
+      timestamp: nowStr,
+    };
+    updatedAttendance = [newRecord, ...currentAttendance];
+  } else {
+    // Clock-Out
+    if (existingIndex >= 0) {
+      updatedAttendance = currentAttendance.map((a, idx) => {
+        if (idx === existingIndex) {
+          return {
+            ...a,
+            clockOutTime: nowStr,
+            totalHours: "Shift Completed",
+            status: "OFF_DUTY",
+          };
+        }
+        return a;
+      });
+    } else {
+      const newRecord: DutyAttendanceRecord = {
+        id: `att-${Date.now()}`,
+        volunteerId: target.id,
+        volunteerCode: target.volunteerCode,
+        volunteerName: target.name,
+        department: target.department,
+        venue: target.assignedVenue,
+        clockInTime: nowStr,
+        clockOutTime: nowStr,
+        totalHours: "Shift Completed",
+        status: "OFF_DUTY",
+        timestamp: nowStr,
+      };
+      updatedAttendance = [newRecord, ...currentAttendance];
+    }
+  }
+
+  saveAttendanceLogs(updatedAttendance);
+}
+
 // ── REACT HOOK FOR VOLUNTEERS ─────────────────────────────────────────
 export function useVolunteerControl(volunteerId = "v-101") {
   const [volunteers, setVolunteers] = useState<VolunteerUser[]>(DEFAULT_VOLUNTEERS);
   const [tasks, setTasks] = useState<VolunteerTask[]>(DEFAULT_TASKS);
   const [venueStatusList, setVenueStatusList] = useState<EventVenueLiveStatus[]>(DEFAULT_LIVE_STATUS);
   const [issues, setIssues] = useState<VolunteerIssueReport[]>(DEFAULT_ISSUES);
+  const [attendanceLogs, setAttendanceLogs] = useState<DutyAttendanceRecord[]>(DEFAULT_ATTENDANCE);
   const [sharedFiles] = useState<SharedVolunteerFile[]>(DEFAULT_SHARED_FILES);
 
   const refreshAll = () => {
@@ -337,6 +478,7 @@ export function useVolunteerControl(volunteerId = "v-101") {
     setTasks(getVolunteerTasks());
     setVenueStatusList(getVenueStatusList());
     setIssues(getVolunteerIssues());
+    setAttendanceLogs(getAttendanceLogs());
   };
 
   useEffect(() => {
@@ -411,14 +553,9 @@ export function useVolunteerControl(volunteerId = "v-101") {
   };
 
   const toggleClockDuty = () => {
-    const updated = volunteers.map((v) => {
-      if (v.id === currentVolunteer.id) {
-        const nextStatus = v.status === "CHECKED_IN" ? "OFF_DUTY" : "CHECKED_IN";
-        return { ...v, status: nextStatus as "CHECKED_IN" | "OFF_DUTY" };
-      }
-      return v;
-    });
-    saveVolunteersList(updated);
+    if (currentVolunteer) {
+      toggleVolunteerClockDuty(currentVolunteer.id);
+    }
   };
 
   return {
@@ -427,6 +564,7 @@ export function useVolunteerControl(volunteerId = "v-101") {
     assignedTasks,
     currentVenueStatus,
     issues,
+    attendanceLogs,
     sharedFiles,
 
     updateTaskStatus,
