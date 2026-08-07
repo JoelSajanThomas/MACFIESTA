@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   RiGlobalLine,
   RiSaveLine,
@@ -18,8 +18,20 @@ import {
   RiCloseLine,
   RiEyeLine,
   RiEyeOffLine,
+  RiDeviceLine,
+  RiMacbookLine,
+  RiTabletLine,
+  RiSmartphoneLine,
+  RiSparklingLine,
+  RiArrowLeftSLine,
+  RiArrowRightSLine,
+  RiGalleryLine,
+  RiImageAddLine,
+  RiVideoLine,
+  RiRefreshLine,
 } from "react-icons/ri";
 import { useFestivalControl } from "@/lib/festivalStore";
+import { useGalleryItems } from "@/lib/galleryStore";
 
 interface SponsorItem {
   id: string;
@@ -36,33 +48,53 @@ interface CMSModuleProps {
 }
 
 export function CMSModule({ activePage }: CMSModuleProps) {
-  const [activeTab, setActiveTab] = useState<"hero" | "about" | "sponsors" | "faqs" | "contact" | "rules">("sponsors");
+  const { settings, updateSettings, sponsors: storeSponsors, updateSponsors, faqs: storeFaqs, updateFaqs } = useFestivalControl();
+  const { items: galleryItems, addItem: addGalleryItem, deleteItem: deleteGalleryItem } = useGalleryItems();
+
+  const tabRailRef = useRef<HTMLDivElement>(null);
+  const [activeTab, setActiveTab] = useState<"hero" | "about" | "sponsors" | "gallery" | "faqs" | "contact" | "rules">("hero");
 
   useEffect(() => {
     if (!activePage) return;
     if (activePage.endsWith(".hero")) setActiveTab("hero");
     else if (activePage.endsWith(".about")) setActiveTab("about");
     else if (activePage.endsWith(".sponsors")) setActiveTab("sponsors");
+    else if (activePage.endsWith(".gallery")) setActiveTab("gallery");
     else if (activePage.endsWith(".faqs")) setActiveTab("faqs");
     else if (activePage.endsWith(".contact")) setActiveTab("contact");
     else if (activePage.endsWith(".rules")) setActiveTab("rules");
-    else if (activePage === "cms") setActiveTab("sponsors");
+    else if (activePage === "cms" || activePage === "website") setActiveTab("hero");
   }, [activePage]);
 
-  const { settings, updateSettings } = useFestivalControl();
+  const [statusMsg, setStatusMsg] = useState("");
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [previewDevice, setPreviewDevice] = useState<"desktop" | "tablet" | "mobile">("desktop");
+  const [iframeKey, setIframeKey] = useState(0);
 
+  const triggerSaved = (msg = "✓ Public Website Content Updated & Synchronized Live!") => {
+    setStatusMsg(msg);
+    setIframeKey((prev) => prev + 1);
+    setTimeout(() => setStatusMsg(""), 3500);
+  };
 
-  // About Section CMS
+  // Hero States
+  const [heroTitle, setHeroTitle] = useState(settings.name || "MACFIESTA 2026");
+  const [heroTagline, setHeroTagline] = useState(settings.tagline || "Earth's Premier College Festival");
+  const [heroMotto, setHeroMotto] = useState(settings.motto || "Legends Cup 2026");
+  const [heroBannerUrl, setHeroBannerUrl] = useState(settings.homepageBanner || "");
+  const [regOpen, setRegOpen] = useState(settings.registrationOpen ?? true);
+
+  // About Section States
   const [aboutHeading, setAboutHeading] = useState("About MacFiesta");
-  const [aboutBody, setAboutBody] = useState(settings.aboutText);
+  const [aboutBody, setAboutBody] = useState(settings.aboutText || "Earth's premier college festival hosted at MACFAST Campus.");
 
-  // Ultimate Sponsors State
-  const [sponsors, setSponsors] = useState<SponsorItem[]>([
+  // Sponsors State
+  const sponsors: SponsorItem[] = storeSponsors && storeSponsors.length > 0 ? storeSponsors : [
     { id: "sp-1", name: "Red Bull", tier: "Title Sponsor", logoUrl: "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=150", website: "https://redbull.com", amount: 100000, active: true },
     { id: "sp-2", name: "Monster Energy", tier: "Platinum Partner", logoUrl: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=150", website: "https://monsterenergy.com", amount: 75000, active: true },
     { id: "sp-3", name: "KFC Kerala", tier: "Gold Partner", logoUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=150", website: "https://kfc.in", amount: 50000, active: true },
     { id: "sp-4", name: "Spotify", tier: "Audio Partner", logoUrl: "https://images.unsplash.com/photo-1614680376593-902f749f7051?w=150", website: "https://spotify.com", amount: 40000, active: true },
-  ]);
+  ];
 
   // Sponsor Modal State
   const [showSponsorModal, setShowSponsorModal] = useState(false);
@@ -73,15 +105,23 @@ export function CMSModule({ activePage }: CMSModuleProps) {
   const [spWeb, setSpWeb] = useState("");
   const [spAmount, setSpAmount] = useState<number>(25000);
 
+  // Gallery Add Modal
+  const [showGalleryModal, setShowGalleryModal] = useState(false);
+  const [galType, setGalType] = useState<"image" | "video">("image");
+  const [galTitle, setGalTitle] = useState("");
+  const [galCategory, setGalCategory] = useState<"cultural" | "gaming" | "technical" | "general" | "pro-show">("cultural");
+  const [galUrl, setGalUrl] = useState("");
+  const [galThumb, setGalThumb] = useState("");
+
   // FAQs State
-  const [faqs, setFaqs] = useState([
+  const faqs = storeFaqs && storeFaqs.length > 0 ? storeFaqs : [
     { id: "faq-1", question: "Who is eligible to participate in MacFiesta?", answer: "Any student currently enrolled in an accredited college or university with a valid ID card." },
     { id: "faq-2", question: "Is accommodation provided for outstation delegates?", answer: "Yes, hostel accommodations in Block A (Girls) and Block B/C (Boys) are available on booking." },
-  ]);
+  ];
   const [newQuestion, setNewQuestion] = useState("");
   const [newAnswer, setNewAnswer] = useState("");
 
-  // Rules State
+  // Conduct Rules
   const [generalRules, setGeneralRules] = useState([
     "Delegates must carry valid college ID cards at all times.",
     "Decisions of judges and festival coordinators are final and binding.",
@@ -89,14 +129,13 @@ export function CMSModule({ activePage }: CMSModuleProps) {
   ]);
   const [newRule, setNewRule] = useState("");
 
-  const [statusMsg, setStatusMsg] = useState("");
+  // Contact States
+  const [contactEmail, setContactEmail] = useState("macfiesta@macfast.org");
+  const [contactPhone, setContactPhone] = useState("+91 98470 12345");
+  const [contactAddress, setContactAddress] = useState("MACFAST Campus, Tiruvalla, Pathanamthitta, Kerala 689101");
 
-  const triggerSaved = (msg = "✓ Public Website Content Updated & Synchronized Live!") => {
-    setStatusMsg(msg);
-    setTimeout(() => setStatusMsg(""), 3000);
-  };
-
-  const openAddSponsorModal = (item?: SponsorItem) => {
+  // Sponsor Handlers
+  const openSponsorModal = (item?: SponsorItem) => {
     if (item) {
       setEditingSponsor(item);
       setSpName(item.name);
@@ -119,11 +158,11 @@ export function CMSModule({ activePage }: CMSModuleProps) {
     e.preventDefault();
     if (!spName) return;
 
+    let updated: SponsorItem[];
     if (editingSponsor) {
-      setSponsors((prev) =>
-        prev.map((s) =>
-          s.id === editingSponsor.id
-            ? {
+      updated = sponsors.map((s) =>
+        s.id === editingSponsor.id
+          ? {
               ...s,
               name: spName,
               tier: spTier,
@@ -131,10 +170,9 @@ export function CMSModule({ activePage }: CMSModuleProps) {
               website: spWeb,
               amount: Number(spAmount) || 0,
             }
-            : s
-        )
+          : s
       );
-      triggerSaved("✓ Sponsor Details Updated & Synchronized!");
+      triggerSaved("✓ Sponsor Details Updated & Synchronized Live!");
     } else {
       const newItem: SponsorItem = {
         id: `sp-${Date.now()}`,
@@ -145,178 +183,412 @@ export function CMSModule({ activePage }: CMSModuleProps) {
         amount: Number(spAmount) || 0,
         active: true,
       };
-      setSponsors((prev) => [...prev, newItem]);
+      updated = [...sponsors, newItem];
       triggerSaved("✓ New Sponsor Added to Public Website!");
     }
+    updateSponsors(updated as any);
     setShowSponsorModal(false);
   };
 
   const toggleSponsorActive = (id: string) => {
-    setSponsors((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, active: !s.active } : s))
-    );
+    const updated = sponsors.map((s) => (s.id === id ? { ...s, active: !s.active } : s));
+    updateSponsors(updated as any);
     triggerSaved("✓ Sponsor Visibility Toggled!");
   };
 
   const deleteSponsor = (id: string) => {
     if (confirm("Are you sure you want to remove this sponsor?")) {
-      setSponsors((prev) => prev.filter((s) => s.id !== id));
+      const updated = sponsors.filter((s) => s.id !== id);
+      updateSponsors(updated as any);
       triggerSaved("✓ Sponsor Removed!");
     }
   };
 
+  // Hero Submit
+  const handleSaveHero = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateSettings({
+      name: heroTitle,
+      tagline: heroTagline,
+      motto: heroMotto,
+      homepageBanner: heroBannerUrl,
+      registrationOpen: regOpen,
+    });
+    triggerSaved("✓ Hero Banner Copy & Registration Settings Updated!");
+  };
+
+  // About Submit
+  const handleSaveAbout = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateSettings({
+      aboutText: aboutBody,
+    });
+    triggerSaved("✓ About Festival Content Updated Live!");
+  };
+
+  // FAQ Handlers
   const handleAddFaq = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newQuestion || !newAnswer) return;
-    setFaqs((prev) => [
-      ...prev,
-      { id: `faq-${Date.now()}`, question: newQuestion, answer: newAnswer },
-    ]);
+    const updated = [...faqs, { id: `faq-${Date.now()}`, question: newQuestion, answer: newAnswer }];
+    updateFaqs(updated as any);
     setNewQuestion("");
     setNewAnswer("");
-    triggerSaved();
+    triggerSaved("✓ New FAQ Published Live!");
   };
 
-  const handleAddRule = (e: React.FormEvent) => {
+  const handleDeleteFaq = (id: string) => {
+    const updated = faqs.filter((f: any) => f.id !== id);
+    updateFaqs(updated as any);
+    triggerSaved("✓ FAQ Removed!");
+  };
+
+  // Gallery Add Handler
+  const handleAddGalleryMedia = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newRule) return;
-    setGeneralRules((prev) => [...prev, newRule]);
-    setNewRule("");
-    triggerSaved();
+    if (!galTitle || !galUrl) return;
+
+    addGalleryItem({
+      type: galType,
+      title: galTitle,
+      category: galCategory,
+      url: galUrl,
+      thumbnailUrl: galThumb || (galType === "image" ? galUrl : "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=800"),
+      featured: true,
+    });
+
+    triggerSaved(`✓ New ${galType === "image" ? "Photo" : "Video"} Added to Live Gallery!`);
+    setGalTitle("");
+    setGalUrl("");
+    setGalThumb("");
+    setShowGalleryModal(false);
   };
 
   return (
-    <div className="space-y-6">
-      {/* CMS Module Banner */}
-      <div className="p-6 rounded-3xl bg-zinc-900/60 border border-zinc-800/80 flex flex-col md:flex-row md:items-center justify-between gap-4 backdrop-blur-xl">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-[#F5B301] text-zinc-950 shadow-md">
-              Live Website CMS & Sponsors Suite
-            </span>
-            <span className="text-xs text-zinc-400 font-semibold">Real-Time Synchronization</span>
+    <div className="space-y-6 select-none font-mono">
+      {/* Toast Alert */}
+      {statusMsg && (
+        <div className="px-4 py-2 bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 text-xs font-bold rounded-xl animate-pulse flex items-center gap-2">
+          <RiCheckDoubleLine className="text-base" />
+          <span>{statusMsg}</span>
+        </div>
+      )}
+
+      {/* HEADER BANNER WITH STARK HUD Telemetry & Live Preview Launcher */}
+      <div className="glass p-6 rounded-3xl border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#0A0D1A] shadow-[0_0_40px_rgba(0,212,255,0.15)]">
+        <div className="space-y-1">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-marvel-red/10 border border-marvel-red/30 text-marvel-red text-[10px] font-bold uppercase tracking-widest">
+            <RiSparklingLine className="animate-spin-slow" />
+            <span>REAL-TIME VISUAL CMS & PUBLIC WEBSITE STUDIO</span>
           </div>
-          <h1 className="text-xl font-black text-white uppercase tracking-wider flex items-center gap-2">
-            <RiGlobalLine className="text-[#F5B301]" />
-            <span>Public Website Content & Sponsor Manager</span>
-          </h1>
-          <p className="text-xs text-zinc-400">
-            Add sponsors, manage tiers, edit homepage hero banner, about text, FAQs, and general rules live.
+          <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
+            Website CMS <span className="marvel-bang-comic-gradient font-black">& Visual Editor</span>
+          </h2>
+          <p className="text-xs text-white/50">
+            Edit Hero Copy, Videos, Sponsors, FAQs, Photo/Video Gallery & Contact Details with instant live sync.
           </p>
         </div>
 
-        {statusMsg && (
-          <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-full flex items-center gap-1 shadow-md">
-            <RiCheckDoubleLine size={16} /> {statusMsg}
-          </span>
-        )}
+        {/* Live Multi-Device Preview Launcher Button */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowPreviewModal(true)}
+            className="px-5 py-3 rounded-xl bg-arc-cyan text-black font-bold text-xs uppercase tracking-wider hover:bg-white transition-all cursor-pointer flex items-center gap-2 shadow-[0_0_20px_#00D4FF]"
+          >
+            <RiDeviceLine className="text-lg animate-pulse" />
+            <span>Launch Live Preview</span>
+          </button>
+        </div>
       </div>
 
-      {/* CMS Category Tabs */}
-      <div className="flex flex-wrap items-center gap-2 p-3 rounded-3xl bg-zinc-900/60 border border-zinc-800/80">
-        {[
-          { id: "sponsors", label: "Sponsors & Partners", icon: RiCoupon3Line },
-          { id: "hero", label: "Homepage Hero & Video", icon: RiGlobalLine },
-          { id: "about", label: "About Page Content", icon: RiFileTextLine },
-          { id: "faqs", label: "FAQs Manager", icon: RiQuestionAnswerLine },
-          { id: "contact", label: "Contact Info & Address", icon: RiContactsBookLine },
-          { id: "rules", label: "General Conduct Rules", icon: RiShieldLine },
-        ].map((tab) => {
-          const Icon = tab.icon;
-          const isSelected = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-extrabold transition-all cursor-pointer ${isSelected
-                ? "bg-[#F5B301] text-zinc-950 shadow-md"
-                : "bg-zinc-800/60 text-zinc-300 hover:bg-zinc-700 hover:text-white"
+      {/* HORIZONTAL SCROLLABLE TAB NAVIGATION RAIL WITH ARROWS */}
+      <div className="relative flex items-center bg-black/60 p-1.5 rounded-2xl border border-white/10 group">
+        <button
+          onClick={() => tabRailRef.current?.scrollBy({ left: -220, behavior: "smooth" })}
+          className="p-2 rounded-xl bg-white/5 hover:bg-marvel-red text-white transition-all cursor-pointer z-10 shrink-0 border border-white/10"
+          title="Scroll Left"
+        >
+          <RiArrowLeftSLine size={18} />
+        </button>
+
+        <div
+          ref={tabRailRef}
+          className="flex-1 flex overflow-x-auto scrollbar-none gap-1 px-2 scroll-smooth"
+        >
+          {[
+            { id: "hero" as const, label: "Homepage Hero & Video", icon: RiGlobalLine },
+            { id: "about" as const, label: "About Festival & Mission", icon: RiFileTextLine },
+            { id: "sponsors" as const, label: `Sponsors & Partners (${sponsors.length})`, icon: RiCoupon3Line },
+            { id: "gallery" as const, label: `Photo & Video Gallery (${galleryItems.length})`, icon: RiGalleryLine },
+            { id: "faqs" as const, label: `FAQ Manager (${faqs.length})`, icon: RiQuestionAnswerLine },
+            { id: "contact" as const, label: "Footer & Contact Info", icon: RiContactsBookLine },
+            { id: "rules" as const, label: "Conduct Rules", icon: RiShieldLine },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                  isActive
+                    ? "bg-marvel-red text-white shadow-[0_0_15px_#ED1D24]"
+                    : "text-white/60 hover:text-white hover:bg-white/5"
                 }`}
-            >
-              <Icon size={16} />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
+                style={{ fontFamily: "var(--font-heading)" }}
+              >
+                <Icon />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        <button
+          onClick={() => tabRailRef.current?.scrollBy({ left: 220, behavior: "smooth" })}
+          className="p-2 rounded-xl bg-white/5 hover:bg-marvel-red text-white transition-all cursor-pointer z-10 shrink-0 border border-white/10"
+          title="Scroll Right"
+        >
+          <RiArrowRightSLine size={18} />
+        </button>
       </div>
 
-      {/* 1. Ultimate Sponsors Suite */}
-      {activeTab === "sponsors" && (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
+      {/* 1. HOMEPAGE HERO & BANNER TAB */}
+      {activeTab === "hero" && (
+        <form onSubmit={handleSaveHero} className="glass p-6 md:p-8 rounded-3xl border border-white/10 bg-[#0A0D1A] space-y-6">
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
             <div>
-              <h2 className="text-sm font-black text-white uppercase tracking-wider">
-                Official Festival Sponsors & Brand Partners
-              </h2>
-              <p className="text-xs text-zinc-400">
-                Sponsors added here display live across the public website homepage and footer.
-              </p>
+              <span className="text-[10px] text-arc-cyan font-bold uppercase tracking-wider block">CMS TAB 1</span>
+              <h3 className="text-xl font-black text-white uppercase tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
+                Homepage Hero Headline & Video Loop Banner
+              </h3>
             </div>
 
-            <button
-              onClick={() => openAddSponsorModal()}
-              className="px-4 py-2.5 rounded-2xl bg-[#F5B301] hover:bg-amber-300 text-zinc-950 font-black text-xs flex items-center gap-1.5 shadow-lg shadow-amber-500/20 cursor-pointer"
-            >
-              <RiAddLine size={18} /> Add New Sponsor
+            <button type="submit" className="px-5 py-2.5 rounded-xl bg-arc-cyan text-black text-xs font-bold uppercase hover:bg-white transition-all cursor-pointer shadow-[0_0_15px_#00D4FF] flex items-center gap-1.5">
+              <RiSaveLine className="text-base" />
+              <span>Save Hero Changes</span>
             </button>
           </div>
 
-          {/* Sponsors Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {sponsors.map((sp) => (
-              <div
-                key={sp.id}
-                className={`p-4 rounded-3xl border space-y-3 transition-all ${sp.active
-                  ? "bg-zinc-900/60 border-zinc-800/80 hover:border-[#F5B301]/40"
-                  : "bg-zinc-950/60 border-zinc-800/40 opacity-60"
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <div>
+              <label className="block text-white/70 font-bold mb-1">Festival Main Name / Title</label>
+              <input
+                type="text"
+                value={heroTitle}
+                onChange={(e) => setHeroTitle(e.target.value)}
+                required
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white font-bold focus:border-arc-cyan focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-white/70 font-bold mb-1">Festival Tagline Headline</label>
+              <input
+                type="text"
+                value={heroTagline}
+                onChange={(e) => setHeroTagline(e.target.value)}
+                required
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white font-bold focus:border-arc-cyan focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-white/70 font-bold mb-1">Subtitle Motto (e.g. Legends Cup 2026)</label>
+              <input
+                type="text"
+                value={heroMotto}
+                onChange={(e) => setHeroMotto(e.target.value)}
+                required
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white font-bold focus:border-arc-cyan focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-white/70 font-bold mb-1">Registration Gate Status</label>
+              <div className="flex items-center gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setRegOpen(!regOpen)}
+                  className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase transition-all cursor-pointer border ${
+                    regOpen
+                      ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+                      : "bg-rose-500/20 text-rose-400 border-rose-500/50"
                   }`}
+                >
+                  {regOpen ? "● REGISTRATION OPEN LIVE" : "○ REGISTRATION CLOSED"}
+                </button>
+              </div>
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-white/70 font-bold mb-1">Homepage Promo Video Loop URL (MP4 / Direct Link)</label>
+              <input
+                type="text"
+                value={heroBannerUrl}
+                onChange={(e) => setHeroBannerUrl(e.target.value)}
+                placeholder="https://domain.com/trailer.mp4"
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white font-mono focus:border-arc-cyan focus:outline-none"
+              />
+            </div>
+          </div>
+        </form>
+      )}
+
+      {/* 2. ABOUT FESTIVAL & MISSION TAB */}
+      {activeTab === "about" && (
+        <form onSubmit={handleSaveAbout} className="glass p-6 md:p-8 rounded-3xl border border-white/10 bg-[#0A0D1A] space-y-6">
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <div>
+              <span className="text-[10px] text-metallic-gold font-bold uppercase tracking-wider block">CMS TAB 2</span>
+              <h3 className="text-xl font-black text-white uppercase tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
+                About Festival History, Vision & Mission Copy
+              </h3>
+            </div>
+
+            <button type="submit" className="px-5 py-2.5 rounded-xl bg-metallic-gold text-black text-xs font-bold uppercase hover:bg-white transition-all cursor-pointer shadow-[0_0_15px_#FFD700] flex items-center gap-1.5">
+              <RiSaveLine className="text-base" />
+              <span>Save About Section</span>
+            </button>
+          </div>
+
+          <div className="space-y-4 text-xs">
+            <div>
+              <label className="block text-white/70 font-bold mb-1">Section Heading Title</label>
+              <input
+                type="text"
+                value={aboutHeading}
+                onChange={(e) => setAboutHeading(e.target.value)}
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white font-bold focus:border-metallic-gold focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-white/70 font-bold mb-1">About Festival Body Description Text</label>
+              <textarea
+                rows={6}
+                value={aboutBody}
+                onChange={(e) => setAboutBody(e.target.value)}
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white focus:border-metallic-gold focus:outline-none"
+              />
+            </div>
+          </div>
+        </form>
+      )}
+
+      {/* 3. SPONSORS & BRAND PARTNERS TAB */}
+      {activeTab === "sponsors" && (
+        <div className="space-y-6">
+          <div className="glass p-6 md:p-8 rounded-3xl border border-white/10 bg-[#0A0D1A] space-y-6">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div>
+                <span className="text-[10px] text-marvel-red font-bold uppercase tracking-wider block">CMS TAB 3</span>
+                <h3 className="text-xl font-black text-white uppercase tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
+                  Official Festival Sponsors & Brand Partners
+                </h3>
+              </div>
+
+              <button
+                onClick={() => openSponsorModal()}
+                className="px-5 py-2.5 rounded-xl bg-marvel-red text-white text-xs font-bold uppercase hover:bg-white hover:text-black transition-all cursor-pointer shadow-[0_0_15px_#ED1D24] flex items-center gap-1.5"
               >
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-[#F5B301]/10 text-[#F5B301] border border-[#F5B301]/25">
-                    {sp.tier}
-                  </span>
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => toggleSponsorActive(sp.id)}
-                      className="p-1 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 cursor-pointer"
-                      title={sp.active ? "Hide on website" : "Show on website"}
-                    >
-                      {sp.active ? <RiEyeLine size={15} /> : <RiEyeOffLine size={15} />}
-                    </button>
-                    <button
-                      onClick={() => openAddSponsorModal(sp)}
-                      className="p-1 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 cursor-pointer"
-                      title="Edit Sponsor"
-                    >
-                      <RiEditLine size={15} />
-                    </button>
-                    <button
-                      onClick={() => deleteSponsor(sp.id)}
-                      className="p-1 rounded-lg text-rose-400 hover:bg-rose-500/20 cursor-pointer"
-                      title="Delete Sponsor"
-                    >
-                      <RiDeleteBinLine size={15} />
-                    </button>
+                <RiAddLine className="text-base" />
+                <span>+ Add Sponsor</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              {sponsors.map((sp) => (
+                <div
+                  key={sp.id}
+                  className={`p-5 rounded-2xl border space-y-3 transition-all ${
+                    sp.active ? "bg-black/60 border-white/10 hover:border-marvel-red" : "bg-black/20 border-white/5 opacity-50"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-marvel-red/20 text-marvel-red border border-marvel-red/40">
+                      {sp.tier}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => toggleSponsorActive(sp.id)}
+                        className="p-1 text-white/50 hover:text-white cursor-pointer"
+                        title={sp.active ? "Hide on website" : "Show on website"}
+                      >
+                        {sp.active ? <RiEyeLine size={15} /> : <RiEyeOffLine size={15} />}
+                      </button>
+                      <button
+                        onClick={() => openSponsorModal(sp)}
+                        className="p-1 text-white/50 hover:text-white cursor-pointer"
+                        title="Edit Sponsor"
+                      >
+                        <RiEditLine size={15} />
+                      </button>
+                      <button
+                        onClick={() => deleteSponsor(sp.id)}
+                        className="p-1 text-rose-400 hover:text-rose-300 cursor-pointer"
+                        title="Delete Sponsor"
+                      >
+                        <RiDeleteBinLine size={15} />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="font-bold text-white text-sm">{sp.name}</h4>
+                    <p className="text-[10px] text-white/50 truncate">{sp.website}</p>
+                  </div>
+
+                  <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs">
+                    <span className="text-[10px] text-white/40 font-bold uppercase">Contribution</span>
+                    <span className="font-bold text-emerald-400">₹{sp.amount.toLocaleString()}</span>
                   </div>
                 </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
-                <div className="space-y-1">
-                  <p className="font-extrabold text-white text-sm">{sp.name}</p>
-                  {sp.website && (
-                    <a
-                      href={sp.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[11px] text-zinc-400 hover:text-[#F5B301] flex items-center gap-1 font-mono truncate"
-                    >
-                      <RiExternalLinkLine size={12} /> {sp.website.replace("https://", "")}
-                    </a>
-                  )}
+      {/* 4. PHOTO & VIDEO GALLERY TAB */}
+      {activeTab === "gallery" && (
+        <div className="glass p-6 md:p-8 rounded-3xl border border-white/10 bg-[#0A0D1A] space-y-6">
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <div>
+              <span className="text-[10px] text-arc-cyan font-bold uppercase tracking-wider block">CMS TAB 4</span>
+              <h3 className="text-xl font-black text-white uppercase tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
+                Photo & Video Gallery Media Studio
+              </h3>
+            </div>
+
+            <button
+              onClick={() => setShowGalleryModal(true)}
+              className="px-5 py-2.5 rounded-xl bg-arc-cyan text-black text-xs font-bold uppercase hover:bg-white transition-all cursor-pointer shadow-[0_0_15px_#00D4FF] flex items-center gap-1.5"
+            >
+              <RiAddLine className="text-base" />
+              <span>+ Add Media Asset</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            {galleryItems.map((item) => (
+              <div key={item.id} className="p-4 rounded-2xl bg-black/60 border border-white/10 space-y-3 relative group">
+                <div className="aspect-video bg-black rounded-xl overflow-hidden relative">
+                  <img src={item.type === "image" ? item.url : item.thumbnailUrl || item.url} alt={item.title} className="w-full h-full object-cover" />
+                  <span className={`absolute top-2 left-2 px-2 py-0.5 rounded text-[9px] font-bold uppercase ${item.type === "image" ? "bg-arc-cyan text-black" : "bg-marvel-red text-white"}`}>
+                    {item.type.toUpperCase()}
+                  </span>
                 </div>
 
-                <div className="pt-2 border-t border-zinc-800/80 flex items-center justify-between text-xs">
-                  <span className="text-[10px] text-zinc-500 font-bold uppercase">Contribution</span>
-                  <span className="font-black text-emerald-400">₹{sp.amount.toLocaleString()}</span>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-xs font-bold text-white line-clamp-1">{item.title}</h4>
+                    <span className="text-[9px] text-white/40 font-mono">{item.category}</span>
+                  </div>
+
+                  <button onClick={() => deleteGalleryItem(item.id)} className="p-1 text-rose-400 hover:text-rose-300 cursor-pointer">
+                    <RiDeleteBinLine size={14} />
+                  </button>
                 </div>
               </div>
             ))}
@@ -324,99 +596,170 @@ export function CMSModule({ activePage }: CMSModuleProps) {
         </div>
       )}
 
-      {/* Add / Edit Sponsor Modal */}
-      {showSponsorModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
-          <div className="bg-[#111114] border border-zinc-800 p-6 rounded-3xl max-w-lg w-full space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-              <h3 className="text-sm font-black text-white flex items-center gap-2 uppercase">
-                <RiCoupon3Line className="text-[#F5B301]" />
-                <span>{editingSponsor ? "Edit Sponsor Details" : "Add New Festival Sponsor"}</span>
+      {/* 5. FAQ MANAGER TAB */}
+      {activeTab === "faqs" && (
+        <div className="glass p-6 md:p-8 rounded-3xl border border-white/10 bg-[#0A0D1A] space-y-6">
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <div>
+              <span className="text-[10px] text-metallic-gold font-bold uppercase tracking-wider block">CMS TAB 5</span>
+              <h3 className="text-xl font-black text-white uppercase tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
+                Frequently Asked Questions (FAQ) Manager
               </h3>
-              <button
-                onClick={() => setShowSponsorModal(false)}
-                className="p-1 rounded-lg text-zinc-500 hover:text-white cursor-pointer"
-              >
+            </div>
+          </div>
+
+          {/* Add FAQ Form */}
+          <form onSubmit={handleAddFaq} className="p-5 rounded-2xl bg-black/40 border border-white/10 space-y-3 text-xs">
+            <h4 className="font-bold text-white uppercase">Add New FAQ Entry</h4>
+            <div>
+              <label className="block text-white/70 font-bold mb-1">Question</label>
+              <input
+                type="text"
+                placeholder="e.g. Is accommodation included?"
+                value={newQuestion}
+                onChange={(e) => setNewQuestion(e.target.value)}
+                required
+                className="w-full px-4 py-2.5 bg-black/60 border border-white/10 rounded-xl text-white focus:border-metallic-gold focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-white/70 font-bold mb-1">Answer</label>
+              <textarea
+                rows={2}
+                placeholder="e.g. Yes, hostel accommodation is provided..."
+                value={newAnswer}
+                onChange={(e) => setNewAnswer(e.target.value)}
+                required
+                className="w-full px-4 py-2.5 bg-black/60 border border-white/10 rounded-xl text-white focus:border-metallic-gold focus:outline-none"
+              />
+            </div>
+            <button type="submit" className="px-4 py-2 rounded-xl bg-metallic-gold text-black font-bold uppercase hover:bg-white transition-colors cursor-pointer">
+              + Publish FAQ
+            </button>
+          </form>
+
+          {/* FAQs List */}
+          <div className="space-y-3">
+            {faqs.map((faq: any) => (
+              <div key={faq.id} className="p-4 rounded-2xl bg-black/40 border border-white/10 space-y-1">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-bold text-white text-xs">{faq.question}</h4>
+                  <button onClick={() => handleDeleteFaq(faq.id)} className="p-1 text-rose-400 hover:text-rose-300 cursor-pointer">
+                    <RiDeleteBinLine size={14} />
+                  </button>
+                </div>
+                <p className="text-xs text-white/60">{faq.answer}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 6. FOOTER & CONTACT INFO TAB */}
+      {activeTab === "contact" && (
+        <form onSubmit={(e) => { e.preventDefault(); triggerSaved("✓ Contact & Footer Info Updated!"); }} className="glass p-6 md:p-8 rounded-3xl border border-white/10 bg-[#0A0D1A] space-y-6">
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <div>
+              <span className="text-[10px] text-arc-cyan font-bold uppercase tracking-wider block">CMS TAB 6</span>
+              <h3 className="text-xl font-black text-white uppercase tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
+                Public Footer & Official Contact Info
+              </h3>
+            </div>
+
+            <button type="submit" className="px-5 py-2.5 rounded-xl bg-arc-cyan text-black text-xs font-bold uppercase hover:bg-white transition-all cursor-pointer shadow-[0_0_15px_#00D4FF] flex items-center gap-1.5">
+              <RiSaveLine className="text-base" />
+              <span>Save Contact Info</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <div>
+              <label className="block text-white/70 font-bold mb-1">Official Support Email</label>
+              <input
+                type="email"
+                value={contactEmail}
+                onChange={(e) => setContactEmail(e.target.value)}
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white font-mono focus:border-arc-cyan focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-white/70 font-bold mb-1">Support Hotline Phone</label>
+              <input
+                type="text"
+                value={contactPhone}
+                onChange={(e) => setContactPhone(e.target.value)}
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white font-mono focus:border-arc-cyan focus:outline-none"
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-white/70 font-bold mb-1">Campus Venue Address</label>
+              <input
+                type="text"
+                value={contactAddress}
+                onChange={(e) => setContactAddress(e.target.value)}
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white font-mono focus:border-arc-cyan focus:outline-none"
+              />
+            </div>
+          </div>
+        </form>
+      )}
+
+      {/* ADD SPONSOR MODAL */}
+      {showSponsorModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="max-w-md w-full glass p-6 rounded-3xl border border-marvel-red/40 bg-[#0A0D1A] space-y-4">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <h3 className="text-sm font-bold text-white uppercase">{editingSponsor ? "Edit Sponsor" : "Add Sponsor"}</h3>
+              <button onClick={() => setShowSponsorModal(false)} className="p-1 text-white/40 hover:text-white cursor-pointer">
                 <RiCloseLine size={18} />
               </button>
             </div>
 
             <form onSubmit={handleSaveSponsor} className="space-y-3 text-xs">
               <div>
-                <label className="block text-zinc-400 font-bold mb-1">Company / Sponsor Name</label>
+                <label className="block text-white/70 font-bold mb-1">Sponsor Company Name</label>
                 <input
                   type="text"
-                  required
-                  placeholder="e.g. Red Bull, Monster Energy, KFC"
                   value={spName}
                   onChange={(e) => setSpName(e.target.value)}
-                  className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#F5B301]"
+                  required
+                  className="w-full px-4 py-2.5 bg-black/60 border border-white/10 rounded-xl text-white focus:border-marvel-red focus:outline-none"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-zinc-400 font-bold mb-1">Sponsorship Tier</label>
-                  <select
-                    value={spTier}
-                    onChange={(e) => setSpTier(e.target.value)}
-                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-white focus:outline-none font-bold"
-                  >
-                    <option value="Title Sponsor">Title Sponsor</option>
-                    <option value="Platinum Partner">Platinum Partner</option>
-                    <option value="Gold Partner">Gold Partner</option>
-                    <option value="Silver Partner">Silver Partner</option>
-                    <option value="Food Partner">Food Partner</option>
-                    <option value="Media Partner">Media Partner</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-zinc-400 font-bold mb-1">Contribution (₹)</label>
-                  <input
-                    type="number"
-                    value={spAmount}
-                    onChange={(e) => setSpAmount(Number(e.target.value))}
-                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#F5B301]"
-                  />
-                </div>
+              <div>
+                <label className="block text-white/70 font-bold mb-1">Tier Level</label>
+                <select
+                  value={spTier}
+                  onChange={(e) => setSpTier(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-black/60 border border-white/10 rounded-xl text-white focus:border-marvel-red focus:outline-none"
+                >
+                  <option value="Title Sponsor">Title Sponsor</option>
+                  <option value="Platinum Partner">Platinum Partner</option>
+                  <option value="Gold Partner">Gold Partner</option>
+                  <option value="Silver Partner">Silver Partner</option>
+                </select>
               </div>
 
               <div>
-                <label className="block text-zinc-400 font-bold mb-1">Official Website URL</label>
+                <label className="block text-white/70 font-bold mb-1">Website Link</label>
                 <input
                   type="url"
-                  placeholder="https://sponsor.com"
                   value={spWeb}
                   onChange={(e) => setSpWeb(e.target.value)}
-                  className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-[#F5B301]"
+                  placeholder="https://sponsor.com"
+                  className="w-full px-4 py-2.5 bg-black/60 border border-white/10 rounded-xl text-white font-mono focus:border-marvel-red focus:outline-none"
                 />
               </div>
 
-              <div>
-                <label className="block text-zinc-400 font-bold mb-1">Sponsor Logo URL</label>
-                <input
-                  type="text"
-                  placeholder="https://images.unsplash.com/..."
-                  value={spLogo}
-                  onChange={(e) => setSpLogo(e.target.value)}
-                  className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-[#F5B301]"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-3 border-t border-zinc-800">
-                <button
-                  type="button"
-                  onClick={() => setShowSponsorModal(false)}
-                  className="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold cursor-pointer"
-                >
+              <div className="flex justify-end gap-2 pt-3 border-t border-white/10">
+                <button type="button" onClick={() => setShowSponsorModal(false)} className="px-4 py-2 rounded-xl bg-white/5 text-white/70 font-bold cursor-pointer">
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded-xl bg-[#F5B301] hover:bg-amber-300 text-zinc-950 font-black flex items-center gap-1.5 cursor-pointer shadow-md"
-                >
-                  <RiSaveLine size={14} /> Save Sponsor
+                <button type="submit" className="px-5 py-2 rounded-xl bg-marvel-red text-white font-bold uppercase cursor-pointer shadow-[0_0_15px_#ED1D24]">
+                  Save Sponsor
                 </button>
               </div>
             </form>
@@ -424,226 +767,141 @@ export function CMSModule({ activePage }: CMSModuleProps) {
         </div>
       )}
 
-      {/* 2. Hero Section CMS */}
-      {activeTab === "hero" && (
-        <form onSubmit={(e) => { e.preventDefault(); triggerSaved(); }} className="p-6 rounded-3xl bg-zinc-900/60 border border-zinc-800/80 space-y-5 max-w-3xl">
-          <h4 className="text-xs font-black text-white uppercase tracking-widest border-b border-zinc-800 pb-3">
-            Homepage Hero Copy & Video Banner
-          </h4>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-[10px] uppercase font-bold text-zinc-400 mb-1.5">Festival Tagline</label>
-              <input
-                type="text"
-                value={settings.tagline}
-                onChange={(e) => updateSettings({ tagline: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white text-xs focus:border-[#F5B301] focus:outline-none"
-              />
+      {/* ADD GALLERY MEDIA MODAL */}
+      {showGalleryModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="max-w-md w-full glass p-6 rounded-3xl border border-arc-cyan/40 bg-[#0A0D1A] space-y-4">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <h3 className="text-sm font-bold text-white uppercase">Add Media Asset to Gallery</h3>
+              <button onClick={() => setShowGalleryModal(false)} className="p-1 text-white/40 hover:text-white cursor-pointer">
+                <RiCloseLine size={18} />
+              </button>
             </div>
 
-            <div>
-              <label className="block text-[10px] uppercase font-bold text-zinc-400 mb-1.5">Festival Subtitle</label>
-              <input
-                type="text"
-                value={settings.subtitle}
-                onChange={(e) => updateSettings({ subtitle: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white text-xs focus:border-[#F5B301] focus:outline-none"
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-[10px] uppercase font-bold text-zinc-400 mb-1.5">Homepage Promo Video URL</label>
-              <input
-                type="text"
-                value={settings.homepageBanner}
-                onChange={(e) => updateSettings({ homepageBanner: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white text-xs font-mono focus:border-[#F5B301] focus:outline-none"
-              />
-            </div>
-          </div>
-
-          <button type="submit" className="px-6 py-2.5 rounded-xl bg-[#F5B301] hover:bg-amber-300 text-zinc-950 text-xs font-black shadow-lg flex items-center gap-2 cursor-pointer">
-            <RiSaveLine size={16} />
-            <span>Update Hero Copy Live</span>
-          </button>
-        </form>
-      )}
-
-      {/* 3. About Section CMS */}
-      {activeTab === "about" && (
-        <form onSubmit={(e) => { e.preventDefault(); updateSettings({ aboutText: aboutBody }); triggerSaved(); }} className="p-6 rounded-3xl bg-zinc-900/60 border border-zinc-800/80 space-y-5 max-w-3xl">
-          <h4 className="text-xs font-black text-white uppercase tracking-widest border-b border-zinc-800 pb-3">
-            About Festival Page Content
-          </h4>
-
-          <div className="space-y-4">
-            <div>
-              <label className="block text-[10px] uppercase font-bold text-zinc-400 mb-1.5">Page Title</label>
-              <input
-                type="text"
-                value={aboutHeading}
-                onChange={(e) => setAboutHeading(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white text-xs focus:border-[#F5B301] focus:outline-none font-bold"
-              />
-            </div>
-
-            <div>
-              <label className="block text-[10px] uppercase font-bold text-zinc-400 mb-1.5">About Text Overview</label>
-              <textarea
-                rows={5}
-                value={aboutBody}
-                onChange={(e) => setAboutBody(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white text-xs focus:border-[#F5B301] focus:outline-none"
-              />
-            </div>
-          </div>
-
-          <button type="submit" className="px-6 py-2.5 rounded-xl bg-[#F5B301] hover:bg-amber-300 text-zinc-950 text-xs font-black shadow-lg flex items-center gap-2 cursor-pointer">
-            <RiSaveLine size={16} />
-            <span>Publish About Content</span>
-          </button>
-        </form>
-      )}
-
-      {/* 4. FAQs Manager CMS */}
-      {activeTab === "faqs" && (
-        <div className="space-y-6 max-w-4xl">
-          <form onSubmit={handleAddFaq} className="p-6 rounded-3xl bg-zinc-900/60 border border-zinc-800/80 space-y-4">
-            <h4 className="text-xs font-black text-white uppercase tracking-widest border-b border-zinc-800 pb-3">
-              Add Frequently Asked Question (FAQ)
-            </h4>
-            <div>
-              <label className="block text-[10px] uppercase font-bold text-zinc-400 mb-1.5">Question</label>
-              <input
-                type="text"
-                required
-                placeholder="What is the refund policy?..."
-                value={newQuestion}
-                onChange={(e) => setNewQuestion(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white text-xs focus:border-[#F5B301] focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-[10px] uppercase font-bold text-zinc-400 mb-1.5">Answer</label>
-              <textarea
-                required
-                rows={3}
-                placeholder="Provide detailed answer..."
-                value={newAnswer}
-                onChange={(e) => setNewAnswer(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white text-xs focus:border-[#F5B301] focus:outline-none"
-              />
-            </div>
-            <button type="submit" className="px-5 py-2.5 rounded-xl bg-[#F5B301] hover:bg-amber-300 text-zinc-950 text-xs font-black flex items-center gap-1.5 cursor-pointer">
-              <RiAddLine size={16} />
-              <span>Publish FAQ</span>
-            </button>
-          </form>
-
-          <div className="space-y-3">
-            {faqs.map((faq) => (
-              <div key={faq.id} className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 space-y-1">
-                <div className="flex items-center justify-between">
-                  <p className="font-bold text-white text-xs">{faq.question}</p>
+            <form onSubmit={handleAddGalleryMedia} className="space-y-3 text-xs">
+              <div>
+                <label className="block text-white/70 font-bold mb-1">Media Type</label>
+                <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
-                    onClick={() => setFaqs((prev) => prev.filter((f) => f.id !== faq.id))}
-                    className="p-1 rounded text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer"
+                    onClick={() => setGalType("image")}
+                    className={`py-2 rounded-xl text-xs font-bold uppercase border ${galType === "image" ? "bg-arc-cyan text-black border-arc-cyan" : "bg-black/60 text-white/60 border-white/10"}`}
                   >
-                    <RiDeleteBinLine size={14} />
+                    📷 Photo
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setGalType("video")}
+                    className={`py-2 rounded-xl text-xs font-bold uppercase border ${galType === "video" ? "bg-marvel-red text-white border-marvel-red" : "bg-black/60 text-white/60 border-white/10"}`}
+                  >
+                    🎥 Video
                   </button>
                 </div>
-                <p className="text-xs text-zinc-400">{faq.answer}</p>
               </div>
-            ))}
+
+              <div>
+                <label className="block text-white/70 font-bold mb-1">Title</label>
+                <input
+                  type="text"
+                  value={galTitle}
+                  onChange={(e) => setGalTitle(e.target.value)}
+                  required
+                  className="w-full px-4 py-2.5 bg-black/60 border border-white/10 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-white/70 font-bold mb-1">Direct URL (Image or MP4 Video)</label>
+                <input
+                  type="text"
+                  value={galUrl}
+                  onChange={(e) => setGalUrl(e.target.value)}
+                  required
+                  className="w-full px-4 py-2.5 bg-black/60 border border-white/10 rounded-xl text-white font-mono focus:border-arc-cyan focus:outline-none"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-white/10">
+                <button type="button" onClick={() => setShowGalleryModal(false)} className="px-4 py-2 rounded-xl bg-white/5 text-white/70 font-bold cursor-pointer">
+                  Cancel
+                </button>
+                <button type="submit" className="px-5 py-2 rounded-xl bg-arc-cyan text-black font-bold uppercase cursor-pointer shadow-[0_0_15px_#00D4FF]">
+                  Publish Asset
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
 
-      {/* 5. Contact Info CMS */}
-      {activeTab === "contact" && (
-        <form onSubmit={(e) => { e.preventDefault(); triggerSaved(); }} className="p-6 rounded-3xl bg-zinc-900/60 border border-zinc-800/80 space-y-5 max-w-3xl">
-          <h4 className="text-xs font-black text-white uppercase tracking-widest border-b border-zinc-800 pb-3">
-            Public Contact Details CMS
-          </h4>
+      {/* MULTI-DEVICE LIVE PREVIEW MODAL */}
+      {showPreviewModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl">
+          <div className="bg-[#09090b] border border-white/20 rounded-3xl w-full max-w-6xl h-[88vh] flex flex-col shadow-2xl overflow-hidden relative">
+            {/* Modal Header */}
+            <div className="h-14 px-6 border-b border-white/10 flex items-center justify-between bg-black/80">
+              <div className="flex items-center gap-2">
+                <RiSparklingLine className="text-arc-cyan animate-pulse" />
+                <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+                  MacFiesta Public Website Live Preview
+                </h3>
+              </div>
 
-          <div className="space-y-4">
-            <div>
-              <label className="block text-[10px] uppercase font-bold text-zinc-400 mb-1.5">Official Festival Email</label>
-              <input
-                type="email"
-                value={settings.contactEmail}
-                onChange={(e) => updateSettings({ contactEmail: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white text-xs focus:border-[#F5B301] focus:outline-none"
-              />
-            </div>
+              {/* Device Selector */}
+              <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10">
+                {[
+                  { id: "desktop" as const, icon: RiMacbookLine, label: "Desktop" },
+                  { id: "tablet" as const, icon: RiTabletLine, label: "Tablet" },
+                  { id: "mobile" as const, icon: RiSmartphoneLine, label: "Mobile" },
+                ].map((d) => {
+                  const Icon = d.icon;
+                  return (
+                    <button
+                      key={d.id}
+                      onClick={() => setPreviewDevice(d.id)}
+                      className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        previewDevice === d.id ? "bg-arc-cyan text-black shadow-[0_0_10px_#00D4FF]" : "text-white/50 hover:text-white"
+                      }`}
+                    >
+                      <Icon size={14} />
+                      <span>{d.label}</span>
+                    </button>
+                  );
+                })}
 
-            <div>
-              <label className="block text-[10px] uppercase font-bold text-zinc-400 mb-1.5">Helpline Phone Number</label>
-              <input
-                type="text"
-                value={settings.contactPhone}
-                onChange={(e) => updateSettings({ contactPhone: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white text-xs focus:border-[#F5B301] focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-[10px] uppercase font-bold text-zinc-400 mb-1.5">Venue Campus Address</label>
-              <textarea
-                rows={3}
-                value={settings.venueAddress}
-                onChange={(e) => updateSettings({ venueAddress: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white text-xs focus:border-[#F5B301] focus:outline-none"
-              />
-            </div>
-          </div>
-
-          <button type="submit" className="px-6 py-2.5 rounded-xl bg-[#F5B301] hover:bg-amber-300 text-zinc-950 text-xs font-black shadow-lg flex items-center gap-2 cursor-pointer">
-            <RiSaveLine size={16} />
-            <span>Save Contact Info CMS</span>
-          </button>
-        </form>
-      )}
-
-      {/* 6. General Rules CMS */}
-      {activeTab === "rules" && (
-        <div className="space-y-6 max-w-4xl">
-          <form onSubmit={handleAddRule} className="p-6 rounded-3xl bg-zinc-900/60 border border-zinc-800/80 space-y-4">
-            <h4 className="text-xs font-black text-white uppercase tracking-widest border-b border-zinc-800 pb-3">
-              General Festival Conduct Rules
-            </h4>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                required
-                placeholder="Enter general rule or regulation..."
-                value={newRule}
-                onChange={(e) => setNewRule(e.target.value)}
-                className="flex-1 px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white text-xs focus:border-[#F5B301] focus:outline-none"
-              />
-              <button type="submit" className="px-5 py-2.5 rounded-xl bg-[#F5B301] hover:bg-amber-300 text-zinc-950 text-xs font-black flex items-center gap-1.5 cursor-pointer shrink-0">
-                <RiAddLine size={16} />
-                <span>Add Rule</span>
-              </button>
-            </div>
-          </form>
-
-          <div className="space-y-2">
-            {generalRules.map((rule, idx) => (
-              <div key={idx} className="p-3.5 rounded-2xl bg-zinc-900/60 border border-zinc-800 flex items-center justify-between gap-3 text-xs text-white">
-                <span className="font-mono text-[#F5B301] font-bold">Rule {idx + 1}:</span>
-                <p className="flex-1">{rule}</p>
                 <button
-                  type="button"
-                  onClick={() => setGeneralRules((prev) => prev.filter((_, i) => i !== idx))}
-                  className="p-1 rounded text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer"
+                  onClick={() => setIframeKey((prev) => prev + 1)}
+                  className="p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors ml-2"
+                  title="Refresh Live Frame"
                 >
-                  <RiDeleteBinLine size={14} />
+                  <RiRefreshLine size={14} />
                 </button>
               </div>
-            ))}
+
+              <button onClick={() => setShowPreviewModal(false)} className="p-1.5 text-white/50 hover:text-white cursor-pointer">
+                <RiCloseLine size={22} />
+              </button>
+            </div>
+
+            {/* Frame Viewport Container */}
+            <div className="flex-1 bg-black/90 p-4 flex items-center justify-center overflow-hidden relative">
+              <div
+                className={`bg-[#05050A] border-2 border-arc-cyan/40 rounded-2xl shadow-[0_0_50px_rgba(0,212,255,0.25)] overflow-hidden transition-all duration-300 relative ${
+                  previewDevice === "desktop"
+                    ? "w-full h-full"
+                    : previewDevice === "tablet"
+                    ? "w-[768px] h-[95%]"
+                    : "w-[375px] h-[95%]"
+                }`}
+              >
+                <iframe
+                  key={iframeKey}
+                  src="/"
+                  className="w-full h-full border-0 bg-[#05050A]"
+                  title="MacFiesta Live Website Preview"
+                />
+              </div>
+            </div>
           </div>
         </div>
       )}
