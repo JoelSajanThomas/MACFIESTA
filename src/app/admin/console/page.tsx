@@ -247,19 +247,21 @@ export default function AdminDashboardPage() {
 
       // 3. Website Workspace
       case "website":
+      case "website.builder":
       case "festival.builder":
         return <HomepageBuilderModule />;
       case "cms":
+      case "website.cms":
       case "cms.hero":
       case "cms.about":
       case "cms.sponsors":
       case "cms.faqs":
       case "cms.contact":
-        return <CMSModule />;
+        return <CMSModule activePage={activePage} />;
       case "gallery":
+      case "website.gallery":
       case "cms.gallery":
         return <GalleryModule />;
-
 
       // 4. Participants Workspace
       case "participants":

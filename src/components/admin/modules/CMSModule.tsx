@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   RiGlobalLine,
   RiSaveLine,
@@ -18,8 +18,10 @@ import {
   RiCloseLine,
   RiEyeLine,
   RiEyeOffLine,
+  RiGalleryLine,
 } from "react-icons/ri";
 import { useFestivalControl } from "@/lib/festivalStore";
+import { GalleryModule } from "./GalleryModule";
 
 interface SponsorItem {
   id: string;
@@ -31,9 +33,25 @@ interface SponsorItem {
   active: boolean;
 }
 
-export function CMSModule() {
-  const [activeTab, setActiveTab] = useState<"hero" | "about" | "sponsors" | "faqs" | "contact" | "rules">("sponsors");
-  const { settings, updateSettings } = useFestivalControl();
+interface CMSModuleProps {
+  activePage?: string;
+}
+
+export function CMSModule({ activePage }: CMSModuleProps) {
+  const [activeTab, setActiveTab] = useState<"hero" | "about" | "sponsors" | "faqs" | "contact" | "rules" | "gallery">("sponsors");
+  const { settings, sponsors: storeSponsors, faqs: storeFaqs, updateSettings, updateSponsors, updateFaqs } = useFestivalControl();
+
+  useEffect(() => {
+    if (!activePage) return;
+    if (activePage.endsWith(".hero")) setActiveTab("hero");
+    else if (activePage.endsWith(".about")) setActiveTab("about");
+    else if (activePage.endsWith(".sponsors")) setActiveTab("sponsors");
+    else if (activePage.endsWith(".faqs")) setActiveTab("faqs");
+    else if (activePage.endsWith(".contact")) setActiveTab("contact");
+    else if (activePage.endsWith(".rules")) setActiveTab("rules");
+    else if (activePage.endsWith(".gallery") || activePage === "gallery") setActiveTab("gallery");
+  }, [activePage]);
+
 
   // About Section CMS
   const [aboutHeading, setAboutHeading] = useState("About MacFiesta");
@@ -201,10 +219,12 @@ export function CMSModule() {
           { id: "sponsors", label: "Sponsors & Partners", icon: RiCoupon3Line },
           { id: "hero", label: "Homepage Hero & Video", icon: RiGlobalLine },
           { id: "about", label: "About Page Content", icon: RiFileTextLine },
+          { id: "gallery", label: "Photo & Video Gallery Studio", icon: RiGalleryLine },
           { id: "faqs", label: "FAQs Manager", icon: RiQuestionAnswerLine },
           { id: "contact", label: "Contact Info & Address", icon: RiContactsBookLine },
           { id: "rules", label: "General Conduct Rules", icon: RiShieldLine },
         ].map((tab) => {
+
           const Icon = tab.icon;
           const isSelected = activeTab === tab.id;
           return (
@@ -489,7 +509,11 @@ export function CMSModule() {
         </form>
       )}
 
+      {/* GALLERY & MEDIA STUDIO */}
+      {activeTab === "gallery" && <GalleryModule />}
+
       {/* 4. FAQs Manager CMS */}
+
       {activeTab === "faqs" && (
         <div className="space-y-6 max-w-4xl">
           <form onSubmit={handleAddFaq} className="p-6 rounded-3xl bg-zinc-900/60 border border-zinc-800/80 space-y-4">
