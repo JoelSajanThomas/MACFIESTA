@@ -137,7 +137,7 @@ export function Footer() {
                 <p className="text-[9px] text-white/40 uppercase font-mono font-black tracking-wider">Portals</p>
                 <ul className="space-y-2.5">
                   {portals.map((link) => (
-                    <li key={link.href}>
+                    <li key={link.label}>
                       <Link
                         href={link.href}
                         className="inline-block text-xs text-white/70 hover:text-arc-cyan transition-all duration-300 relative pb-0.5"
@@ -152,7 +152,7 @@ export function Footer() {
                 <p className="text-[9px] text-white/40 uppercase font-mono font-black tracking-wider">Resources</p>
                 <ul className="space-y-2.5">
                   {resources.map((link) => (
-                    <li key={link.href}>
+                    <li key={link.label}>
                       <Link
                         href={link.href}
                         className="inline-block text-xs text-white/70 hover:text-arc-cyan transition-all duration-300 relative pb-0.5"
@@ -162,6 +162,7 @@ export function Footer() {
                     </li>
                   ))}
                 </ul>
+
               </div>
             </div>
           </div>
