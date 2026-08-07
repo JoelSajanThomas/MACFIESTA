@@ -32,6 +32,8 @@ import {
 } from "react-icons/ri";
 import { useFestivalControl } from "@/lib/festivalStore";
 import { useGalleryItems } from "@/lib/galleryStore";
+import { GalleryModule } from "./GalleryModule";
+
 
 interface SponsorItem {
   id: string;
@@ -522,49 +524,11 @@ export function CMSModule({ activePage }: CMSModuleProps) {
 
       {/* 4. PHOTO & VIDEO GALLERY TAB */}
       {activeTab === "gallery" && (
-        <div className="glass p-6 md:p-8 rounded-3xl border border-white/10 bg-[#0A0D1A] space-y-6">
-          <div className="flex items-center justify-between border-b border-white/10 pb-4">
-            <div>
-              <span className="text-[10px] text-arc-cyan font-bold uppercase tracking-wider block">CMS TAB 4</span>
-              <h3 className="text-xl font-black text-white uppercase tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
-                Photo & Video Gallery Media Studio
-              </h3>
-            </div>
-
-            <button
-              onClick={() => setShowGalleryModal(true)}
-              className="px-5 py-2.5 rounded-xl bg-arc-cyan text-black text-xs font-bold uppercase hover:bg-white transition-all cursor-pointer shadow-[0_0_15px_#00D4FF] flex items-center gap-1.5"
-            >
-              <RiAddLine className="text-base" />
-              <span>+ Add Media Asset</span>
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            {galleryItems.map((item) => (
-              <div key={item.id} className="p-4 rounded-2xl bg-black/60 border border-white/10 space-y-3 relative group">
-                <div className="aspect-video bg-black rounded-xl overflow-hidden relative">
-                  <img src={item.type === "image" ? item.url : item.thumbnailUrl || item.url} alt={item.title} className="w-full h-full object-cover" />
-                  <span className={`absolute top-2 left-2 px-2 py-0.5 rounded text-[9px] font-bold uppercase ${item.type === "image" ? "bg-arc-cyan text-black" : "bg-marvel-red text-white"}`}>
-                    {item.type.toUpperCase()}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="text-xs font-bold text-white line-clamp-1">{item.title}</h4>
-                    <span className="text-[9px] text-white/40 font-mono">{item.category}</span>
-                  </div>
-
-                  <button onClick={() => deleteGalleryItem(item.id)} className="p-1 text-rose-400 hover:text-rose-300 cursor-pointer">
-                    <RiDeleteBinLine size={14} />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+        <div className="glass p-6 md:p-8 rounded-3xl border border-white/10 bg-[#0A0D1A]">
+          <GalleryModule />
         </div>
       )}
+
 
       {/* 5. FAQ MANAGER TAB */}
       {activeTab === "faqs" && (
