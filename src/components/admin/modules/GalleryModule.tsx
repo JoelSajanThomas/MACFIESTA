@@ -1,38 +1,480 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   RiGalleryLine,
   RiVideoLine,
-  RiFolderOpenLine,
-  RiUploadCloudLine,
+  RiImageAddLine,
+  RiMovieLine,
+  RiDeleteBinLine,
+  RiEyeLine,
+  RiCheckDoubleLine,
+  RiCloseLine,
+  RiSearchLine,
+  RiPlayLine,
+  RiStarLine,
+  RiStarFill,
+  RiUploadCloud2Line,
 } from "react-icons/ri";
+import { useGalleryItems, GalleryItem, normalizeMediaPath } from "@/lib/galleryStore";
 
 export function GalleryModule() {
-  const [photos] = useState([
-    { id: "p1", title: "Inauguration Lighting Ceremony", album: "Day 1 Highlights", date: "Sep 24, 2026", size: "2.4 MB" },
-    { id: "p2", title: "Battle of Bands Stage Performance", album: "Cultural Night", date: "Sep 24, 2026", size: "4.1 MB" },
-  ]);
+  const { items, addItem, deleteItem, saveItems } = useGalleryItems();
+
+  const [activeMediaType, setActiveMediaType] = useState<"all" | "image" | "video">("all");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusMsg, setStatusMsg] = useState("");
+
+  // Modal States
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [itemType, setItemType] = useState<"image" | "video">("image");
+  const [itemTitle, setItemTitle] = useState("");
+  const [itemCategory, setItemCategory] = useState<"gaming" | "cultural" | "technical" | "general" | "pro-show">("cultural");
+  const [itemUrl, setItemUrl] = useState("");
+  const [itemThumbUrl, setItemThumbUrl] = useState("");
+  const [isFeatured, setIsFeatured] = useState(false);
+
+  // File Upload Ref
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Preview Modal
+  const [previewItem, setPreviewItem] = useState<GalleryItem | null>(null);
+
+  const triggerToast = (msg: string) => {
+    setStatusMsg(msg);
+    setTimeout(() => setStatusMsg(""), 3500);
+  };
+
+  const imagesCount = items.filter((i) => i.type === "image").length;
+  const videosCount = items.filter((i) => i.type === "video").length;
+
+  const filteredItems = items.filter((item) => {
+    const matchType = activeMediaType === "all" || item.type === activeMediaType;
+    const matchCat = selectedCategory === "all" || item.category === selectedCategory;
+    const matchSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchType && matchCat && matchSearch;
+  });
+
+  // Native File Picker Handler
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Detect if video or image
+    const isVid = file.type.startsWith("video/");
+    if (isVid) setItemType("video");
+    else setItemType("image");
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      if (dataUrl) {
+        setItemUrl(dataUrl);
+        if (!itemTitle) {
+          // Remove extension for title
+          const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+          setItemTitle(nameWithoutExt);
+        }
+        triggerToast(`✓ Selected '${file.name}' from your computer!`);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleAddItem = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!itemTitle || !itemUrl) return;
+
+    const normalizedUrl = normalizeMediaPath(itemUrl);
+
+    addItem({
+      type: itemType,
+      title: itemTitle,
+      category: itemCategory,
+      url: normalizedUrl,
+      thumbnailUrl: itemThumbUrl ? normalizeMediaPath(itemThumbUrl) : (itemType === "image" ? normalizedUrl : "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=800"),
+      featured: isFeatured,
+    });
+
+    triggerToast(`✓ New ${itemType === "image" ? "Photo" : "Video"} Published & Synchronized Live!`);
+
+    // Reset Form
+    setItemTitle("");
+    setItemUrl("");
+    setItemThumbUrl("");
+    setIsFeatured(false);
+    setShowAddModal(false);
+  };
+
+  const handleToggleFeatured = (id: string) => {
+    const updated = items.map((i) => (i.id === id ? { ...i, featured: !i.featured } : i));
+    saveItems(updated);
+    triggerToast("✓ Featured Status Updated!");
+  };
+
+  const handleDelete = (id: string, title: string) => {
+    if (confirm(`Are you sure you want to remove '${title}' from the gallery?`)) {
+      deleteItem(id);
+      triggerToast("✓ Media Item Removed from Gallery!");
+    }
+  };
 
   return (
-    <div className="space-y-6 select-none">
-      <div className="glass p-4 rounded-2xl border border-white/10 flex items-center justify-between">
+    <div className="space-y-6 select-none font-mono">
+      {/* Toast Alert */}
+      {statusMsg && (
+        <div className="px-4 py-2 bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 text-xs font-bold rounded-xl animate-pulse flex items-center gap-2">
+          <RiCheckDoubleLine className="text-base" />
+          <span>{statusMsg}</span>
+        </div>
+      )}
+
+      {/* Header Banner */}
+      <div className="glass p-6 rounded-3xl border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#0A0D1A]">
         <div>
-          <h2 className="text-sm font-extrabold text-white uppercase tracking-wider">
-            Media Gallery & Photo / Video Albums Center
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-arc-cyan/10 border border-arc-cyan/30 text-arc-cyan text-[10px] font-bold uppercase tracking-widest mb-1">
+            <RiGalleryLine className="animate-pulse" />
+            <span>FESTIVAL MEDIA GALLERY STUDIO</span>
+          </div>
+          <h2 className="text-2xl font-black text-white uppercase tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
+            Media Gallery <span className="marvel-bang-comic-gradient font-black">Manager</span>
           </h2>
-          <p className="text-xs text-white/40">Upload festival photography and video highlights for website display</p>
+          <p className="text-xs text-white/50">
+            Upload photos and videos directly from your computer or URL, and publish live to public website.
+          </p>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => {
+              setItemType("image");
+              setShowAddModal(true);
+            }}
+            className="px-4 py-2.5 rounded-xl bg-arc-cyan text-black font-bold text-xs hover:bg-white transition-colors cursor-pointer flex items-center gap-1.5 shadow-[0_0_15px_#00D4FF]"
+          >
+            <RiImageAddLine className="text-base" />
+            <span>+ Add Photo</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setItemType("video");
+              setShowAddModal(true);
+            }}
+            className="px-4 py-2.5 rounded-xl bg-marvel-red text-white font-bold text-xs hover:bg-white hover:text-black transition-colors cursor-pointer flex items-center gap-1.5 shadow-[0_0_15px_#ED1D24]"
+          >
+            <RiMovieLine className="text-base" />
+            <span>+ Add Video</span>
+          </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-        {photos.map((p) => (
-          <div key={p.id} className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-2">
-            <h4 className="font-extrabold text-white">{p.title}</h4>
-            <p className="text-[10px] text-white/40">{p.album} • {p.size}</p>
+      {/* Telemetry Stats Bar */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="p-4 rounded-2xl bg-black/40 border border-arc-cyan/30 space-y-1">
+          <span className="text-white/50 text-[10px] uppercase font-bold">Total Gallery Assets</span>
+          <div className="text-2xl font-black text-white">{items.length}</div>
+          <span className="text-arc-cyan text-[10px]">Published Assets</span>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-black/40 border border-emerald-500/30 space-y-1">
+          <span className="text-white/50 text-[10px] uppercase font-bold">Photos Enrolled</span>
+          <div className="text-2xl font-black text-emerald-400">{imagesCount}</div>
+          <span className="text-emerald-400 text-[10px]">High-Res Imagery</span>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-black/40 border border-marvel-red/30 space-y-1">
+          <span className="text-white/50 text-[10px] uppercase font-bold">Videos & Highlights</span>
+          <div className="text-2xl font-black text-marvel-red">{videosCount}</div>
+          <span className="text-marvel-red text-[10px]">MP4 & Teasers</span>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-black/40 border border-metallic-gold/30 space-y-1">
+          <span className="text-white/50 text-[10px] uppercase font-bold">Featured Spotlights</span>
+          <div className="text-2xl font-black text-metallic-gold">{items.filter((i) => i.featured).length}</div>
+          <span className="text-metallic-gold text-[10px]">Hero Carousel Active</span>
+        </div>
+      </div>
+
+      {/* MEDIA TYPE & CATEGORY FILTER RAIL */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-black/60 p-2 rounded-2xl border border-white/10">
+        <div className="flex bg-white/5 p-1 rounded-xl border border-white/10 gap-1">
+          {[
+            { id: "all" as const, label: `All Media (${items.length})`, icon: RiGalleryLine },
+            { id: "image" as const, label: `Photos (${imagesCount})`, icon: RiImageAddLine },
+            { id: "video" as const, label: `Videos (${videosCount})`, icon: RiVideoLine },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeMediaType === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveMediaType(tab.id)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all cursor-pointer flex items-center gap-1.5 ${
+                  isActive
+                    ? "bg-marvel-red text-white shadow-[0_0_15px_#ED1D24]"
+                    : "text-white/60 hover:text-white hover:bg-white/10"
+                }`}
+              >
+                <Icon />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="px-3 py-2 bg-black/60 border border-white/10 rounded-xl text-white text-xs font-bold focus:border-arc-cyan focus:outline-none"
+          >
+            <option value="all">All Categories</option>
+            <option value="cultural">Cultural & Stage</option>
+            <option value="gaming">Gaming Arena</option>
+            <option value="technical">Technical Sprint</option>
+            <option value="pro-show">Pro Show & Teasers</option>
+            <option value="general">General Campus</option>
+          </select>
+
+          <div className="relative w-44">
+            <input
+              type="text"
+              placeholder="Search title..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-3 py-2 pl-8 bg-black/60 border border-white/10 rounded-xl text-white text-xs focus:border-arc-cyan focus:outline-none"
+            />
+            <RiSearchLine className="absolute left-2.5 top-2.5 text-white/40" />
+          </div>
+        </div>
+      </div>
+
+      {/* MEDIA ASSETS GRID */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {filteredItems.map((item) => (
+          <div
+            key={item.id}
+            className="glass rounded-2xl border border-white/10 overflow-hidden bg-[#0A0D1A] group hover:border-arc-cyan/50 transition-all flex flex-col justify-between"
+          >
+            <div className="relative aspect-video bg-black overflow-hidden group">
+              <img
+                src={item.type === "image" ? item.url : item.thumbnailUrl || item.url}
+                alt={item.title}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+
+              <div className="absolute top-2 left-2 flex items-center gap-1.5">
+                <span
+                  className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase border ${
+                    item.type === "image"
+                      ? "bg-arc-cyan/20 border-arc-cyan/40 text-arc-cyan"
+                      : "bg-marvel-red/20 border-marvel-red/40 text-marvel-red"
+                  }`}
+                >
+                  {item.type === "image" ? "📷 PHOTO" : "🎥 VIDEO"}
+                </span>
+
+                <span className="px-2 py-0.5 rounded-md text-[9px] font-bold uppercase bg-black/60 text-white/70 border border-white/10">
+                  {item.category}
+                </span>
+              </div>
+
+              <div className="absolute top-2 right-2">
+                <button
+                  onClick={() => handleToggleFeatured(item.id)}
+                  className={`p-1.5 rounded-lg border transition-all cursor-pointer ${
+                    item.featured
+                      ? "bg-metallic-gold text-black border-metallic-gold shadow-[0_0_10px_#FFD700]"
+                      : "bg-black/60 text-white/40 border-white/10 hover:text-metallic-gold"
+                  }`}
+                  title={item.featured ? "Featured on homepage" : "Set as featured"}
+                >
+                  {item.featured ? <RiStarFill size={14} /> : <RiStarLine size={14} />}
+                </button>
+              </div>
+
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                <button
+                  onClick={() => setPreviewItem(item)}
+                  className="p-3 rounded-full bg-arc-cyan text-black font-bold text-sm hover:scale-110 transition-transform cursor-pointer shadow-lg"
+                >
+                  {item.type === "video" ? <RiPlayLine /> : <RiEyeLine />}
+                </button>
+              </div>
+            </div>
+
+            <div className="p-4 space-y-2">
+              <h4 className="text-xs font-bold text-white line-clamp-1">{item.title}</h4>
+              <p className="text-[10px] text-white/40 font-mono truncate">{item.url}</p>
+
+              <div className="pt-2 border-t border-white/10 flex items-center justify-between">
+                <span className="text-[9px] text-white/40">{item.date}</span>
+
+                <button
+                  onClick={() => handleDelete(item.id, item.title)}
+                  className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white transition-colors cursor-pointer"
+                  title="Delete item"
+                >
+                  <RiDeleteBinLine size={14} />
+                </button>
+              </div>
+            </div>
           </div>
         ))}
       </div>
+
+      {/* ADD MEDIA MODAL WITH NATIVE FILE PICKER */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="max-w-md w-full glass p-6 rounded-3xl border border-arc-cyan/40 bg-[#0A0D1A] space-y-4">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                {itemType === "image" ? <RiImageAddLine className="text-arc-cyan" /> : <RiMovieLine className="text-marvel-red" />}
+                <span>{itemType === "image" ? "Add New Photo Asset" : "Add New Video Asset"}</span>
+              </h3>
+              <button onClick={() => setShowAddModal(false)} className="p-1 text-white/40 hover:text-white cursor-pointer">
+                <RiCloseLine size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddItem} className="space-y-3 text-xs">
+              {/* Device File Picker Input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*,video/*"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full py-3 px-4 rounded-xl bg-white/10 hover:bg-arc-cyan hover:text-black border border-dashed border-arc-cyan/50 text-arc-cyan font-bold transition-all cursor-pointer flex items-center justify-center gap-2 shadow-inner"
+              >
+                <RiUploadCloud2Line className="text-lg" />
+                <span>📁 Upload File from Computer / Device</span>
+              </button>
+
+              <div className="text-center text-[10px] text-white/40 font-mono">OR Enter URL / Local Web Path Below</div>
+
+              {/* Media Type Selector */}
+              <div>
+                <label className="block text-white/70 font-bold mb-1">Asset Category Type</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setItemType("image")}
+                    className={`py-2 rounded-xl text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-1.5 border ${
+                      itemType === "image"
+                        ? "bg-arc-cyan text-black border-arc-cyan shadow-[0_0_15px_#00D4FF]"
+                        : "bg-black/60 text-white/60 border-white/10"
+                    }`}
+                  >
+                    <RiImageAddLine /> Photo (Image)
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setItemType("video")}
+                    className={`py-2 rounded-xl text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-1.5 border ${
+                      itemType === "video"
+                        ? "bg-marvel-red text-white border-marvel-red shadow-[0_0_15px_#ED1D24]"
+                        : "bg-black/60 text-white/60 border-white/10"
+                    }`}
+                  >
+                    <RiMovieLine /> Video (Highlight)
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-white/70 font-bold mb-1">Media Title</label>
+                <input
+                  type="text"
+                  placeholder={itemType === "image" ? "e.g. Battle of Bands Stage Night" : "e.g. Official Teaser 2026"}
+                  value={itemTitle}
+                  onChange={(e) => setItemTitle(e.target.value)}
+                  required
+                  className="w-full px-4 py-2.5 bg-black/60 border border-white/10 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-white/70 font-bold mb-1">Festival Event Category</label>
+                <select
+                  value={itemCategory}
+                  onChange={(e) => setItemCategory(e.target.value as any)}
+                  className="w-full px-4 py-2.5 bg-black/60 border border-white/10 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
+                >
+                  <option value="cultural">Cultural & Pro Shows</option>
+                  <option value="gaming">Gaming & Esports</option>
+                  <option value="technical">Technical Sprint & Hackathon</option>
+                  <option value="pro-show">Pro Show Video</option>
+                  <option value="general">General Campus</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-white/70 font-bold mb-1">
+                  {itemType === "image" ? "Photo URL / System Path" : "Video URL / System Path"}
+                </label>
+                <input
+                  type="text"
+                  placeholder="Paste URL, Windows Path, or click Upload above"
+                  value={itemUrl}
+                  onChange={(e) => setItemUrl(e.target.value)}
+                  required
+                  className="w-full px-4 py-2.5 bg-black/60 border border-white/10 rounded-xl text-white font-mono focus:border-arc-cyan focus:outline-none"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 font-bold cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-arc-cyan text-black font-bold uppercase cursor-pointer shadow-[0_0_15px_#00D4FF]"
+                >
+                  Publish Asset Live
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* PREVIEW MEDIA MODAL */}
+      {previewItem && (
+        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="max-w-3xl w-full glass p-6 rounded-3xl border border-white/20 bg-[#0A0D1A] space-y-4 relative">
+            <button
+              onClick={() => setPreviewItem(null)}
+              className="absolute top-4 right-4 p-2 rounded-full bg-black/60 text-white hover:bg-marvel-red transition-colors cursor-pointer z-10"
+            >
+              <RiCloseLine size={20} />
+            </button>
+
+            <h3 className="text-base font-bold text-white uppercase">{previewItem.title}</h3>
+
+            <div className="aspect-video w-full bg-black rounded-2xl overflow-hidden relative">
+              {previewItem.type === "image" ? (
+                <img src={previewItem.url} alt={previewItem.title} className="w-full h-full object-contain" />
+              ) : (
+                <video src={previewItem.url} controls autoPlay className="w-full h-full object-contain" />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -28,10 +28,13 @@ import {
   RiGalleryLine,
   RiImageAddLine,
   RiVideoLine,
+  RiUploadCloud2Line,
   RiRefreshLine,
 } from "react-icons/ri";
+
 import { useFestivalControl } from "@/lib/festivalStore";
-import { useGalleryItems } from "@/lib/galleryStore";
+import { useGalleryItems, normalizeMediaPath } from "@/lib/galleryStore";
+
 
 interface SponsorItem {
   id: string;
@@ -204,18 +207,22 @@ export function CMSModule({ activePage }: CMSModuleProps) {
     }
   };
 
+  const heroVideoFileRef = useRef<HTMLInputElement | null>(null);
+
   // Hero Submit
   const handleSaveHero = (e: React.FormEvent) => {
     e.preventDefault();
+    const cleanBannerUrl = normalizeMediaPath(heroBannerUrl);
     updateSettings({
       name: heroTitle,
       tagline: heroTagline,
       motto: heroMotto,
-      homepageBanner: heroBannerUrl,
+      homepageBanner: cleanBannerUrl,
       registrationOpen: regOpen,
     });
-    triggerSaved("✓ Hero Banner Copy & Registration Settings Updated!");
+    triggerSaved("✓ Hero Banner Copy & Video Settings Updated Live!");
   };
+
 
   // About Submit
   const handleSaveAbout = (e: React.FormEvent) => {
@@ -405,16 +412,48 @@ export function CMSModule({ activePage }: CMSModuleProps) {
             </div>
 
 
-            <div className="md:col-span-2">
-              <label className="block text-white/70 font-bold mb-1">Homepage Promo Video Loop URL (MP4 / Direct Link)</label>
+            <div className="md:col-span-2 space-y-2">
+              <label className="block text-white/70 font-bold">Homepage Promo Video Loop URL (MP4 / Direct Link)</label>
+
               <input
-                type="text"
-                value={heroBannerUrl}
-                onChange={(e) => setHeroBannerUrl(e.target.value)}
-                placeholder="https://domain.com/trailer.mp4"
-                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white font-mono focus:border-arc-cyan focus:outline-none"
+                ref={heroVideoFileRef}
+                type="file"
+                accept="video/*,image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onload = (event) => {
+                    const dataUrl = event.target?.result as string;
+                    if (dataUrl) {
+                      setHeroBannerUrl(dataUrl);
+                      triggerSaved(`✓ Selected video file '${file.name}'! Click Save Hero Changes to apply.`);
+                    }
+                  };
+                  reader.readAsDataURL(file);
+                }}
+                className="hidden"
               />
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={heroBannerUrl}
+                  onChange={(e) => setHeroBannerUrl(e.target.value)}
+                  placeholder="Paste URL, Windows Path (e.g. C:\...\video.mp4), or click Upload"
+                  className="flex-1 px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white font-mono focus:border-arc-cyan focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => heroVideoFileRef.current?.click()}
+                  className="px-4 py-3 rounded-xl bg-white/10 hover:bg-arc-cyan hover:text-black border border-arc-cyan/40 text-arc-cyan font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0"
+                >
+                  <RiUploadCloud2Line className="text-base" />
+                  <span>📁 Upload File</span>
+                </button>
+              </div>
             </div>
+
           </div>
         </form>
       )}
