@@ -251,9 +251,12 @@ export default function AdminDashboardPage() {
       case "cms.hero":
       case "cms.about":
       case "cms.sponsors":
+      case "cms.gallery":
+      case "gallery":
       case "cms.faqs":
       case "cms.contact":
         return <CMSModule activePage={activePage} />;
+
 
 
 
