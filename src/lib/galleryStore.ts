@@ -175,11 +175,26 @@ export function addGalleryItem(item: Omit<GalleryItem, "id" | "date">): GalleryI
   return newItem;
 }
 
+export function updateGalleryItem(updatedItem: GalleryItem): void {
+  const current = getGalleryItems();
+  const updated = current.map((i) =>
+    i.id === updatedItem.id
+      ? {
+          ...updatedItem,
+          url: normalizeMediaPath(updatedItem.url),
+          thumbnailUrl: updatedItem.thumbnailUrl ? normalizeMediaPath(updatedItem.thumbnailUrl) : undefined,
+        }
+      : i
+  );
+  saveGalleryItems(updated);
+}
+
 export function deleteGalleryItem(id: string): void {
   const current = getGalleryItems();
   const updated = current.filter((i) => i.id !== id);
   saveGalleryItems(updated);
 }
+
 
 export function useGalleryItems() {
   const [items, setItems] = useState<GalleryItem[]>(DEFAULT_GALLERY);
@@ -216,7 +231,9 @@ export function useGalleryItems() {
     items,
     refresh,
     addItem: addGalleryItem,
+    updateItem: updateGalleryItem,
     deleteItem: deleteGalleryItem,
     saveItems: saveGalleryItems,
   };
+
 }

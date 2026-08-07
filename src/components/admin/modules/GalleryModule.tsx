@@ -15,18 +15,20 @@ import {
   RiStarLine,
   RiStarFill,
   RiUploadCloud2Line,
+  RiEditLine,
+  RiImageEditLine,
 } from "react-icons/ri";
 import { useGalleryItems, GalleryItem, normalizeMediaPath } from "@/lib/galleryStore";
 
 export function GalleryModule() {
-  const { items, addItem, deleteItem, saveItems } = useGalleryItems();
+  const { items, addItem, updateItem, deleteItem, saveItems } = useGalleryItems();
 
   const [activeMediaType, setActiveMediaType] = useState<"all" | "image" | "video">("all");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusMsg, setStatusMsg] = useState("");
 
-  // Modal States
+  // Add Modal State
   const [showAddModal, setShowAddModal] = useState(false);
   const [itemType, setItemType] = useState<"image" | "video">("image");
   const [itemTitle, setItemTitle] = useState("");
@@ -35,8 +37,19 @@ export function GalleryModule() {
   const [itemThumbUrl, setItemThumbUrl] = useState("");
   const [isFeatured, setIsFeatured] = useState(false);
 
-  // File Upload Ref
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  // Edit Cover Modal State
+  const [editingItem, setEditingItem] = useState<GalleryItem | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editCategory, setEditCategory] = useState<"gaming" | "cultural" | "technical" | "general" | "pro-show">("cultural");
+  const [editUrl, setEditUrl] = useState("");
+  const [editThumbUrl, setEditThumbUrl] = useState("");
+  const [editFeatured, setEditFeatured] = useState(false);
+
+  // File Upload Refs
+  const addSourceFileRef = useRef<HTMLInputElement | null>(null);
+  const addThumbFileRef = useRef<HTMLInputElement | null>(null);
+  const editSourceFileRef = useRef<HTMLInputElement | null>(null);
+  const editThumbFileRef = useRef<HTMLInputElement | null>(null);
 
   // Preview Modal
   const [previewItem, setPreviewItem] = useState<GalleryItem | null>(null);
@@ -56,8 +69,8 @@ export function GalleryModule() {
     return matchType && matchCat && matchSearch;
   });
 
-  // Native File Picker Handler
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Native File Picker Handlers for Add Modal
+  const handleAddSourceFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -74,7 +87,53 @@ export function GalleryModule() {
           const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
           setItemTitle(nameWithoutExt);
         }
-        triggerToast(`✓ Loaded '${file.name}' from device!`);
+        triggerToast(`✓ Loaded media file '${file.name}' from device!`);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleAddThumbFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      if (dataUrl) {
+        setItemThumbUrl(dataUrl);
+        triggerToast(`✓ Loaded cover image '${file.name}'!`);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Native File Picker Handlers for Edit Modal
+  const handleEditSourceFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      if (dataUrl) {
+        setEditUrl(dataUrl);
+        triggerToast(`✓ Updated media file with '${file.name}'!`);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleEditThumbFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      if (dataUrl) {
+        setEditThumbUrl(dataUrl);
+        triggerToast(`✓ Updated cover thumbnail with '${file.name}'!`);
       }
     };
     reader.readAsDataURL(file);
@@ -105,10 +164,39 @@ export function GalleryModule() {
     setShowAddModal(false);
   };
 
+  const openEditModal = (item: GalleryItem) => {
+    setEditingItem(item);
+    setEditTitle(item.title);
+    setEditCategory(item.category);
+    setEditUrl(item.url);
+    setEditThumbUrl(item.thumbnailUrl || "");
+    setEditFeatured(item.featured);
+  };
+
+  const handleSaveEdit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingItem || !editTitle || !editUrl) return;
+
+    const normalizedUrl = normalizeMediaPath(editUrl);
+    const normalizedThumb = editThumbUrl ? normalizeMediaPath(editThumbUrl) : undefined;
+
+    updateItem({
+      ...editingItem,
+      title: editTitle,
+      category: editCategory,
+      url: normalizedUrl,
+      thumbnailUrl: normalizedThumb,
+      featured: editFeatured,
+    });
+
+    triggerToast("✓ Gallery Asset Cover Image & Details Updated Live!");
+    setEditingItem(null);
+  };
+
   const handleToggleFeatured = (id: string) => {
     const updated = items.map((i) => (i.id === id ? { ...i, featured: !i.featured } : i));
     saveItems(updated);
-    triggerToast("✓ Featured Status Updated!");
+    triggerToast("✓ Featured Spotlight Status Updated!");
   };
 
   const handleDelete = (id: string, title: string) => {
@@ -139,7 +227,7 @@ export function GalleryModule() {
             Media Gallery <span className="marvel-bang-comic-gradient font-black">Manager</span>
           </h2>
           <p className="text-xs text-white/50">
-            Upload photos and videos directly from your computer or URL, and publish live to public website.
+            Upload photos and videos, and update cover images for each photo or video asset.
           </p>
         </div>
 
@@ -210,10 +298,11 @@ export function GalleryModule() {
               <button
                 key={tab.id}
                 onClick={() => setActiveMediaType(tab.id)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all cursor-pointer flex items-center gap-1.5 ${isActive
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all cursor-pointer flex items-center gap-1.5 ${
+                  isActive
                     ? "bg-marvel-red text-white shadow-[0_0_15px_#ED1D24]"
                     : "text-white/60 hover:text-white hover:bg-white/10"
-                  }`}
+                }`}
               >
                 <Icon />
                 <span>{tab.label}</span>
@@ -265,10 +354,11 @@ export function GalleryModule() {
 
               <div className="absolute top-2 left-2 flex items-center gap-1.5">
                 <span
-                  className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase border ${item.type === "image"
+                  className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase border ${
+                    item.type === "image"
                       ? "bg-arc-cyan/20 border-arc-cyan/40 text-arc-cyan"
                       : "bg-marvel-red/20 border-marvel-red/40 text-marvel-red"
-                    }`}
+                  }`}
                 >
                   {item.type === "image" ? "📷 PHOTO" : "🎥 VIDEO"}
                 </span>
@@ -278,16 +368,25 @@ export function GalleryModule() {
                 </span>
               </div>
 
-              <div className="absolute top-2 right-2">
+              <div className="absolute top-2 right-2 flex items-center gap-1">
                 <button
                   onClick={() => handleToggleFeatured(item.id)}
-                  className={`p-1.5 rounded-lg border transition-all cursor-pointer ${item.featured
+                  className={`p-1.5 rounded-lg border transition-all cursor-pointer ${
+                    item.featured
                       ? "bg-metallic-gold text-black border-metallic-gold shadow-[0_0_10px_#FFD700]"
                       : "bg-black/60 text-white/40 border-white/10 hover:text-metallic-gold"
-                    }`}
+                  }`}
                   title={item.featured ? "Featured on homepage" : "Set as featured"}
                 >
                   {item.featured ? <RiStarFill size={14} /> : <RiStarLine size={14} />}
+                </button>
+
+                <button
+                  onClick={() => openEditModal(item)}
+                  className="p-1.5 rounded-lg bg-black/60 border border-white/10 text-white/80 hover:text-arc-cyan hover:border-arc-cyan transition-all cursor-pointer"
+                  title="Change Cover Image & Details"
+                >
+                  <RiImageEditLine size={14} />
                 </button>
               </div>
 
@@ -305,12 +404,18 @@ export function GalleryModule() {
               <h4 className="text-xs font-bold text-white line-clamp-1">{item.title}</h4>
               <p className="text-[10px] text-white/40 font-mono truncate">{item.url}</p>
 
-              <div className="pt-2 border-t border-white/10 flex items-center justify-between">
-                <span className="text-[9px] text-white/40">{item.date}</span>
+              <div className="pt-2 border-t border-white/10 flex items-center justify-between gap-2">
+                <button
+                  onClick={() => openEditModal(item)}
+                  className="px-2.5 py-1.5 rounded-xl bg-metallic-gold/10 hover:bg-metallic-gold text-metallic-gold hover:text-black border border-metallic-gold/40 text-[10px] font-bold uppercase transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  <RiImageEditLine className="text-xs" />
+                  <span>Change Cover</span>
+                </button>
 
                 <button
                   onClick={() => handleDelete(item.id, item.title)}
-                  className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white transition-colors cursor-pointer"
+                  className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white transition-colors cursor-pointer shrink-0"
                   title="Delete item"
                 >
                   <RiDeleteBinLine size={14} />
@@ -321,10 +426,10 @@ export function GalleryModule() {
         ))}
       </div>
 
-      {/* ADD MEDIA MODAL WITH NATIVE FILE PICKER */}
+      {/* ADD MEDIA MODAL WITH COVER IMAGE CUSTOMIZER */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="max-w-md w-full glass p-6 rounded-3xl border border-arc-cyan/40 bg-[#0A0D1A] space-y-4">
+          <div className="max-w-md w-full glass p-6 rounded-3xl border border-arc-cyan/40 bg-[#0A0D1A] space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
                 {itemType === "image" ? <RiImageAddLine className="text-arc-cyan" /> : <RiMovieLine className="text-marvel-red" />}
@@ -337,23 +442,31 @@ export function GalleryModule() {
 
             <form onSubmit={handleAddItem} className="space-y-3 text-xs">
               <input
-                ref={fileInputRef}
+                ref={addSourceFileRef}
                 type="file"
                 accept="image/*,video/*"
-                onChange={handleFileUpload}
+                onChange={handleAddSourceFileUpload}
+                className="hidden"
+              />
+
+              <input
+                ref={addThumbFileRef}
+                type="file"
+                accept="image/*"
+                onChange={handleAddThumbFileUpload}
                 className="hidden"
               />
 
               <button
                 type="button"
-                onClick={() => fileInputRef.current?.click()}
+                onClick={() => addSourceFileRef.current?.click()}
                 className="w-full py-3 px-4 rounded-xl bg-white/10 hover:bg-arc-cyan hover:text-black border border-dashed border-arc-cyan/50 text-arc-cyan font-bold transition-all cursor-pointer flex items-center justify-center gap-2 shadow-inner"
               >
                 <RiUploadCloud2Line className="text-lg" />
-                <span>📁 Upload File from Computer / Device</span>
+                <span>📁 Pick Media File from Computer / Device</span>
               </button>
 
-              <div className="text-center text-[10px] text-white/40 font-mono">OR Enter URL / Local System Path Below</div>
+              <div className="text-center text-[10px] text-white/40 font-mono">OR Paste Folder System Path (e.g. C:\Users\...\video.mp4)</div>
 
               <div>
                 <label className="block text-white/70 font-bold mb-1">Asset Category Type</label>
@@ -361,10 +474,11 @@ export function GalleryModule() {
                   <button
                     type="button"
                     onClick={() => setItemType("image")}
-                    className={`py-2 rounded-xl text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-1.5 border ${itemType === "image"
+                    className={`py-2 rounded-xl text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-1.5 border ${
+                      itemType === "image"
                         ? "bg-arc-cyan text-black border-arc-cyan shadow-[0_0_15px_#00D4FF]"
                         : "bg-black/60 text-white/60 border-white/10"
-                      }`}
+                    }`}
                   >
                     <RiImageAddLine /> Photo (Image)
                   </button>
@@ -372,10 +486,11 @@ export function GalleryModule() {
                   <button
                     type="button"
                     onClick={() => setItemType("video")}
-                    className={`py-2 rounded-xl text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-1.5 border ${itemType === "video"
+                    className={`py-2 rounded-xl text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-1.5 border ${
+                      itemType === "video"
                         ? "bg-marvel-red text-white border-marvel-red shadow-[0_0_15px_#ED1D24]"
                         : "bg-black/60 text-white/60 border-white/10"
-                      }`}
+                    }`}
                   >
                     <RiMovieLine /> Video (Highlight)
                   </button>
@@ -411,15 +526,39 @@ export function GalleryModule() {
 
               <div>
                 <label className="block text-white/70 font-bold mb-1">
-                  {itemType === "image" ? "Photo URL / System Path" : "Video URL / System Path"}
+                  {itemType === "image" ? "Photo URL / System Folder Path" : "Video URL / System Folder Path"}
                 </label>
                 <input
                   type="text"
-                  placeholder="Paste URL, Windows Path, or click Upload above"
+                  placeholder='Paste URL or Windows Path (e.g. "C:\Users\...\video.mp4")'
                   value={itemUrl}
                   onChange={(e) => setItemUrl(e.target.value)}
                   required
                   className="w-full px-4 py-2.5 bg-black/60 border border-white/10 rounded-xl text-white font-mono focus:border-arc-cyan focus:outline-none"
+                />
+              </div>
+
+              {/* Cover Image Customizer */}
+              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="block text-white font-bold text-xs flex items-center gap-1">
+                    <RiImageEditLine className="text-metallic-gold" />
+                    <span>Custom Cover Thumbnail Image</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => addThumbFileRef.current?.click()}
+                    className="text-[10px] px-2 py-0.5 rounded bg-metallic-gold/20 text-metallic-gold border border-metallic-gold/40 hover:bg-metallic-gold hover:text-black font-bold transition-all"
+                  >
+                    📁 Upload Cover File
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Cover image URL or Windows Folder Path"
+                  value={itemThumbUrl}
+                  onChange={(e) => setItemThumbUrl(e.target.value)}
+                  className="w-full px-3 py-2 bg-black/80 border border-white/10 rounded-xl text-white font-mono focus:border-metallic-gold focus:outline-none"
                 />
               </div>
 
@@ -436,6 +575,141 @@ export function GalleryModule() {
                   className="px-5 py-2 rounded-xl bg-arc-cyan text-black font-bold uppercase cursor-pointer shadow-[0_0_15px_#00D4FF]"
                 >
                   Publish Asset Live
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* CHANGE COVER IMAGE & EDIT MEDIA MODAL */}
+      {editingItem && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="max-w-md w-full glass p-6 rounded-3xl border border-metallic-gold/40 bg-[#0A0D1A] space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <RiImageEditLine className="text-metallic-gold" />
+                <span>Change Cover Image & Asset Details</span>
+              </h3>
+              <button onClick={() => setEditingItem(null)} className="p-1 text-white/40 hover:text-white cursor-pointer">
+                <RiCloseLine size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEdit} className="space-y-3 text-xs">
+              <input
+                ref={editSourceFileRef}
+                type="file"
+                accept="image/*,video/*"
+                onChange={handleEditSourceFileUpload}
+                className="hidden"
+              />
+
+              <input
+                ref={editThumbFileRef}
+                type="file"
+                accept="image/*"
+                onChange={handleEditThumbFileUpload}
+                className="hidden"
+              />
+
+              {/* Cover Image Customizer Box */}
+              <div className="p-4 rounded-2xl bg-metallic-gold/10 border border-metallic-gold/30 space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="block text-metallic-gold font-bold text-xs flex items-center gap-1.5">
+                    <RiImageEditLine className="text-base" />
+                    <span>Change Cover Thumbnail Image</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => editThumbFileRef.current?.click()}
+                    className="text-[10px] px-2.5 py-1 rounded-lg bg-metallic-gold text-black font-extrabold hover:bg-white transition-all cursor-pointer shadow-md"
+                  >
+                    📁 Upload Cover File
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  placeholder='Paste Cover Image URL or Windows Path (e.g. "C:\Users\...\cover.jpg")'
+                  value={editThumbUrl}
+                  onChange={(e) => setEditThumbUrl(e.target.value)}
+                  className="w-full px-3 py-2 bg-black/80 border border-white/10 rounded-xl text-white font-mono focus:border-metallic-gold focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-white/70 font-bold mb-1">Asset Title</label>
+                <input
+                  type="text"
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  required
+                  className="w-full px-4 py-2.5 bg-black/60 border border-white/10 rounded-xl text-white focus:border-metallic-gold focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-white/70 font-bold mb-1">Event Category</label>
+                <select
+                  value={editCategory}
+                  onChange={(e) => setEditCategory(e.target.value as any)}
+                  className="w-full px-4 py-2.5 bg-black/60 border border-white/10 rounded-xl text-white focus:border-metallic-gold focus:outline-none"
+                >
+                  <option value="cultural">Cultural & Pro Shows</option>
+                  <option value="gaming">Gaming & Esports</option>
+                  <option value="technical">Technical Sprint & Hackathon</option>
+                  <option value="pro-show">Pro Show Video</option>
+                  <option value="general">General Campus</option>
+                </select>
+              </div>
+
+              {/* Source Media URL / File */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-white/70 font-bold">Media Source URL / System Folder Path</label>
+                  <button
+                    type="button"
+                    onClick={() => editSourceFileRef.current?.click()}
+                    className="text-[10px] text-arc-cyan font-bold hover:underline cursor-pointer"
+                  >
+                    📁 Change File
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  value={editUrl}
+                  onChange={(e) => setEditUrl(e.target.value)}
+                  required
+                  className="w-full px-4 py-2.5 bg-black/60 border border-white/10 rounded-xl text-white font-mono focus:border-metallic-gold focus:outline-none"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 pt-2">
+                <input
+                  type="checkbox"
+                  id="editFeatCheck"
+                  checked={editFeatured}
+                  onChange={(e) => setEditFeatured(e.target.checked)}
+                  className="w-4 h-4 accent-metallic-gold cursor-pointer"
+                />
+                <label htmlFor="editFeatCheck" className="text-white/80 font-bold cursor-pointer">
+                  Feature this asset on Homepage Gallery Preview
+                </label>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setEditingItem(null)}
+                  className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 font-bold cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-metallic-gold text-black font-bold uppercase cursor-pointer shadow-[0_0_15px_#FFD700]"
+                >
+                  Save Cover & Details
                 </button>
               </div>
             </form>
