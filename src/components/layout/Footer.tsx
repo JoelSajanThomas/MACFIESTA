@@ -22,9 +22,10 @@ const portals = [
   { label: "Participant Portal", href: "/dashboard" },
   { label: "Command Console", href: "/admin" },
   { label: "Mission Control", href: "/admin/console" },
-  { label: "Volunteer HQ", href: "/volunteers" },
-  { label: "Judge Command", href: "/judges" },
+  { label: "Volunteer HQ", href: "/volunteer/login" },
+  { label: "Judge Command", href: "/admin/console" },
 ];
+
 
 const resources = [
   { label: "Mission Brochure", href: "/brochure" },
