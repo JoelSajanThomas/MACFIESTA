@@ -4,8 +4,12 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { RiPlayLine, RiCalendarCheckLine } from "react-icons/ri";
+import { useFestivalControl } from "@/lib/festivalStore";
+
 
 export function RegistrationCTA() {
+  const { settings } = useFestivalControl();
+
   return (
     <section className="relative bg-[#05050A] section-padding overflow-hidden border-t border-white/10 min-h-[480px] flex items-center justify-center">
       {/* Full Cover Background Image — /MARVEL/658651514296997716.png (Maximum Visibility) */}
@@ -32,7 +36,7 @@ export function RegistrationCTA() {
             className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-metallic-gold/40 bg-metallic-gold/15 text-metallic-gold text-xs font-mono font-bold tracking-widest uppercase shadow-[0_0_15px_rgba(255,215,0,0.3)]"
           >
             <RiCalendarCheckLine className="animate-bounce" />
-            <span>LIMITED REGISTRATION SLOTS REMAINING</span>
+            <span>{settings.registrationOpen ? "REGISTRATION SLOTS OPEN" : "REGISTRATION CLOSED"}</span>
           </motion.div>
 
           <div className="space-y-4">
@@ -44,7 +48,7 @@ export function RegistrationCTA() {
               style={{ fontFamily: "var(--font-heading)" }}
             >
               Are You Ready <br />
-              To Claim Your <span className="marvel-bang-comic-gradient font-black">Legends Cup?</span>
+              To Claim Your <span className="marvel-bang-comic-gradient font-black">{settings.motto || "Legends Cup"}?</span>
             </motion.h2>
 
             <motion.p
@@ -53,7 +57,7 @@ export function RegistrationCTA() {
               viewport={{ once: true }}
               className="text-white font-medium text-sm md:text-base max-w-2xl mx-auto font-mono drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]"
             >
-              {"Don't miss the chance to represent your college in technical challenges, gaming leagues, and cultural pro shows. Get your unified festival entry pass now."}
+              {settings.tagline || "Don't miss the chance to represent your college in technical challenges, gaming leagues, and cultural pro shows. Get your unified festival entry pass now."}
             </motion.p>
           </div>
 
@@ -64,9 +68,10 @@ export function RegistrationCTA() {
             className="flex flex-wrap justify-center gap-4 pt-2"
           >
             <Link href="/signup" className="btn-primary px-10 py-4 group shadow-[0_0_30px_#ED1D24]">
-              <span>Register Pass Now</span>
+              <span>{settings.registrationOpen ? "Register Pass Now" : "View Schedule"}</span>
               <RiPlayLine className="group-hover:translate-x-1 transition-transform text-lg" />
             </Link>
+
             <Link href="/events" className="btn-outline px-10 py-4 border-arc-cyan text-white hover:bg-arc-cyan/20">
               <span>Explore Categories</span>
             </Link>
