@@ -143,11 +143,25 @@ const DEFAULT_WINNERS: WinnerSelection[] = [
   },
 ];
 
-export function JudgeCommandModule() {
+interface JudgeCommandModuleProps {
+  activePage?: string;
+}
+
+export function JudgeCommandModule({ activePage }: JudgeCommandModuleProps) {
   const { broadcasts, saveJuryBroadcasts } = useJudgeControl();
   const tabRailRef = useRef<HTMLDivElement>(null);
 
   const [activeTab, setActiveTab] = useState<"dashboard" | "roster" | "builder" | "results" | "announcements">("dashboard");
+
+  useEffect(() => {
+    if (!activePage) return;
+    if (activePage.endsWith(".roster")) setActiveTab("roster");
+    else if (activePage.endsWith(".builder")) setActiveTab("builder");
+    else if (activePage.endsWith(".results")) setActiveTab("results");
+    else if (activePage.endsWith(".announcements")) setActiveTab("announcements");
+    else if (activePage.endsWith(".dashboard") || activePage === "judges.command") setActiveTab("dashboard");
+  }, [activePage]);
+
   const [judges, setJudges] = useState<JudgeUser[]>(DEFAULT_JUDGES);
   const [criteria, setCriteria] = useState<ScoreCriterion[]>(DEFAULT_CRITERIA);
   const [winners, setWinners] = useState<WinnerSelection[]>(DEFAULT_WINNERS);

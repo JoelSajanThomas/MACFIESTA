@@ -37,13 +37,26 @@ import {
   toggleVolunteerClockDuty,
 } from "@/lib/volunteerStore";
 
-export function VolunteerHQModule() {
+interface VolunteerHQModuleProps {
+  activePage?: string;
+}
+
+export function VolunteerHQModule({ activePage }: VolunteerHQModuleProps) {
   const { volunteers, assignedTasks, issues, attendanceLogs } = useVolunteerControl();
   const tabRailRef = useRef<HTMLDivElement>(null);
 
-
-
   const [activeTab, setActiveTab] = useState<"dashboard" | "roster" | "tasks" | "attendance" | "announcements" | "reports">("dashboard");
+
+  useEffect(() => {
+    if (!activePage) return;
+    if (activePage.endsWith(".roster")) setActiveTab("roster");
+    else if (activePage.endsWith(".tasks")) setActiveTab("tasks");
+    else if (activePage.endsWith(".attendance")) setActiveTab("attendance");
+    else if (activePage.endsWith(".announcements")) setActiveTab("announcements");
+    else if (activePage.endsWith(".reports")) setActiveTab("reports");
+    else if (activePage.endsWith(".dashboard") || activePage === "volunteers.hq") setActiveTab("dashboard");
+  }, [activePage]);
+
   const [volList, setVolList] = useState<VolunteerUser[]>(volunteers);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDeptFilter, setSelectedDeptFilter] = useState("ALL");
