@@ -140,10 +140,11 @@ export default function GalleryPage() {
                 className="relative aspect-video overflow-hidden rounded-3xl border border-white/10 group shadow-2xl cursor-pointer bg-black/80"
               >
                 <img
-                  src={item.type === "image" ? item.url : item.thumbnailUrl || item.url}
+                  src={encodeURI(item.type === "image" ? item.url : item.thumbnailUrl || item.url)}
                   alt={item.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
+
 
                 {/* Media Badges */}
                 <div className="absolute top-3 left-3 z-10 flex gap-2">
