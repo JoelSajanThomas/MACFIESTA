@@ -253,22 +253,33 @@ export default function GalleryPage() {
               </div>
 
               {/* Media Display Container */}
-              <div className="aspect-video w-full bg-black rounded-2xl overflow-hidden relative border border-white/10 flex items-center justify-center">
                 {activeItem.type === "image" ? (
                   <img
-                    src={activeItem.url}
+                    src={encodeURI(activeItem.url)}
                     alt={activeItem.title}
                     className="w-full h-full object-contain"
                   />
+                ) : activeItem.url.includes("youtube.com/embed/") ? (
+                  <iframe
+                    src={activeItem.url}
+                    className="w-full h-full border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
                 ) : (
                   <video
-                    src={activeItem.url}
+                    key={activeItem.url}
                     controls
                     autoPlay
-                    className="w-full h-full object-contain"
-                  />
+                    playsInline
+                    className="w-full h-full object-contain bg-black"
+                  >
+                    <source src={encodeURI(activeItem.url)} />
+                    <source src={activeItem.url} />
+                    Your browser does not support playing this video format directly.
+                  </video>
                 )}
-              </div>
+
 
               {/* Navigation Hint Footer */}
               <div className="flex items-center justify-between text-[11px] text-white/50 pt-2 border-t border-white/10">

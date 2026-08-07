@@ -13,6 +13,53 @@ export interface GalleryItem {
   featured: boolean;
 }
 
+export function normalizeMediaPath(rawPath: string): string {
+  if (!rawPath) return "";
+  let clean = rawPath.trim();
+
+  // If YouTube URL, convert to embed URL or keep
+  if (clean.includes("youtube.com/watch?v=")) {
+    const videoId = clean.split("v=")[1]?.split("&")[0];
+    if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+  } else if (clean.includes("youtu.be/")) {
+    const videoId = clean.split("youtu.be/")[1]?.split("?")[0];
+    if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+  }
+
+  // If data URL, blob URL or http/https, return directly
+  if (
+    clean.startsWith("data:") ||
+    clean.startsWith("blob:") ||
+    clean.startsWith("http://") ||
+    clean.startsWith("https://")
+  ) {
+    return clean;
+  }
+
+  // Convert Windows backslashes \ to /
+  clean = clean.replace(/\\/g, "/");
+
+  // Strip file:// prefix
+  if (clean.startsWith("file:///")) {
+    clean = clean.slice(7);
+  } else if (clean.startsWith("file://")) {
+    clean = clean.slice(6);
+  }
+
+  // If path contains /public/, extract relative web path after /public
+  if (clean.toLowerCase().includes("/public/")) {
+    const publicIdx = clean.toLowerCase().indexOf("/public/");
+    clean = clean.slice(publicIdx + "/public".length);
+  }
+
+  // Ensure leading slash for relative paths (e.g. "MARVEL/Video Project 4.mp4" -> "/MARVEL/Video Project 4.mp4")
+  if (!clean.startsWith("/") && !/^[a-zA-Z]:\//.test(clean)) {
+    clean = `/${clean}`;
+  }
+
+  return clean;
+}
+
 export const DEFAULT_GALLERY: GalleryItem[] = [
   {
     id: "gal-1",
@@ -46,7 +93,7 @@ export const DEFAULT_GALLERY: GalleryItem[] = [
     type: "video",
     category: "pro-show",
     title: "MacFiesta Official Teaser Video",
-    url: "https://www.w3schools.com/html/mov_bbb.mp4",
+    url: "/MARVEL/Video Project 4.mp4",
     thumbnailUrl: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=800&auto=format&fit=crop",
     date: "2026-08-07",
     featured: true,
@@ -81,7 +128,7 @@ if (typeof window !== "undefined" && "BroadcastChannel" in window) {
     syncChannel.onmessage = () => {
       galleryListeners.forEach((l) => l());
     };
-  } catch { }
+  } catch {}
 }
 
 function notifyGalleryListeners() {
@@ -89,7 +136,7 @@ function notifyGalleryListeners() {
   if (syncChannel) {
     try {
       syncChannel.postMessage("updated");
-    } catch { }
+    } catch {}
   }
 }
 
@@ -104,9 +151,14 @@ export function getGalleryItems(): GalleryItem[] {
 }
 
 export function saveGalleryItems(items: GalleryItem[]): void {
+  const normalized = items.map((i) => ({
+    ...i,
+    url: normalizeMediaPath(i.url),
+    thumbnailUrl: i.thumbnailUrl ? normalizeMediaPath(i.thumbnailUrl) : undefined,
+  }));
   try {
-    localStorage.setItem("macfiesta_gallery_items", JSON.stringify(items));
-  } catch { }
+    localStorage.setItem("macfiesta_gallery_items", JSON.stringify(normalized));
+  } catch {}
   notifyGalleryListeners();
 }
 
@@ -114,6 +166,8 @@ export function addGalleryItem(item: Omit<GalleryItem, "id" | "date">): GalleryI
   const current = getGalleryItems();
   const newItem: GalleryItem = {
     ...item,
+    url: normalizeMediaPath(item.url),
+    thumbnailUrl: item.thumbnailUrl ? normalizeMediaPath(item.thumbnailUrl) : undefined,
     id: `gal-${Date.now()}`,
     date: new Date().toISOString().split("T")[0],
   };
