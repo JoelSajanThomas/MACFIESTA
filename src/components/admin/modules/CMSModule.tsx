@@ -18,617 +18,1111 @@ import {
   RiCloseLine,
   RiEyeLine,
   RiEyeOffLine,
+  RiPaletteLine,
+  RiMagicLine,
+  RiMegaphoneLine,
+  RiFileList3Line,
+  RiFolderImageLine,
+  RiLayoutGridLine,
+  RiNavigationLine,
+  RiShieldFlashLine,
+  RiSparklingLine,
+  RiBuilding2Line,
+  RiChat1Line,
 } from "react-icons/ri";
 import { useFestivalControl } from "@/lib/festivalStore";
 
-interface SponsorItem {
-  id: string;
-  name: string;
-  tier: string;
-  logoUrl: string;
-  website: string;
-  amount: number;
-  active: boolean;
-}
-
 export function CMSModule() {
-  const [activeTab, setActiveTab] = useState<"hero" | "about" | "sponsors" | "faqs" | "contact" | "rules">("sponsors");
-  const { settings, updateSettings } = useFestivalControl();
+  const [activeTab, setActiveTab] = useState<
+    | "hero"
+    | "navbar"
+    | "about"
+    | "departments"
+    | "sponsors"
+    | "testimonials"
+    | "faqs"
+    | "contact"
+    | "theme"
+    | "announcements"
+    | "forms"
+    | "seo"
+  >("hero");
 
-  // About Section CMS
-  const [aboutHeading, setAboutHeading] = useState("About MacFiesta");
-  const [aboutBody, setAboutBody] = useState(settings.aboutText);
-
-  // Ultimate Sponsors State
-  const [sponsors, setSponsors] = useState<SponsorItem[]>([
-    { id: "sp-1", name: "Red Bull", tier: "Title Sponsor", logoUrl: "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=150", website: "https://redbull.com", amount: 100000, active: true },
-    { id: "sp-2", name: "Monster Energy", tier: "Platinum Partner", logoUrl: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=150", website: "https://monsterenergy.com", amount: 75000, active: true },
-    { id: "sp-3", name: "KFC Kerala", tier: "Gold Partner", logoUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=150", website: "https://kfc.in", amount: 50000, active: true },
-    { id: "sp-4", name: "Spotify", tier: "Audio Partner", logoUrl: "https://images.unsplash.com/photo-1614680376593-902f749f7051?w=150", website: "https://spotify.com", amount: 40000, active: true },
-  ]);
-
-  // Sponsor Modal State
-  const [showSponsorModal, setShowSponsorModal] = useState(false);
-  const [editingSponsor, setEditingSponsor] = useState<SponsorItem | null>(null);
-  const [spName, setSpName] = useState("");
-  const [spTier, setSpTier] = useState("Platinum Partner");
-  const [spLogo, setSpLogo] = useState("");
-  const [spWeb, setSpWeb] = useState("");
-  const [spAmount, setSpAmount] = useState<number>(25000);
-
-  // FAQs State
-  const [faqs, setFaqs] = useState([
-    { id: "faq-1", question: "Who is eligible to participate in MacFiesta?", answer: "Any student currently enrolled in an accredited college or university with a valid ID card." },
-    { id: "faq-2", question: "Is accommodation provided for outstation delegates?", answer: "Yes, hostel accommodations in Block A (Girls) and Block B/C (Boys) are available on booking." },
-  ]);
-  const [newQuestion, setNewQuestion] = useState("");
-  const [newAnswer, setNewAnswer] = useState("");
-
-  // Rules State
-  const [generalRules, setGeneralRules] = useState([
-    "Delegates must carry valid college ID cards at all times.",
-    "Decisions of judges and festival coordinators are final and binding.",
-    "Smoking, alcohol, and contraband are strictly prohibited on campus premises.",
-  ]);
-  const [newRule, setNewRule] = useState("");
+  const {
+    settings,
+    timeline,
+    theme,
+    navbar,
+    sections,
+    departments,
+    sponsors,
+    testimonials,
+    faqs,
+    announcements,
+    animations,
+    seo,
+    formFields,
+    updateSettings,
+    updateTimeline,
+    updateTheme,
+    updateNavbar,
+    updateSections,
+    updateDepartments,
+    updateSponsors,
+    updateTestimonials,
+    updateFaqs,
+    updateAnnouncements,
+    updateAnimations,
+    updateSeo,
+    updateFormFields,
+  } = useFestivalControl();
 
   const [statusMsg, setStatusMsg] = useState("");
 
   const triggerSaved = (msg = "✓ Public Website Content Updated & Synchronized Live!") => {
     setStatusMsg(msg);
-    setTimeout(() => setStatusMsg(""), 3000);
+    setTimeout(() => setStatusMsg(""), 3500);
   };
 
-  const openAddSponsorModal = (item?: SponsorItem) => {
-    if (item) {
-      setEditingSponsor(item);
-      setSpName(item.name);
-      setSpTier(item.tier);
-      setSpLogo(item.logoUrl);
-      setSpWeb(item.website);
-      setSpAmount(item.amount);
-    } else {
-      setEditingSponsor(null);
-      setSpName("");
-      setSpTier("Platinum Partner");
-      setSpLogo("");
-      setSpWeb("");
-      setSpAmount(25000);
-    }
-    setShowSponsorModal(true);
+  // ── 1. Hero Form State ─────────────────────────────────────────────
+  const [heroTitle, setHeroTitle] = useState(settings.heroTitle || "WELCOME TO");
+  const [heroName, setHeroName] = useState(settings.name || "MACFIESTA");
+  const [heroSubtitle, setHeroSubtitle] = useState(settings.heroSubtitle || "MARVELVERSE");
+  const [heroDesc, setHeroDesc] = useState(settings.heroDesc || "");
+  const [bgType, setBgType] = useState<"video" | "image" | "3d">(settings.bgType || "image");
+  const [videoBgUrl, setVideoBgUrl] = useState(settings.videoBgUrl || "/MARVEL/Video Project 4.mp4");
+  const [wallpaperUrl, setWallpaperUrl] = useState(settings.wallpaperUrl || "/MARVEL/3025924746959430.jpg");
+  const [ctaPrimaryText, setCtaPrimaryText] = useState(settings.ctaPrimaryText || "Join Mission Now");
+  const [ctaPrimaryUrl, setCtaPrimaryUrl] = useState(settings.ctaPrimaryUrl || "/events");
+  const [ctaSecondaryText, setCtaSecondaryText] = useState(settings.ctaSecondaryText || "Explore Schedule");
+  const [ctaSecondaryUrl, setCtaSecondaryUrl] = useState(settings.ctaSecondaryUrl || "/schedule");
+  const [floatingIronMan, setFloatingIronMan] = useState(settings.floatingIronManEnabled);
+
+  const saveHero = () => {
+    updateSettings({
+      heroTitle,
+      name: heroName,
+      heroSubtitle,
+      heroDesc,
+      bgType,
+      videoBgUrl,
+      wallpaperUrl,
+      ctaPrimaryText,
+      ctaPrimaryUrl,
+      ctaSecondaryText,
+      ctaSecondaryUrl,
+      floatingIronManEnabled: floatingIronMan,
+    });
+    triggerSaved("✓ Hero Section & Video/Wallpaper Background Live Updated!");
   };
 
-  const handleSaveSponsor = (e: React.FormEvent) => {
-    e.preventDefault();
+  // ── 2. Navbar State ────────────────────────────────────────────────
+  const [logoText, setLogoText] = useState(navbar.logoText);
+  const [stickyMode, setStickyMode] = useState(navbar.stickyMode);
+  const [glassEffect, setGlassEffect] = useState(navbar.glassEffect);
+  const [navItems, setNavItems] = useState(navbar.items);
+  const [newNavLabel, setNewNavLabel] = useState("");
+  const [newNavHref, setNewNavHref] = useState("");
+
+  const saveNavbar = () => {
+    updateNavbar({
+      logoText,
+      stickyMode,
+      glassEffect,
+      items: navItems,
+    });
+    triggerSaved("✓ Navbar Links & Glass Effect Live Updated!");
+  };
+
+  const addNavItem = () => {
+    if (!newNavLabel || !newNavHref) return;
+    const updated = [
+      ...navItems,
+      {
+        id: `nav-${Date.now()}`,
+        label: newNavLabel,
+        href: newNavHref,
+        visible: true,
+        order: navItems.length,
+      },
+    ];
+    setNavItems(updated);
+    setNewNavLabel("");
+    setNewNavHref("");
+  };
+
+  const deleteNavItem = (id: string) => {
+    setNavItems(navItems.filter((i) => i.id !== id));
+  };
+
+  // ── 3. About Section State ─────────────────────────────────────────
+  const [aboutText, setAboutText] = useState(settings.aboutText);
+  const saveAbout = () => {
+    updateSettings({ aboutText });
+    triggerSaved("✓ About Festival Description Live Updated!");
+  };
+
+  // ── 4. Department State ────────────────────────────────────────────
+  const [deptList, setDeptList] = useState(departments);
+  const [newDeptName, setNewDeptName] = useState("");
+  const [newDeptCode, setNewDeptCode] = useState("");
+  const [newDeptCoordinator, setNewDeptCoordinator] = useState("");
+  const [newDeptFaculty, setNewDeptFaculty] = useState("");
+
+  const saveDepts = () => {
+    updateDepartments(deptList);
+    triggerSaved("✓ Department Directory Live Updated!");
+  };
+
+  const addDept = () => {
+    if (!newDeptName || !newDeptCode) return;
+    const item = {
+      id: `dept-${Date.now()}`,
+      name: newDeptName,
+      code: newDeptCode.toUpperCase(),
+      logoUrl: "/MARVEL/ironman.png",
+      description: "Department events and competitions.",
+      coordinatorName: newDeptCoordinator || "Faculty Lead",
+      coordinatorPhone: "+91 94470 00000",
+      facultyName: newDeptFaculty || "HOD",
+      eventCount: 4,
+    };
+    const updated = [...deptList, item];
+    setDeptList(updated);
+    setNewDeptName("");
+    setNewDeptCode("");
+    setNewDeptCoordinator("");
+    setNewDeptFaculty("");
+  };
+
+  const deleteDept = (id: string) => {
+    setDeptList(deptList.filter((d) => d.id !== id));
+  };
+
+  // ── 5. Sponsors State ──────────────────────────────────────────────
+  const [spList, setSpList] = useState(sponsors);
+  const [spName, setSpName] = useState("");
+  const [spTier, setSpTier] = useState<"Title" | "Platinum" | "Gold" | "Silver" | "Bronze">("Platinum");
+  const [spLogo, setSpLogo] = useState("");
+  const [spWeb, setSpWeb] = useState("");
+
+  const saveSponsors = () => {
+    updateSponsors(spList);
+    triggerSaved("✓ Sponsor Partners Live Updated!");
+  };
+
+  const addSponsor = () => {
     if (!spName) return;
-
-    if (editingSponsor) {
-      setSponsors((prev) =>
-        prev.map((s) =>
-          s.id === editingSponsor.id
-            ? {
-                ...s,
-                name: spName,
-                tier: spTier,
-                logoUrl: spLogo || "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=150",
-                website: spWeb,
-                amount: Number(spAmount) || 0,
-              }
-            : s
-        )
-      );
-      triggerSaved("✓ Sponsor Details Updated & Synchronized!");
-    } else {
-      const newItem: SponsorItem = {
-        id: `sp-${Date.now()}`,
-        name: spName,
-        tier: spTier,
-        logoUrl: spLogo || "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=150",
-        website: spWeb,
-        amount: Number(spAmount) || 0,
-        active: true,
-      };
-      setSponsors((prev) => [...prev, newItem]);
-      triggerSaved("✓ New Sponsor Added to Public Website!");
-    }
-    setShowSponsorModal(false);
-  };
-
-  const toggleSponsorActive = (id: string) => {
-    setSponsors((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, active: !s.active } : s))
-    );
-    triggerSaved("✓ Sponsor Visibility Toggled!");
+    const item = {
+      id: `sp-${Date.now()}`,
+      name: spName,
+      tier: spTier,
+      logoUrl: spLogo || "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=200",
+      website: spWeb || "https://macfast.org",
+      amount: 50000,
+      active: true,
+      order: spList.length,
+    };
+    const updated = [...spList, item];
+    setSpList(updated);
+    setSpName("");
+    setSpLogo("");
+    setSpWeb("");
   };
 
   const deleteSponsor = (id: string) => {
-    if (confirm("Are you sure you want to remove this sponsor?")) {
-      setSponsors((prev) => prev.filter((s) => s.id !== id));
-      triggerSaved("✓ Sponsor Removed!");
-    }
+    setSpList(spList.filter((s) => s.id !== id));
   };
 
-  const handleAddFaq = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newQuestion || !newAnswer) return;
-    setFaqs((prev) => [
-      ...prev,
-      { id: `faq-${Date.now()}`, question: newQuestion, answer: newAnswer },
-    ]);
-    setNewQuestion("");
-    setNewAnswer("");
-    triggerSaved();
+  // ── 6. Testimonials State ──────────────────────────────────────────
+  const [testiList, setTestiList] = useState(testimonials);
+  const toggleTestiApproval = (id: string) => {
+    const updated = testiList.map((t) => (t.id === id ? { ...t, approved: !t.approved } : t));
+    setTestiList(updated);
+    updateTestimonials(updated);
+    triggerSaved("✓ Testimonial Approval Status Updated!");
   };
 
-  const handleAddRule = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newRule) return;
-    setGeneralRules((prev) => [...prev, newRule]);
-    setNewRule("");
-    triggerSaved();
+  // ── 7. FAQs State ──────────────────────────────────────────────────
+  const [faqList, setFaqList] = useState(faqs);
+  const [faqCat, setFaqCat] = useState("General");
+  const [faqQ, setFaqQ] = useState("");
+  const [faqA, setFaqA] = useState("");
+
+  const saveFaqs = () => {
+    updateFaqs(faqList);
+    triggerSaved("✓ FAQs Directory Live Updated!");
+  };
+
+  const addFaq = () => {
+    if (!faqQ || !faqA) return;
+    const item = {
+      id: `faq-${Date.now()}`,
+      category: faqCat,
+      question: faqQ,
+      answer: faqA,
+    };
+    const updated = [...faqList, item];
+    setFaqList(updated);
+    setFaqQ("");
+    setFaqA("");
+  };
+
+  const deleteFaq = (id: string) => {
+    setFaqList(faqList.filter((f) => f.id !== id));
+  };
+
+  // ── 8. Contact & Footer State ──────────────────────────────────────
+  const [contactEmail, setContactEmail] = useState(settings.contactEmail);
+  const [contactPhone, setContactPhone] = useState(settings.contactPhone);
+  const [venueAddress, setVenueAddress] = useState(settings.venueAddress);
+  const [socialInstagram, setSocialInstagram] = useState(settings.socialInstagram);
+  const [socialYoutube, setSocialYoutube] = useState(settings.socialYoutube);
+  const [socialLinkedin, setSocialLinkedin] = useState(settings.socialLinkedin);
+
+  const saveContact = () => {
+    updateSettings({
+      contactEmail,
+      contactPhone,
+      venueAddress,
+      socialInstagram,
+      socialYoutube,
+      socialLinkedin,
+    });
+    triggerSaved("✓ Contact & Social Media Links Live Updated!");
+  };
+
+  // ── 9. Theme State ──────────────────────────────────────────────────
+  const [primaryColor, setPrimaryColor] = useState(theme.primaryColor);
+  const [secondaryColor, setSecondaryColor] = useState(theme.secondaryColor);
+  const [bgColor, setBgColor] = useState(theme.backgroundColor);
+  const [presetTheme, setPresetTheme] = useState(theme.presetTheme);
+
+  const saveTheme = () => {
+    updateTheme({
+      primaryColor,
+      secondaryColor,
+      backgroundColor: bgColor,
+      presetTheme,
+    });
+    triggerSaved("✓ Theme Palette & Glassmorphism Preset Live Updated!");
+  };
+
+  // ── 10. Announcements State ────────────────────────────────────────
+  const [annList, setAnnList] = useState(announcements);
+  const [annTitle, setAnnTitle] = useState("");
+  const [annMessage, setAnnMessage] = useState("");
+  const [annType, setAnnType] = useState<"popup" | "banner" | "toast" | "alert">("banner");
+
+  const addAnnouncement = () => {
+    if (!annTitle || !annMessage) return;
+    const item = {
+      id: `ann-${Date.now()}`,
+      title: annTitle,
+      message: annMessage,
+      type: annType,
+      active: true,
+      scheduledTime: new Date().toLocaleString(),
+    };
+    const updated = [...annList, item];
+    setAnnList(updated);
+    updateAnnouncements(updated);
+    setAnnTitle("");
+    setAnnMessage("");
+    triggerSaved("✓ Broadcast Announcement Activated & Pushed Live!");
+  };
+
+  // ── 11. Custom Form Builder State ──────────────────────────────────
+  const [fields, setFields] = useState(formFields);
+  const [fieldLabel, setFieldLabel] = useState("");
+  const [fieldType, setFieldType] = useState<"text" | "number" | "dropdown" | "checkbox" | "file" | "date">("text");
+
+  const addFormField = () => {
+    if (!fieldLabel) return;
+    const item = {
+      id: `field-${Date.now()}`,
+      label: fieldLabel,
+      type: fieldType,
+      required: true,
+    };
+    const updated = [...fields, item];
+    setFields(updated);
+    updateFormFields(updated);
+    setFieldLabel("");
+    triggerSaved("✓ Registration Form Builder Field Saved!");
+  };
+
+  // ── 12. SEO State ──────────────────────────────────────────────────
+  const [metaTitle, setMetaTitle] = useState(seo.metaTitle);
+  const [metaDesc, setMetaDesc] = useState(seo.metaDescription);
+  const [keywords, setKeywords] = useState(seo.keywords);
+
+  const saveSeo = () => {
+    updateSeo({ metaTitle, metaDescription: metaDesc, keywords });
+    triggerSaved("✓ SEO Meta Tags & Open Graph Saved!");
   };
 
   return (
-    <div className="space-y-6">
-      {/* CMS Module Banner */}
-      <div className="p-6 rounded-3xl bg-zinc-900/60 border border-zinc-800/80 flex flex-col md:flex-row md:items-center justify-between gap-4 backdrop-blur-xl">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-[#F5B301] text-zinc-950 shadow-md">
-              Live Website CMS & Sponsors Suite
-            </span>
-            <span className="text-xs text-zinc-400 font-semibold">Real-Time Synchronization</span>
+    <div className="space-y-6 font-mono">
+      {/* Module Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-3xl bg-gradient-to-r from-black/90 via-[#0A0D1A] to-[#05050A] border-2 border-arc-cyan/30 shadow-[0_0_40px_rgba(0,212,255,0.15)]">
+        <div className="space-y-1">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-arc-cyan/10 border border-arc-cyan/30 text-arc-cyan text-[10px] font-bold uppercase tracking-widest">
+            <RiGlobalLine />
+            <span>FULL WEBSITE CONTENT MANAGEMENT SYSTEM</span>
           </div>
-          <h1 className="text-xl font-black text-white uppercase tracking-wider flex items-center gap-2">
-            <RiGlobalLine className="text-[#F5B301]" />
-            <span>Public Website Content & Sponsor Manager</span>
-          </h1>
-          <p className="text-xs text-zinc-400">
-            Add sponsors, manage tiers, edit homepage hero banner, about text, FAQs, and general rules live.
+          <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
+            Visual Content <span className="marvel-bang-comic-gradient font-black">Control Studio</span>
+          </h2>
+          <p className="text-xs text-white/60">
+            Edit text, video backgrounds, navigation links, departments, sponsors, FAQs, themes & announcements with real-time browser sync.
           </p>
         </div>
 
         {statusMsg && (
-          <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-full flex items-center gap-1 shadow-md">
-            <RiCheckDoubleLine size={16} /> {statusMsg}
-          </span>
+          <div className="px-4 py-2 bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 text-xs font-bold rounded-xl animate-pulse flex items-center gap-2">
+            <RiCheckDoubleLine className="text-base" />
+            <span>{statusMsg}</span>
+          </div>
         )}
       </div>
 
-      {/* CMS Category Tabs */}
-      <div className="flex flex-wrap items-center gap-2 p-3 rounded-3xl bg-zinc-900/60 border border-zinc-800/80">
+      {/* Navigation Sub-Tabs */}
+      <div className="flex bg-black/60 p-1.5 rounded-2xl border border-white/10 overflow-x-auto scrollbar-none gap-1">
         {[
-          { id: "sponsors", label: "Sponsors & Partners", icon: RiCoupon3Line },
-          { id: "hero", label: "Homepage Hero & Video", icon: RiGlobalLine },
-          { id: "about", label: "About Page Content", icon: RiFileTextLine },
-          { id: "faqs", label: "FAQs Manager", icon: RiQuestionAnswerLine },
-          { id: "contact", label: "Contact Info & Address", icon: RiContactsBookLine },
-          { id: "rules", label: "General Conduct Rules", icon: RiShieldLine },
+          { id: "hero", label: "Hero & Video", icon: RiLayoutGridLine },
+          { id: "navbar", label: "Navbar & Links", icon: RiNavigationLine },
+          { id: "about", label: "About Page", icon: RiFileTextLine },
+          { id: "departments", label: "Departments", icon: RiBuilding2Line },
+          { id: "sponsors", label: "Sponsors", icon: RiMoneyDollarCircleLine },
+          { id: "testimonials", label: "Testimonials", icon: RiChat1Line },
+          { id: "faqs", label: "FAQs", icon: RiQuestionAnswerLine },
+          { id: "contact", label: "Contact & Footer", icon: RiContactsBookLine },
+          { id: "theme", label: "Theme & Palette", icon: RiPaletteLine },
+          { id: "announcements", label: "Broadcast Alerts", icon: RiMegaphoneLine },
+          { id: "forms", label: "Form Builder", icon: RiFileList3Line },
+          { id: "seo", label: "SEO & Meta", icon: RiGlobalLine },
         ].map((tab) => {
           const Icon = tab.icon;
-          const isSelected = activeTab === tab.id;
+          const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-extrabold transition-all cursor-pointer ${
-                isSelected
-                  ? "bg-[#F5B301] text-zinc-950 shadow-md"
-                  : "bg-zinc-800/60 text-zinc-300 hover:bg-zinc-700 hover:text-white"
+              className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                isActive
+                  ? "bg-marvel-red text-white shadow-[0_0_15px_#ED1D24]"
+                  : "text-white/60 hover:text-white hover:bg-white/5"
               }`}
+              style={{ fontFamily: "var(--font-heading)" }}
             >
-              <Icon size={16} />
+              <Icon />
               <span>{tab.label}</span>
             </button>
           );
         })}
       </div>
 
-      {/* 1. Ultimate Sponsors Suite */}
-      {activeTab === "sponsors" && (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-sm font-black text-white uppercase tracking-wider">
-                Official Festival Sponsors & Brand Partners
-              </h2>
-              <p className="text-xs text-zinc-400">
-                Sponsors added here display live across the public website homepage and footer.
-              </p>
-            </div>
-
-            <button
-              onClick={() => openAddSponsorModal()}
-              className="px-4 py-2.5 rounded-2xl bg-[#F5B301] hover:bg-amber-300 text-zinc-950 font-black text-xs flex items-center gap-1.5 shadow-lg shadow-amber-500/20 cursor-pointer"
-            >
-              <RiAddLine size={18} /> Add New Sponsor
+      {/* TAB CONTENT AREAS */}
+      {/* 1. HERO CMS */}
+      {activeTab === "hero" && (
+        <div className="marvel-card p-6 md:p-8 rounded-3xl border border-arc-cyan/30 bg-[#0A0D1A] space-y-6">
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <h3 className="text-lg font-bold text-white uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
+              Hero Section & Background Media Studio
+            </h3>
+            <button onClick={saveHero} className="btn-primary py-2.5 px-6 text-xs flex items-center gap-2 cursor-pointer shadow-[0_0_15px_#ED1D24]">
+              <RiSaveLine />
+              <span>Save & Publish Hero</span>
             </button>
           </div>
 
-          {/* Sponsors Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {sponsors.map((sp) => (
-              <div
-                key={sp.id}
-                className={`p-4 rounded-3xl border space-y-3 transition-all ${
-                  sp.active
-                    ? "bg-zinc-900/60 border-zinc-800/80 hover:border-[#F5B301]/40"
-                    : "bg-zinc-950/60 border-zinc-800/40 opacity-60"
-                }`}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
+            <div>
+              <label className="block text-white/70 font-bold mb-2">Hero Line 1 (Badge Title)</label>
+              <input
+                type="text"
+                value={heroTitle}
+                onChange={(e) => setHeroTitle(e.target.value)}
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-white/70 font-bold mb-2">Hero Line 2 (Festival Name)</label>
+              <input
+                type="text"
+                value={heroName}
+                onChange={(e) => setHeroName(e.target.value)}
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-white/70 font-bold mb-2">Hero Line 3 (Subtitle Tag)</label>
+              <input
+                type="text"
+                value={heroSubtitle}
+                onChange={(e) => setHeroSubtitle(e.target.value)}
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-white/70 font-bold mb-2">Hero Paragraph Description</label>
+            <textarea
+              rows={3}
+              value={heroDesc}
+              onChange={(e) => setHeroDesc(e.target.value)}
+              className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white focus:border-arc-cyan focus:outline-none text-xs"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+            <div>
+              <label className="block text-white/70 font-bold mb-2">Background Media Type</label>
+              <select
+                value={bgType}
+                onChange={(e) => setBgType(e.target.value as any)}
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
               >
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-[#F5B301]/10 text-[#F5B301] border border-[#F5B301]/25">
-                    {sp.tier}
-                  </span>
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => toggleSponsorActive(sp.id)}
-                      className="p-1 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 cursor-pointer"
-                      title={sp.active ? "Hide on website" : "Show on website"}
-                    >
-                      {sp.active ? <RiEyeLine size={15} /> : <RiEyeOffLine size={15} />}
-                    </button>
-                    <button
-                      onClick={() => openAddSponsorModal(sp)}
-                      className="p-1 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 cursor-pointer"
-                      title="Edit Sponsor"
-                    >
-                      <RiEditLine size={15} />
-                    </button>
-                    <button
-                      onClick={() => deleteSponsor(sp.id)}
-                      className="p-1 rounded-lg text-rose-400 hover:bg-rose-500/20 cursor-pointer"
-                      title="Delete Sponsor"
-                    >
-                      <RiDeleteBinLine size={15} />
-                    </button>
-                  </div>
-                </div>
+                <option value="image">Marvel Wallpaper Image (.jpg/.png)</option>
+                <option value="video">Marvel Video Loop (.mp4)</option>
+              </select>
+            </div>
 
-                <div className="space-y-1">
-                  <p className="font-extrabold text-white text-sm">{sp.name}</p>
-                  {sp.website && (
-                    <a
-                      href={sp.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[11px] text-zinc-400 hover:text-[#F5B301] flex items-center gap-1 font-mono truncate"
-                    >
-                      <RiExternalLinkLine size={12} /> {sp.website.replace("https://", "")}
-                    </a>
-                  )}
-                </div>
-
-                <div className="pt-2 border-t border-zinc-800/80 flex items-center justify-between text-xs">
-                  <span className="text-[10px] text-zinc-500 font-bold uppercase">Contribution</span>
-                  <span className="font-black text-emerald-400">₹{sp.amount.toLocaleString()}</span>
-                </div>
+            <div>
+              <label className="block text-white/70 font-bold mb-2">Floating Graphic Overlay</label>
+              <div className="flex items-center gap-4 pt-2">
+                <label className="flex items-center gap-2 cursor-pointer text-white">
+                  <input
+                    type="checkbox"
+                    checked={floatingIronMan}
+                    onChange={(e) => setFloatingIronMan(e.target.checked)}
+                    className="accent-marvel-red w-4 h-4"
+                  />
+                  <span>Show Floating Iron Man HUD Graphic</span>
+                </label>
               </div>
-            ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+            <div>
+              <label className="block text-white/70 font-bold mb-2">Video Background URL (.mp4)</label>
+              <input
+                type="text"
+                value={videoBgUrl}
+                onChange={(e) => setVideoBgUrl(e.target.value)}
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-white/70 font-bold mb-2">Wallpaper Background Image URL</label>
+              <input
+                type="text"
+                value={wallpaperUrl}
+                onChange={(e) => setWallpaperUrl(e.target.value)}
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs pt-4 border-t border-white/10">
+            <div>
+              <label className="block text-white/70 font-bold mb-2">Primary CTA Button Text</label>
+              <input
+                type="text"
+                value={ctaPrimaryText}
+                onChange={(e) => setCtaPrimaryText(e.target.value)}
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-white/70 font-bold mb-2">Secondary CTA Button Text</label>
+              <input
+                type="text"
+                value={ctaSecondaryText}
+                onChange={(e) => setCtaSecondaryText(e.target.value)}
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
+              />
+            </div>
           </div>
         </div>
       )}
 
-      {/* Add / Edit Sponsor Modal */}
-      {showSponsorModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
-          <div className="bg-[#111114] border border-zinc-800 p-6 rounded-3xl max-w-lg w-full space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-              <h3 className="text-sm font-black text-white flex items-center gap-2 uppercase">
-                <RiCoupon3Line className="text-[#F5B301]" />
-                <span>{editingSponsor ? "Edit Sponsor Details" : "Add New Festival Sponsor"}</span>
-              </h3>
-              <button
-                onClick={() => setShowSponsorModal(false)}
-                className="p-1 rounded-lg text-zinc-500 hover:text-white cursor-pointer"
-              >
-                <RiCloseLine size={18} />
+      {/* 2. NAVBAR CMS */}
+      {activeTab === "navbar" && (
+        <div className="marvel-card p-6 md:p-8 rounded-3xl border border-arc-cyan/30 bg-[#0A0D1A] space-y-6">
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <h3 className="text-lg font-bold text-white uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
+              Navbar Links & Glassmorphism Configuration
+            </h3>
+            <button onClick={saveNavbar} className="btn-primary py-2.5 px-6 text-xs flex items-center gap-2 cursor-pointer shadow-[0_0_15px_#ED1D24]">
+              <RiSaveLine />
+              <span>Save Navbar</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
+            <div>
+              <label className="block text-white/70 font-bold mb-2">Logo Text</label>
+              <input
+                type="text"
+                value={logoText}
+                onChange={(e) => setLogoText(e.target.value)}
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
+              />
+            </div>
+
+            <div className="flex items-center gap-4 pt-6">
+              <label className="flex items-center gap-2 cursor-pointer text-white font-bold">
+                <input
+                  type="checkbox"
+                  checked={stickyMode}
+                  onChange={(e) => setStickyMode(e.target.checked)}
+                  className="accent-marvel-red w-4 h-4"
+                />
+                <span>Sticky Top Navigation</span>
+              </label>
+            </div>
+
+            <div className="flex items-center gap-4 pt-6">
+              <label className="flex items-center gap-2 cursor-pointer text-white font-bold">
+                <input
+                  type="checkbox"
+                  checked={glassEffect}
+                  onChange={(e) => setGlassEffect(e.target.checked)}
+                  className="accent-marvel-red w-4 h-4"
+                />
+                <span>Backdrop Glass Effect</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Add Nav Item Form */}
+          <div className="p-4 bg-black/60 border border-white/10 rounded-2xl space-y-4">
+            <h4 className="text-xs font-bold text-metallic-gold uppercase tracking-wider">Add New Navigation Link</h4>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <input
+                type="text"
+                placeholder="Link Label (e.g. Workshop)"
+                value={newNavLabel}
+                onChange={(e) => setNewNavLabel(e.target.value)}
+                className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-xs flex-1"
+              />
+              <input
+                type="text"
+                placeholder="URL Path (e.g. /events)"
+                value={newNavHref}
+                onChange={(e) => setNewNavHref(e.target.value)}
+                className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-xs flex-1"
+              />
+              <button onClick={addNavItem} className="px-5 py-2.5 bg-arc-cyan text-black font-bold text-xs rounded-xl hover:bg-white transition-colors cursor-pointer shrink-0">
+                + Add Link
               </button>
             </div>
-
-            <form onSubmit={handleSaveSponsor} className="space-y-3 text-xs">
-              <div>
-                <label className="block text-zinc-400 font-bold mb-1">Company / Sponsor Name</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Red Bull, Monster Energy, KFC"
-                  value={spName}
-                  onChange={(e) => setSpName(e.target.value)}
-                  className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#F5B301]"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-zinc-400 font-bold mb-1">Sponsorship Tier</label>
-                  <select
-                    value={spTier}
-                    onChange={(e) => setSpTier(e.target.value)}
-                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-white focus:outline-none font-bold"
-                  >
-                    <option value="Title Sponsor">Title Sponsor</option>
-                    <option value="Platinum Partner">Platinum Partner</option>
-                    <option value="Gold Partner">Gold Partner</option>
-                    <option value="Silver Partner">Silver Partner</option>
-                    <option value="Food Partner">Food Partner</option>
-                    <option value="Media Partner">Media Partner</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-zinc-400 font-bold mb-1">Contribution (₹)</label>
-                  <input
-                    type="number"
-                    value={spAmount}
-                    onChange={(e) => setSpAmount(Number(e.target.value))}
-                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#F5B301]"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-zinc-400 font-bold mb-1">Official Website URL</label>
-                <input
-                  type="url"
-                  placeholder="https://sponsor.com"
-                  value={spWeb}
-                  onChange={(e) => setSpWeb(e.target.value)}
-                  className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-[#F5B301]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-zinc-400 font-bold mb-1">Sponsor Logo URL</label>
-                <input
-                  type="text"
-                  placeholder="https://images.unsplash.com/..."
-                  value={spLogo}
-                  onChange={(e) => setSpLogo(e.target.value)}
-                  className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-[#F5B301]"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-3 border-t border-zinc-800">
-                <button
-                  type="button"
-                  onClick={() => setShowSponsorModal(false)}
-                  className="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded-xl bg-[#F5B301] hover:bg-amber-300 text-zinc-950 font-black flex items-center gap-1.5 cursor-pointer shadow-md"
-                >
-                  <RiSaveLine size={14} /> Save Sponsor
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* 2. Hero Section CMS */}
-      {activeTab === "hero" && (
-        <form onSubmit={(e) => { e.preventDefault(); triggerSaved(); }} className="p-6 rounded-3xl bg-zinc-900/60 border border-zinc-800/80 space-y-5 max-w-3xl">
-          <h4 className="text-xs font-black text-white uppercase tracking-widest border-b border-zinc-800 pb-3">
-            Homepage Hero Copy & Video Banner
-          </h4>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-[10px] uppercase font-bold text-zinc-400 mb-1.5">Festival Tagline</label>
-              <input
-                type="text"
-                value={settings.tagline}
-                onChange={(e) => updateSettings({ tagline: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white text-xs focus:border-[#F5B301] focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-[10px] uppercase font-bold text-zinc-400 mb-1.5">Festival Subtitle</label>
-              <input
-                type="text"
-                value={settings.subtitle}
-                onChange={(e) => updateSettings({ subtitle: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white text-xs focus:border-[#F5B301] focus:outline-none"
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-[10px] uppercase font-bold text-zinc-400 mb-1.5">Homepage Promo Video URL</label>
-              <input
-                type="text"
-                value={settings.homepageBanner}
-                onChange={(e) => updateSettings({ homepageBanner: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white text-xs font-mono focus:border-[#F5B301] focus:outline-none"
-              />
-            </div>
           </div>
 
-          <button type="submit" className="px-6 py-2.5 rounded-xl bg-[#F5B301] hover:bg-amber-300 text-zinc-950 text-xs font-black shadow-lg flex items-center gap-2 cursor-pointer">
-            <RiSaveLine size={16} />
-            <span>Update Hero Copy Live</span>
-          </button>
-        </form>
-      )}
-
-      {/* 3. About Section CMS */}
-      {activeTab === "about" && (
-        <form onSubmit={(e) => { e.preventDefault(); updateSettings({ aboutText: aboutBody }); triggerSaved(); }} className="p-6 rounded-3xl bg-zinc-900/60 border border-zinc-800/80 space-y-5 max-w-3xl">
-          <h4 className="text-xs font-black text-white uppercase tracking-widest border-b border-zinc-800 pb-3">
-            About Festival Page Content
-          </h4>
-
-          <div className="space-y-4">
-            <div>
-              <label className="block text-[10px] uppercase font-bold text-zinc-400 mb-1.5">Page Title</label>
-              <input
-                type="text"
-                value={aboutHeading}
-                onChange={(e) => setAboutHeading(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white text-xs focus:border-[#F5B301] focus:outline-none font-bold"
-              />
-            </div>
-
-            <div>
-              <label className="block text-[10px] uppercase font-bold text-zinc-400 mb-1.5">About Text Overview</label>
-              <textarea
-                rows={5}
-                value={aboutBody}
-                onChange={(e) => setAboutBody(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white text-xs focus:border-[#F5B301] focus:outline-none"
-              />
-            </div>
-          </div>
-
-          <button type="submit" className="px-6 py-2.5 rounded-xl bg-[#F5B301] hover:bg-amber-300 text-zinc-950 text-xs font-black shadow-lg flex items-center gap-2 cursor-pointer">
-            <RiSaveLine size={16} />
-            <span>Publish About Content</span>
-          </button>
-        </form>
-      )}
-
-      {/* 4. FAQs Manager CMS */}
-      {activeTab === "faqs" && (
-        <div className="space-y-6 max-w-4xl">
-          <form onSubmit={handleAddFaq} className="p-6 rounded-3xl bg-zinc-900/60 border border-zinc-800/80 space-y-4">
-            <h4 className="text-xs font-black text-white uppercase tracking-widest border-b border-zinc-800 pb-3">
-              Add Frequently Asked Question (FAQ)
-            </h4>
-            <div>
-              <label className="block text-[10px] uppercase font-bold text-zinc-400 mb-1.5">Question</label>
-              <input
-                type="text"
-                required
-                placeholder="What is the refund policy?..."
-                value={newQuestion}
-                onChange={(e) => setNewQuestion(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white text-xs focus:border-[#F5B301] focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-[10px] uppercase font-bold text-zinc-400 mb-1.5">Answer</label>
-              <textarea
-                required
-                rows={3}
-                placeholder="Provide detailed answer..."
-                value={newAnswer}
-                onChange={(e) => setNewAnswer(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white text-xs focus:border-[#F5B301] focus:outline-none"
-              />
-            </div>
-            <button type="submit" className="px-5 py-2.5 rounded-xl bg-[#F5B301] hover:bg-amber-300 text-zinc-950 text-xs font-black flex items-center gap-1.5 cursor-pointer">
-              <RiAddLine size={16} />
-              <span>Publish FAQ</span>
-            </button>
-          </form>
-
-          <div className="space-y-3">
-            {faqs.map((faq) => (
-              <div key={faq.id} className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 space-y-1">
-                <div className="flex items-center justify-between">
-                  <p className="font-bold text-white text-xs">{faq.question}</p>
-                  <button
-                    type="button"
-                    onClick={() => setFaqs((prev) => prev.filter((f) => f.id !== faq.id))}
-                    className="p-1 rounded text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer"
-                  >
-                    <RiDeleteBinLine size={14} />
+          {/* Existing Items Table */}
+          <div className="space-y-2">
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Current Active Navigation Items</h4>
+            <div className="divide-y divide-white/10 border border-white/10 rounded-2xl overflow-hidden">
+              {navItems.map((item) => (
+                <div key={item.id} className="p-4 bg-black/40 flex items-center justify-between text-xs">
+                  <div>
+                    <span className="font-bold text-white">{item.label}</span>
+                    <span className="text-white/40 ml-3 font-mono">{item.href}</span>
+                  </div>
+                  <button onClick={() => deleteNavItem(item.id)} className="text-marvel-red hover:text-white p-2 cursor-pointer">
+                    <RiDeleteBinLine className="text-base" />
                   </button>
                 </div>
-                <p className="text-xs text-zinc-400">{faq.answer}</p>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 3. ABOUT CMS */}
+      {activeTab === "about" && (
+        <div className="marvel-card p-6 md:p-8 rounded-3xl border border-arc-cyan/30 bg-[#0A0D1A] space-y-6">
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <h3 className="text-lg font-bold text-white uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
+              About Festival Page CMS
+            </h3>
+            <button onClick={saveAbout} className="btn-primary py-2.5 px-6 text-xs flex items-center gap-2 cursor-pointer shadow-[0_0_15px_#ED1D24]">
+              <RiSaveLine />
+              <span>Save About Content</span>
+            </button>
+          </div>
+
+          <div>
+            <label className="block text-white/70 font-bold mb-2 text-xs">About Festival Narrative Text</label>
+            <textarea
+              rows={5}
+              value={aboutText}
+              onChange={(e) => setAboutText(e.target.value)}
+              className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white text-xs focus:border-arc-cyan focus:outline-none"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* 4. DEPARTMENTS CMS */}
+      {activeTab === "departments" && (
+        <div className="marvel-card p-6 md:p-8 rounded-3xl border border-arc-cyan/30 bg-[#0A0D1A] space-y-6">
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <h3 className="text-lg font-bold text-white uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
+              Departments & Faculty Directory
+            </h3>
+            <button onClick={saveDepts} className="btn-primary py-2.5 px-6 text-xs flex items-center gap-2 cursor-pointer shadow-[0_0_15px_#ED1D24]">
+              <RiSaveLine />
+              <span>Save Departments</span>
+            </button>
+          </div>
+
+          <div className="p-4 bg-black/60 border border-white/10 rounded-2xl space-y-4 text-xs">
+            <h4 className="font-bold text-metallic-gold uppercase tracking-wider">Add Department</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+              <input
+                type="text"
+                placeholder="Dept Name (e.g. Computer Applications)"
+                value={newDeptName}
+                onChange={(e) => setNewDeptName(e.target.value)}
+                className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white"
+              />
+              <input
+                type="text"
+                placeholder="Code (e.g. MCA)"
+                value={newDeptCode}
+                onChange={(e) => setNewDeptCode(e.target.value)}
+                className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white"
+              />
+              <input
+                type="text"
+                placeholder="Coordinator Name"
+                value={newDeptCoordinator}
+                onChange={(e) => setNewDeptCoordinator(e.target.value)}
+                className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white"
+              />
+              <button onClick={addDept} className="px-5 py-2.5 bg-arc-cyan text-black font-bold rounded-xl hover:bg-white transition-colors cursor-pointer">
+                + Add Dept
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {deptList.map((d) => (
+              <div key={d.id} className="p-5 bg-black/40 border border-white/10 rounded-2xl space-y-2 text-xs relative">
+                <button onClick={() => deleteDept(d.id)} className="absolute top-4 right-4 text-marvel-red hover:text-white cursor-pointer">
+                  <RiDeleteBinLine className="text-base" />
+                </button>
+                <div className="font-bold text-white text-sm">{d.name} ({d.code})</div>
+                <div className="text-white/60">{d.description}</div>
+                <div className="text-metallic-gold font-bold">Coordinator: {d.coordinatorName} ({d.coordinatorPhone})</div>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* 5. Contact Info CMS */}
-      {activeTab === "contact" && (
-        <form onSubmit={(e) => { e.preventDefault(); triggerSaved(); }} className="p-6 rounded-3xl bg-zinc-900/60 border border-zinc-800/80 space-y-5 max-w-3xl">
-          <h4 className="text-xs font-black text-white uppercase tracking-widest border-b border-zinc-800 pb-3">
-            Public Contact Details CMS
-          </h4>
+      {/* 5. SPONSORS CMS */}
+      {activeTab === "sponsors" && (
+        <div className="marvel-card p-6 md:p-8 rounded-3xl border border-arc-cyan/30 bg-[#0A0D1A] space-y-6">
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <h3 className="text-lg font-bold text-white uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
+              Sponsor Partners & Tiers
+            </h3>
+            <button onClick={saveSponsors} className="btn-primary py-2.5 px-6 text-xs flex items-center gap-2 cursor-pointer shadow-[0_0_15px_#ED1D24]">
+              <RiSaveLine />
+              <span>Save Sponsors</span>
+            </button>
+          </div>
 
-          <div className="space-y-4">
-            <div>
-              <label className="block text-[10px] uppercase font-bold text-zinc-400 mb-1.5">Official Festival Email</label>
-              <input
-                type="email"
-                value={settings.contactEmail}
-                onChange={(e) => updateSettings({ contactEmail: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white text-xs focus:border-[#F5B301] focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-[10px] uppercase font-bold text-zinc-400 mb-1.5">Helpline Phone Number</label>
+          <div className="p-4 bg-black/60 border border-white/10 rounded-2xl space-y-4 text-xs">
+            <h4 className="font-bold text-metallic-gold uppercase tracking-wider">Add Sponsor</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
               <input
                 type="text"
-                value={settings.contactPhone}
-                onChange={(e) => updateSettings({ contactPhone: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white text-xs focus:border-[#F5B301] focus:outline-none"
+                placeholder="Sponsor Name"
+                value={spName}
+                onChange={(e) => setSpName(e.target.value)}
+                className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white"
+              />
+              <select
+                value={spTier}
+                onChange={(e) => setSpTier(e.target.value as any)}
+                className="px-4 py-2.5 bg-black border border-white/10 rounded-xl text-white"
+              >
+                <option value="Title">Title Partner</option>
+                <option value="Platinum">Platinum Partner</option>
+                <option value="Gold">Gold Partner</option>
+                <option value="Silver">Silver Partner</option>
+              </select>
+              <input
+                type="text"
+                placeholder="Logo URL"
+                value={spLogo}
+                onChange={(e) => setSpLogo(e.target.value)}
+                className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white"
+              />
+              <input
+                type="text"
+                placeholder="Website URL"
+                value={spWeb}
+                onChange={(e) => setSpWeb(e.target.value)}
+                className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white"
+              />
+              <button onClick={addSponsor} className="px-5 py-2.5 bg-arc-cyan text-black font-bold rounded-xl hover:bg-white transition-colors cursor-pointer">
+                + Add Partner
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {spList.map((s) => (
+              <div key={s.id} className="p-4 bg-black/40 border border-white/10 rounded-2xl space-y-2 text-xs relative">
+                <button onClick={() => deleteSponsor(s.id)} className="absolute top-3 right-3 text-marvel-red hover:text-white cursor-pointer">
+                  <RiDeleteBinLine className="text-base" />
+                </button>
+                <div className="font-bold text-white">{s.name}</div>
+                <div className="px-2.5 py-0.5 rounded bg-metallic-gold/15 text-metallic-gold font-bold inline-block text-[10px] uppercase">
+                  {s.tier}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 6. FAQS CMS */}
+      {activeTab === "faqs" && (
+        <div className="marvel-card p-6 md:p-8 rounded-3xl border border-arc-cyan/30 bg-[#0A0D1A] space-y-6">
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <h3 className="text-lg font-bold text-white uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
+              FAQ Manager
+            </h3>
+            <button onClick={saveFaqs} className="btn-primary py-2.5 px-6 text-xs flex items-center gap-2 cursor-pointer shadow-[0_0_15px_#ED1D24]">
+              <RiSaveLine />
+              <span>Save FAQs</span>
+            </button>
+          </div>
+
+          <div className="p-4 bg-black/60 border border-white/10 rounded-2xl space-y-3 text-xs">
+            <h4 className="font-bold text-metallic-gold uppercase tracking-wider">Add FAQ</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <input
+                type="text"
+                placeholder="Category (e.g. Hospitality)"
+                value={faqCat}
+                onChange={(e) => setFaqCat(e.target.value)}
+                className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white"
+              />
+              <input
+                type="text"
+                placeholder="Question"
+                value={faqQ}
+                onChange={(e) => setFaqQ(e.target.value)}
+                className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white md:col-span-2"
               />
             </div>
+            <textarea
+              rows={2}
+              placeholder="Answer detail..."
+              value={faqA}
+              onChange={(e) => setFaqA(e.target.value)}
+              className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white"
+            />
+            <button onClick={addFaq} className="px-5 py-2.5 bg-arc-cyan text-black font-bold rounded-xl hover:bg-white transition-colors cursor-pointer">
+              + Add FAQ Question
+            </button>
+          </div>
 
+          <div className="space-y-3 text-xs">
+            {faqList.map((f) => (
+              <div key={f.id} className="p-4 bg-black/40 border border-white/10 rounded-2xl space-y-1 relative">
+                <button onClick={() => deleteFaq(f.id)} className="absolute top-4 right-4 text-marvel-red hover:text-white cursor-pointer">
+                  <RiDeleteBinLine className="text-base" />
+                </button>
+                <span className="text-[10px] font-bold text-arc-cyan uppercase tracking-widest">{f.category}</span>
+                <div className="font-bold text-white text-sm">{f.question}</div>
+                <div className="text-white/60 leading-relaxed">{f.answer}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 7. CONTACT & FOOTER CMS */}
+      {activeTab === "contact" && (
+        <div className="marvel-card p-6 md:p-8 rounded-3xl border border-arc-cyan/30 bg-[#0A0D1A] space-y-6">
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <h3 className="text-lg font-bold text-white uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
+              Contact Details & Social Media Links
+            </h3>
+            <button onClick={saveContact} className="btn-primary py-2.5 px-6 text-xs flex items-center gap-2 cursor-pointer shadow-[0_0_15px_#ED1D24]">
+              <RiSaveLine />
+              <span>Save Contact Details</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
             <div>
-              <label className="block text-[10px] uppercase font-bold text-zinc-400 mb-1.5">Venue Campus Address</label>
-              <textarea
-                rows={3}
-                value={settings.venueAddress}
-                onChange={(e) => updateSettings({ venueAddress: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white text-xs focus:border-[#F5B301] focus:outline-none"
+              <label className="block text-white/70 font-bold mb-2">Helpdesk Email</label>
+              <input
+                type="email"
+                value={contactEmail}
+                onChange={(e) => setContactEmail(e.target.value)}
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-white/70 font-bold mb-2">Helpdesk Phone</label>
+              <input
+                type="text"
+                value={contactPhone}
+                onChange={(e) => setContactPhone(e.target.value)}
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-white/70 font-bold mb-2">Venue Address</label>
+              <input
+                type="text"
+                value={venueAddress}
+                onChange={(e) => setVenueAddress(e.target.value)}
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
               />
             </div>
           </div>
 
-          <button type="submit" className="px-6 py-2.5 rounded-xl bg-[#F5B301] hover:bg-amber-300 text-zinc-950 text-xs font-black shadow-lg flex items-center gap-2 cursor-pointer">
-            <RiSaveLine size={16} />
-            <span>Save Contact Info CMS</span>
-          </button>
-        </form>
-      )}
-
-      {/* 6. General Rules CMS */}
-      {activeTab === "rules" && (
-        <div className="space-y-6 max-w-4xl">
-          <form onSubmit={handleAddRule} className="p-6 rounded-3xl bg-zinc-900/60 border border-zinc-800/80 space-y-4">
-            <h4 className="text-xs font-black text-white uppercase tracking-widest border-b border-zinc-800 pb-3">
-              General Festival Conduct Rules
-            </h4>
-            <div className="flex gap-2">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs pt-4 border-t border-white/10">
+            <div>
+              <label className="block text-white/70 font-bold mb-2">Instagram URL</label>
               <input
                 type="text"
-                required
-                placeholder="Enter general rule or regulation..."
-                value={newRule}
-                onChange={(e) => setNewRule(e.target.value)}
-                className="flex-1 px-3.5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white text-xs focus:border-[#F5B301] focus:outline-none"
+                value={socialInstagram}
+                onChange={(e) => setSocialInstagram(e.target.value)}
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
               />
-              <button type="submit" className="px-5 py-2.5 rounded-xl bg-[#F5B301] hover:bg-amber-300 text-zinc-950 text-xs font-black flex items-center gap-1.5 cursor-pointer shrink-0">
-                <RiAddLine size={16} />
-                <span>Add Rule</span>
-              </button>
             </div>
-          </form>
+            <div>
+              <label className="block text-white/70 font-bold mb-2">YouTube Channel URL</label>
+              <input
+                type="text"
+                value={socialYoutube}
+                onChange={(e) => setSocialYoutube(e.target.value)}
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-white/70 font-bold mb-2">LinkedIn Page URL</label>
+              <input
+                type="text"
+                value={socialLinkedin}
+                onChange={(e) => setSocialLinkedin(e.target.value)}
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
-          <div className="space-y-2">
-            {generalRules.map((rule, idx) => (
-              <div key={idx} className="p-3.5 rounded-2xl bg-zinc-900/60 border border-zinc-800 flex items-center justify-between gap-3 text-xs text-white">
-                <span className="font-mono text-[#F5B301] font-bold">Rule {idx + 1}:</span>
-                <p className="flex-1">{rule}</p>
-                <button
-                  type="button"
-                  onClick={() => setGeneralRules((prev) => prev.filter((_, i) => i !== idx))}
-                  className="p-1 rounded text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer"
-                >
-                  <RiDeleteBinLine size={14} />
-                </button>
+      {/* 8. THEME & PALETTE CMS */}
+      {activeTab === "theme" && (
+        <div className="marvel-card p-6 md:p-8 rounded-3xl border border-arc-cyan/30 bg-[#0A0D1A] space-y-6">
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <h3 className="text-lg font-bold text-white uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
+              Theme Studio & Preset Palettes
+            </h3>
+            <button onClick={saveTheme} className="btn-primary py-2.5 px-6 text-xs flex items-center gap-2 cursor-pointer shadow-[0_0_15px_#ED1D24]">
+              <RiSaveLine />
+              <span>Save Theme</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
+            <div>
+              <label className="block text-white/70 font-bold mb-2">Primary Accent Color</label>
+              <input
+                type="color"
+                value={primaryColor}
+                onChange={(e) => setPrimaryColor(e.target.value)}
+                className="w-full h-12 bg-black border border-white/10 rounded-xl cursor-pointer"
+              />
+            </div>
+            <div>
+              <label className="block text-white/70 font-bold mb-2">Secondary Neon Color</label>
+              <input
+                type="color"
+                value={secondaryColor}
+                onChange={(e) => setSecondaryColor(e.target.value)}
+                className="w-full h-12 bg-black border border-white/10 rounded-xl cursor-pointer"
+              />
+            </div>
+            <div>
+              <label className="block text-white/70 font-bold mb-2">Base Canvas Background</label>
+              <input
+                type="color"
+                value={bgColor}
+                onChange={(e) => setBgColor(e.target.value)}
+                className="w-full h-12 bg-black border border-white/10 rounded-xl cursor-pointer"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 9. ANNOUNCEMENTS CMS */}
+      {activeTab === "announcements" && (
+        <div className="marvel-card p-6 md:p-8 rounded-3xl border border-arc-cyan/30 bg-[#0A0D1A] space-y-6">
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <h3 className="text-lg font-bold text-white uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
+              Emergency Broadcasts & Popups
+            </h3>
+          </div>
+
+          <div className="p-4 bg-black/60 border border-white/10 rounded-2xl space-y-3 text-xs">
+            <h4 className="font-bold text-metallic-gold uppercase tracking-wider">Broadcast New Alert</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <input
+                type="text"
+                placeholder="Alert Headline"
+                value={annTitle}
+                onChange={(e) => setAnnTitle(e.target.value)}
+                className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white"
+              />
+              <select
+                value={annType}
+                onChange={(e) => setAnnType(e.target.value as any)}
+                className="px-4 py-2.5 bg-black border border-white/10 rounded-xl text-white"
+              >
+                <option value="banner">Header Banner</option>
+                <option value="popup">Modal Popup</option>
+                <option value="toast">Toast Alert</option>
+                <option value="alert">Emergency High-Priority</option>
+              </select>
+            </div>
+            <textarea
+              rows={2}
+              placeholder="Broadcast message text..."
+              value={annMessage}
+              onChange={(e) => setAnnMessage(e.target.value)}
+              className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white"
+            />
+            <button onClick={addAnnouncement} className="px-5 py-2.5 bg-marvel-red text-white font-bold rounded-xl hover:bg-white hover:text-black transition-colors cursor-pointer shadow-[0_0_15px_#ED1D24]">
+              Broadcast Emergency Alert
+            </button>
+          </div>
+
+          <div className="space-y-3 text-xs">
+            {annList.map((a) => (
+              <div key={a.id} className="p-4 bg-black/40 border border-white/10 rounded-2xl space-y-1">
+                <span className="px-2.5 py-0.5 rounded bg-marvel-red/20 text-marvel-red text-[9px] font-bold uppercase tracking-widest">
+                  {a.type}
+                </span>
+                <div className="font-bold text-white text-sm">{a.title}</div>
+                <div className="text-white/70">{a.message}</div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* 10. FORMS BUILDER CMS */}
+      {activeTab === "forms" && (
+        <div className="marvel-card p-6 md:p-8 rounded-3xl border border-arc-cyan/30 bg-[#0A0D1A] space-y-6">
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <h3 className="text-lg font-bold text-white uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
+              Registration Form Field Builder
+            </h3>
+          </div>
+
+          <div className="p-4 bg-black/60 border border-white/10 rounded-2xl space-y-3 text-xs">
+            <h4 className="font-bold text-metallic-gold uppercase tracking-wider">Add Custom Field to Registration</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <input
+                type="text"
+                placeholder="Field Label (e.g. T-Shirt Size)"
+                value={fieldLabel}
+                onChange={(e) => setFieldLabel(e.target.value)}
+                className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white"
+              />
+              <select
+                value={fieldType}
+                onChange={(e) => setFieldType(e.target.value as any)}
+                className="px-4 py-2.5 bg-black border border-white/10 rounded-xl text-white"
+              >
+                <option value="text">Text Input</option>
+                <option value="number">Number Input</option>
+                <option value="dropdown">Dropdown Select</option>
+                <option value="file">File Upload</option>
+                <option value="date">Date Picker</option>
+              </select>
+              <button onClick={addFormField} className="px-5 py-2.5 bg-arc-cyan text-black font-bold rounded-xl hover:bg-white transition-colors cursor-pointer">
+                + Add Form Field
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-2 text-xs">
+            {fields.map((f) => (
+              <div key={f.id} className="p-4 bg-black/40 border border-white/10 rounded-2xl flex items-center justify-between">
+                <div>
+                  <span className="font-bold text-white">{f.label}</span>
+                  <span className="text-arc-cyan ml-3 text-[10px] uppercase font-bold">({f.type})</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 11. SEO & META CMS */}
+      {activeTab === "seo" && (
+        <div className="marvel-card p-6 md:p-8 rounded-3xl border border-arc-cyan/30 bg-[#0A0D1A] space-y-6">
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <h3 className="text-lg font-bold text-white uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
+              SEO & Social Open Graph Tags
+            </h3>
+            <button onClick={saveSeo} className="btn-primary py-2.5 px-6 text-xs flex items-center gap-2 cursor-pointer shadow-[0_0_15px_#ED1D24]">
+              <RiSaveLine />
+              <span>Save Meta Tags</span>
+            </button>
+          </div>
+
+          <div className="space-y-4 text-xs">
+            <div>
+              <label className="block text-white/70 font-bold mb-2">Meta Title</label>
+              <input
+                type="text"
+                value={metaTitle}
+                onChange={(e) => setMetaTitle(e.target.value)}
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-white/70 font-bold mb-2">Meta Description</label>
+              <textarea
+                rows={3}
+                value={metaDesc}
+                onChange={(e) => setMetaDesc(e.target.value)}
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-white/70 font-bold mb-2">SEO Keywords (Comma Separated)</label>
+              <input
+                type="text"
+                value={keywords}
+                onChange={(e) => setKeywords(e.target.value)}
+                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white focus:border-arc-cyan focus:outline-none"
+              />
+            </div>
           </div>
         </div>
       )}
