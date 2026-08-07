@@ -12,6 +12,8 @@ import {
   RiSparklingLine,
   RiArrowLeftSLine,
   RiArrowRightSLine,
+  RiFullscreenLine,
+  RiFullscreenExitLine,
 } from "react-icons/ri";
 import { useGalleryItems, GalleryItem } from "@/lib/galleryStore";
 
@@ -20,6 +22,7 @@ export default function GalleryPage() {
   const [filterType, setFilterType] = useState<"all" | "image" | "video">("all");
   const [filterCategory, setFilterCategory] = useState("all");
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [isNativeFullscreen, setIsNativeFullscreen] = useState(false);
 
   const imagesCount = items.filter((i) => i.type === "image").length;
   const videosCount = items.filter((i) => i.type === "video").length;
@@ -41,6 +44,18 @@ export default function GalleryPage() {
     if (selectedIndex === null || filteredMedia.length === 0) return;
     setSelectedIndex((prev) => (prev !== null && prev > 0 ? prev - 1 : filteredMedia.length - 1));
   }, [selectedIndex, filteredMedia.length]);
+
+  const toggleNativeFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+      setIsNativeFullscreen(true);
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+        setIsNativeFullscreen(false);
+      }
+    }
+  };
 
   // Keyboard navigation (ArrowLeft, ArrowRight, Escape)
   useEffect(() => {
@@ -73,7 +88,7 @@ export default function GalleryPage() {
             Media <span className="marvel-bang-comic-gradient font-black">Gallery</span>
           </h1>
           <p className="text-white/60 text-sm md:text-base">
-            Glimpses of high-octane esports, cultural stage nights, tech sprint hackathons & pro show highlights.
+            Glimpses of high-octane esports, cultural stage nights, tech sprint hackathons & pro show highlights. Click any photo or video for 100% full-screen playback.
           </p>
         </div>
 
@@ -92,10 +107,11 @@ export default function GalleryPage() {
                   setFilterType(tab.id);
                   setSelectedIndex(null);
                 }}
-                className={`px-5 py-2.5 rounded-2xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer border ${filterType === tab.id
+                className={`px-5 py-2.5 rounded-2xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer border ${
+                  filterType === tab.id
                     ? "bg-marvel-red text-white border-marvel-red shadow-[0_0_20px_#ED1D24]"
                     : "bg-black/60 text-white/60 hover:text-white border-white/10 hover:bg-white/5"
-                  }`}
+                }`}
                 style={{ fontFamily: "var(--font-heading)" }}
               >
                 {tab.label}
@@ -112,10 +128,11 @@ export default function GalleryPage() {
                   setFilterCategory(cat);
                   setSelectedIndex(null);
                 }}
-                className={`px-4 py-2 rounded-full text-[11px] font-bold uppercase tracking-widest whitespace-nowrap transition-all cursor-pointer ${filterCategory === cat
+                className={`px-4 py-2 rounded-full text-[11px] font-bold uppercase tracking-widest whitespace-nowrap transition-all cursor-pointer ${
+                  filterCategory === cat
                     ? "bg-metallic-gold text-black font-extrabold shadow-[0_0_15px_#FFD700]"
                     : "bg-white/5 text-white/60 hover:text-white border border-white/10"
-                  }`}
+                }`}
                 style={{ fontFamily: "var(--font-heading)" }}
               >
                 {cat}
@@ -138,7 +155,7 @@ export default function GalleryPage() {
                 className="relative aspect-video overflow-hidden rounded-3xl border border-white/10 group shadow-2xl cursor-pointer bg-black/80"
               >
                 <img
-                  src={item.type === "image" ? item.url : item.thumbnailUrl || item.url}
+                  src={encodeURI(item.type === "image" ? item.url : item.thumbnailUrl || item.url)}
                   alt={item.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
@@ -146,10 +163,11 @@ export default function GalleryPage() {
                 {/* Media Badges */}
                 <div className="absolute top-3 left-3 z-10 flex gap-2">
                   <span
-                    className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase border ${item.type === "image"
+                    className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase border ${
+                      item.type === "image"
                         ? "bg-arc-cyan/20 border-arc-cyan/40 text-arc-cyan"
                         : "bg-marvel-red/20 border-marvel-red/40 text-marvel-red"
-                      }`}
+                    }`}
                   >
                     {item.type === "image" ? "📷 PHOTO" : "🎥 VIDEO"}
                   </span>
@@ -189,91 +207,107 @@ export default function GalleryPage() {
         )}
       </div>
 
-      {/* INTERACTIVE LIGHTBOX & CAROUSEL MODAL (WITH NEXT / PREV / CLOSE) */}
+      {/* ⚡ 100% IMMERSIVE FULL-SCREEN MEDIA THEATER */}
       <AnimatePresence>
         {activeItem && selectedIndex !== null && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[999] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 md:p-8"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-2xl w-screen h-screen flex items-center justify-center overflow-hidden"
           >
-            {/* Close Button */}
+            {/* FLOATING CLOSE BUTTON */}
             <button
               onClick={() => setSelectedIndex(null)}
-              className="absolute top-6 right-6 p-3 rounded-full bg-black/60 border border-white/20 text-white hover:bg-marvel-red hover:border-marvel-red transition-all cursor-pointer z-50 shadow-[0_0_20px_rgba(237,29,36,0.5)]"
-              title="Close (Esc)"
+              className="fixed top-6 right-6 z-[10000] px-4 py-2.5 rounded-2xl bg-black/80 border border-white/20 text-white hover:bg-marvel-red hover:border-marvel-red transition-all cursor-pointer font-bold text-xs uppercase backdrop-blur-md shadow-[0_0_20px_rgba(237,29,36,0.6)] flex items-center gap-2"
+              title="Close Full Screen (Esc)"
             >
-              <RiCloseLine size={24} />
+              <RiCloseLine size={20} />
+              <span className="hidden sm:inline">Close</span>
             </button>
 
-            {/* PREVIOUS BUTTON */}
+            {/* FLOATING PREVIOUS BUTTON */}
             <button
               onClick={handlePrev}
-              className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 p-3.5 rounded-full bg-black/70 border border-white/20 text-white hover:bg-arc-cyan hover:text-black transition-all cursor-pointer z-50 shadow-[0_0_20px_#00D4FF]"
-              title="Previous Asset (◄)"
+              className="fixed left-4 md:left-8 top-1/2 -translate-y-1/2 z-[10000] p-4 rounded-full bg-black/80 border border-white/20 text-white hover:bg-arc-cyan hover:text-black transition-all cursor-pointer shadow-[0_0_25px_#00D4FF] hover:scale-110"
+              title="Previous (◄)"
             >
-              <RiArrowLeftSLine size={28} />
+              <RiArrowLeftSLine size={32} />
             </button>
 
-            {/* NEXT BUTTON */}
+            {/* FLOATING NEXT BUTTON */}
             <button
               onClick={handleNext}
-              className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 p-3.5 rounded-full bg-black/70 border border-white/20 text-white hover:bg-arc-cyan hover:text-black transition-all cursor-pointer z-50 shadow-[0_0_20px_#00D4FF]"
-              title="Next Asset (►)"
+              className="fixed right-4 md:right-8 top-1/2 -translate-y-1/2 z-[10000] p-4 rounded-full bg-black/80 border border-white/20 text-white hover:bg-arc-cyan hover:text-black transition-all cursor-pointer shadow-[0_0_25px_#00D4FF] hover:scale-110"
+              title="Next (►)"
             >
-              <RiArrowRightSLine size={28} />
+              <RiArrowRightSLine size={32} />
             </button>
 
-            {/* Central Media Content Box */}
-            <div className="max-w-5xl w-full glass p-6 rounded-3xl border border-white/20 bg-[#0A0D1A] space-y-4 relative flex flex-col justify-between max-h-[90vh]">
-              {/* Media Title Header & Item Counter */}
-              <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                <div className="flex items-center gap-2 truncate pr-12">
-                  <span
-                    className={`px-3 py-0.5 rounded-full text-[10px] font-black uppercase ${activeItem.type === "image"
-                        ? "bg-arc-cyan/20 border border-arc-cyan/40 text-arc-cyan"
-                        : "bg-marvel-red/20 border border-marvel-red/40 text-marvel-red"
-                      }`}
-                  >
-                    {activeItem.type.toUpperCase()} · {activeItem.category}
-                  </span>
-                  <h3 className="text-sm md:text-base font-black text-white uppercase truncate">
-                    {activeItem.title}
-                  </h3>
-                </div>
-
-                <div className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-metallic-gold font-bold shrink-0">
-                  {selectedIndex + 1} / {filteredMedia.length}
-                </div>
-              </div>
-
-              {/* Media Display Container */}
-              <div className="aspect-video w-full bg-black rounded-2xl overflow-hidden relative border border-white/10 flex items-center justify-center">
-                {activeItem.type === "image" ? (
-                  <img
-                    src={activeItem.url}
-                    alt={activeItem.title}
-                    className="w-full h-full object-contain"
-                  />
-                ) : (
-                  <video
-                    src={activeItem.url}
-                    controls
-                    autoPlay
-                    className="w-full h-full object-contain"
-                  />
-                )}
-              </div>
-
-              {/* Navigation Hint Footer */}
-              <div className="flex items-center justify-between text-[11px] text-white/50 pt-2 border-t border-white/10">
-                <span>Use keyboard <kbd className="px-2 py-0.5 bg-black/60 border border-white/20 rounded text-metallic-gold font-mono">◄ Left</kbd> and <kbd className="px-2 py-0.5 bg-black/60 border border-white/20 rounded text-metallic-gold font-mono">Right ►</kbd> keys to navigate</span>
-                <button
-                  onClick={() => setSelectedIndex(null)}
-                  className="hover:text-white transition-colors cursor-pointer"
+            {/* FULL SCREEN MEDIA VIEWPORT CONTAINER */}
+            <div className="w-full h-full p-4 md:p-12 flex items-center justify-center relative">
+              {activeItem.type === "image" ? (
+                <motion.img
+                  key={activeItem.url}
+                  initial={{ opacity: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3 }}
+                  src={encodeURI(activeItem.url)}
+                  alt={activeItem.title}
+                  className="max-w-full max-h-[88vh] object-contain rounded-2xl shadow-[0_0_60px_rgba(0,0,0,0.9)]"
+                />
+              ) : activeItem.url.includes("youtube.com/embed/") ? (
+                <iframe
+                  key={activeItem.url}
+                  src={`${activeItem.url}?autoplay=1`}
+                  className="w-full h-full max-w-6xl max-h-[85vh] rounded-2xl border-0 shadow-2xl"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : (
+                <video
+                  key={activeItem.url}
+                  controls
+                  autoPlay
+                  playsInline
+                  className="w-full h-full max-w-6xl max-h-[85vh] object-contain rounded-2xl bg-black shadow-[0_0_60px_rgba(0,0,0,0.9)]"
                 >
-                  Press <kbd className="px-2 py-0.5 bg-black/60 border border-white/20 rounded text-white font-mono">Esc</kbd> to exit
+                  <source src={encodeURI(activeItem.url)} />
+                  <source src={activeItem.url} />
+                  Your browser does not support playing this video format directly.
+                </video>
+              )}
+            </div>
+
+            {/* FLOATING MARVEL HUD BOTTOM CONTROL BAR */}
+            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[10000] max-w-3xl w-[92vw] px-6 py-3 rounded-2xl bg-black/80 border border-white/20 backdrop-blur-xl flex items-center justify-between shadow-[0_10px_40px_rgba(0,0,0,0.8)] font-mono text-xs">
+              <div className="flex items-center gap-3 truncate pr-4">
+                <span
+                  className={`px-3 py-0.5 rounded-full text-[10px] font-black uppercase shrink-0 ${
+                    activeItem.type === "image"
+                      ? "bg-arc-cyan/20 border border-arc-cyan/40 text-arc-cyan"
+                      : "bg-marvel-red/20 border border-marvel-red/40 text-marvel-red"
+                  }`}
+                >
+                  {activeItem.type.toUpperCase()} · {activeItem.category}
+                </span>
+                <h3 className="text-white font-extrabold uppercase truncate text-sm">
+                  {activeItem.title}
+                </h3>
+              </div>
+
+              <div className="flex items-center gap-3 shrink-0">
+                <span className="text-metallic-gold font-bold">
+                  {selectedIndex + 1} / {filteredMedia.length}
+                </span>
+
+                <button
+                  onClick={toggleNativeFullscreen}
+                  className="p-2 rounded-xl bg-white/10 hover:bg-arc-cyan hover:text-black text-white transition-colors cursor-pointer border border-white/10"
+                  title="Toggle Display Fullscreen Mode"
+                >
+                  {isNativeFullscreen ? <RiFullscreenExitLine size={18} /> : <RiFullscreenLine size={18} />}
                 </button>
               </div>
             </div>

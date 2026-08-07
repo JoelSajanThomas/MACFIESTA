@@ -717,34 +717,76 @@ export function GalleryModule() {
         </div>
       )}
 
-      {/* PREVIEW MEDIA MODAL */}
+      {/* ⚡ 100% FULL-SCREEN MEDIA THEATER PREVIEW MODAL */}
       {previewItem && (
-        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="max-w-3xl w-full glass p-6 rounded-3xl border border-white/20 bg-[#0A0D1A] space-y-4 relative">
+        <div className="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-2xl w-screen h-screen flex items-center justify-center overflow-hidden">
+          {/* FLOATING CLOSE BUTTON */}
+          <button
+            onClick={() => setPreviewItem(null)}
+            className="fixed top-6 right-6 z-[10000] px-4 py-2.5 rounded-2xl bg-black/80 border border-white/20 text-white hover:bg-marvel-red hover:border-marvel-red transition-all cursor-pointer font-bold text-xs uppercase backdrop-blur-md shadow-[0_0_20px_rgba(237,29,36,0.6)] flex items-center gap-2"
+            title="Close Full Screen (Esc)"
+          >
+            <RiCloseLine size={20} />
+            <span>Close Full Screen</span>
+          </button>
+
+          {/* FULL SCREEN MEDIA CONTAINER */}
+          <div className="w-full h-full p-4 md:p-12 flex items-center justify-center relative">
+            {previewItem.type === "image" ? (
+              <img
+                src={encodeURI(previewItem.url)}
+                alt={previewItem.title}
+                className="max-w-full max-h-[88vh] object-contain rounded-2xl shadow-[0_0_60px_rgba(0,0,0,0.9)]"
+              />
+            ) : previewItem.url.includes("youtube.com/embed/") ? (
+              <iframe
+                src={`${previewItem.url}?autoplay=1`}
+                className="w-full h-full max-w-6xl max-h-[85vh] rounded-2xl border-0 shadow-2xl"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            ) : (
+              <video
+                key={previewItem.url}
+                controls
+                autoPlay
+                playsInline
+                className="w-full h-full max-w-6xl max-h-[85vh] object-contain rounded-2xl bg-black shadow-[0_0_60px_rgba(0,0,0,0.9)]"
+              >
+                <source src={encodeURI(previewItem.url)} />
+                <source src={previewItem.url} />
+                Your browser does not support playing this video format directly.
+              </video>
+            )}
+          </div>
+
+          {/* FLOATING MARVEL HUD BOTTOM BAR */}
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[10000] max-w-2xl w-[92vw] px-6 py-3 rounded-2xl bg-black/80 border border-white/20 backdrop-blur-xl flex items-center justify-between shadow-[0_10px_40px_rgba(0,0,0,0.8)] font-mono text-xs">
+            <div className="flex items-center gap-3 truncate">
+              <span
+                className={`px-3 py-0.5 rounded-full text-[10px] font-black uppercase shrink-0 ${
+                  previewItem.type === "image"
+                    ? "bg-arc-cyan/20 border border-arc-cyan/40 text-arc-cyan"
+                    : "bg-marvel-red/20 border border-marvel-red/40 text-marvel-red"
+                }`}
+              >
+                {previewItem.type.toUpperCase()} · {previewItem.category}
+              </span>
+              <h3 className="text-white font-extrabold uppercase truncate text-sm">
+                {previewItem.title}
+              </h3>
+            </div>
+
             <button
               onClick={() => setPreviewItem(null)}
-              className="absolute top-4 right-4 p-2 rounded-full bg-black/60 text-white hover:bg-marvel-red transition-colors cursor-pointer z-10"
+              className="px-3 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-[10px] transition-colors cursor-pointer border border-white/10 shrink-0"
             >
-              <RiCloseLine size={20} />
+              Exit Preview
             </button>
-
-            <h3 className="text-base font-bold text-white uppercase">{previewItem.title}</h3>
-
-            <div className="aspect-video w-full bg-black rounded-2xl overflow-hidden relative">
-              {previewItem.type === "image" ? (
-                <img src={encodeURI(previewItem.url)} alt={previewItem.title} className="w-full h-full object-contain" />
-              ) : previewItem.url.includes("youtube.com/embed/") ? (
-                <iframe src={previewItem.url} className="w-full h-full border-0" allowFullScreen />
-              ) : (
-                <video key={previewItem.url} controls autoPlay className="w-full h-full object-contain bg-black">
-                  <source src={encodeURI(previewItem.url)} />
-                  <source src={previewItem.url} />
-                </video>
-              )}
-            </div>
           </div>
         </div>
       )}
+
     </div>
   );
 }
