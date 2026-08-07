@@ -22,25 +22,42 @@ export function CursorGlow() {
     glow.style.opacity = "1";
     core.style.opacity = "1";
 
+    let rafId: number | null = null;
+    let hoveredState = false;
+    let buttonState = false;
+
     const handleMouseMove = (e: MouseEvent) => {
-      requestAnimationFrame(() => {
-        glow.style.left = `${e.clientX}px`;
-        glow.style.top = `${e.clientY}px`;
-        core.style.left = `${e.clientX}px`;
-        core.style.top = `${e.clientY}px`;
-      });
+      if (!rafId) {
+        rafId = requestAnimationFrame(() => {
+          glow.style.left = `${e.clientX}px`;
+          glow.style.top = `${e.clientY}px`;
+          core.style.left = `${e.clientX}px`;
+          core.style.top = `${e.clientY}px`;
+          rafId = null;
+        });
+      }
 
       const target = e.target as HTMLElement | null;
       if (target) {
-        const isInteractive = target.closest("a, button, input, [role='button'], .glass-card, .marvel-card");
-        const isBtn = target.closest("button, .btn-primary, .btn-outline, .marvel-btn");
-        setIsHovered(!!isInteractive);
-        setIsButton(!!isBtn);
+        const nextHovered = !!target.closest("a, button, input, [role='button'], .glass-card, .marvel-card");
+        const nextButton = !!target.closest("button, .btn-primary, .btn-outline, .marvel-btn");
+        
+        if (nextHovered !== hoveredState) {
+          hoveredState = nextHovered;
+          setIsHovered(nextHovered);
+        }
+        if (nextButton !== buttonState) {
+          buttonState = nextButton;
+          setIsButton(nextButton);
+        }
       }
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
   }, []);
 
   return (

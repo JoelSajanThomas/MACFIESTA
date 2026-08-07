@@ -38,7 +38,7 @@ function CameraRig() {
 
   return (
     <group ref={groupRef}>
-      <ParticleField count={2500} />
+      <ParticleField count={1000} />
       <FloatingObjects />
     </group>
   );
@@ -64,9 +64,10 @@ export function HeroScene() {
     <div className="absolute inset-0 z-0">
       <Canvas
         camera={{ position: [0, 0, 12], fov: 60, near: 0.1, far: 100 }}
-        dpr={[1, 1.5]}
+        dpr={[1, 1.25]}
         gl={{
           antialias: true,
+          powerPreference: "high-performance",
           toneMapping: THREE.ACESFilmicToneMapping,
           toneMappingExposure: 1.2,
         }}
@@ -91,16 +92,9 @@ export function HeroScene() {
           {/* Post-processing */}
           <EffectComposer multisampling={0}>
             <Bloom
-              intensity={0.8}
-              luminanceThreshold={0.2}
-              luminanceSmoothing={0.9}
-              mipmapBlur
-            />
-            <ChromaticAberration
-              blendFunction={BlendFunction.NORMAL}
-              offset={new THREE.Vector2(0.0005, 0.0005)}
-              radialModulation={false}
-              modulationOffset={0}
+              intensity={0.5}
+              luminanceThreshold={0.4}
+              luminanceSmoothing={0.7}
             />
           </EffectComposer>
 

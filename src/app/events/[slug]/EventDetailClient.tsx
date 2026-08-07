@@ -293,6 +293,38 @@ export default function EventDetailClient({ slug }: { slug: string }) {
               </p>
             </div>
 
+            {/* Teaser Video Preview if set */}
+            {event.videoUrl && (
+              <div className="marvel-card p-6 md:p-8 rounded-2xl border border-arc-cyan/30 space-y-4">
+                <h2 className="text-xl font-bold text-arc-cyan uppercase tracking-wider flex items-center gap-2" style={{ fontFamily: "var(--font-heading)" }}>
+                  📹 Official Mission Teaser Video
+                </h2>
+                <div className="relative rounded-2xl overflow-hidden border border-white/10 aspect-video bg-black shadow-2xl">
+                  {event.videoUrl.endsWith(".mp4") ? (
+                    <video src={event.videoUrl} controls autoPlay loop muted playsInline className="w-full h-full object-cover" />
+                  ) : (
+                    <iframe src={event.videoUrl} title="Event Teaser Video" className="w-full h-full border-0" allowFullScreen />
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Event Photo Gallery if photos set */}
+            {event.photos && event.photos.length > 0 && (
+              <div className="marvel-card p-6 md:p-8 rounded-2xl border border-white/10 space-y-4">
+                <h2 className="text-xl font-bold text-metallic-gold uppercase tracking-wider flex items-center gap-2" style={{ fontFamily: "var(--font-heading)" }}>
+                  🖼️ Event Photo Gallery
+                </h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {event.photos.map((photoUrl, idx) => (
+                    <div key={idx} className="relative aspect-video rounded-xl overflow-hidden border border-white/10 bg-black group">
+                      <Image src={photoUrl} alt={`${event.title} Photo ${idx + 1}`} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Rules Accordion */}
             {event.rules && event.rules.length > 0 && (
               <div className="marvel-card p-6 md:p-8 rounded-2xl border border-white/10 space-y-4">

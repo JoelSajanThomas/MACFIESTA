@@ -116,8 +116,8 @@ export function Footer() {
               {SOCIAL_LINKS.map((link) => {
                 const Icon = socialIcons[link.platform];
                 const targetUrl = link.platform === "instagram" ? settings.socialInstagram || link.url :
-                                  link.platform === "youtube" ? settings.socialYoutube || link.url :
-                                  link.platform === "linkedin" ? settings.socialLinkedin || link.url : link.url;
+                  link.platform === "youtube" ? settings.socialYoutube || link.url :
+                    link.platform === "linkedin" ? settings.socialLinkedin || link.url : link.url;
                 return (
                   <a
                     key={link.platform}

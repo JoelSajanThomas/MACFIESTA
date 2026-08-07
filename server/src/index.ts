@@ -483,14 +483,19 @@ app.post("/api/events", [authenticateToken, authorizeAdmin] as any, async (req: 
 
 app.put("/api/events/:slug", [authenticateToken, authorizeAdmin] as any, async (req: AuthRequest, res: Response) => {
   try {
+    const param = req.params.slug;
     if (isDbConnected()) {
-      const updatedEvent = await Event.findOneAndUpdate({ slug: req.params.slug }, req.body, { new: true });
+      const updatedEvent = await Event.findOneAndUpdate(
+        { $or: [{ slug: param }, { _id: param }] },
+        req.body,
+        { new: true }
+      );
       if (!updatedEvent) {
         return res.status(404).json({ success: false, message: "Event not found to update" });
       }
       res.json({ success: true, event: updatedEvent });
     } else {
-      const idx = localEvents.findIndex(e => e.slug === req.params.slug);
+      let idx = localEvents.findIndex(e => e.slug === param || e._id === param);
       if (idx === -1) {
         return res.status(404).json({ success: false, message: "Event not found to update" });
       }

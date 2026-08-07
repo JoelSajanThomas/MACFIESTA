@@ -10,7 +10,10 @@ import {
   RiMapPinLine,
   RiTrophyLine,
   RiGroupLine,
-  RiEyeLine,
+  RiImageLine,
+  RiVideoLine,
+  RiImageEditLine,
+  RiFilmLine,
 } from "react-icons/ri";
 
 export interface EventRecord {
@@ -20,6 +23,9 @@ export interface EventRecord {
   category: string;
   venue: string;
   description?: string;
+  coverImage?: string;
+  videoUrl?: string;
+  photos?: string[];
   timeSlot?: string;
   prizePool?: number;
   seatsAvailable?: number;
@@ -32,6 +38,7 @@ interface EventsManagementProps {
   onOpenCreateModal: () => void;
   onEditEvent: (event: EventRecord) => void;
   onDeleteEvent: (id: string) => void;
+  onEditMedia?: (event: EventRecord) => void;
   onRefresh?: () => void;
 }
 
@@ -40,6 +47,7 @@ export function EventsManagement({
   onOpenCreateModal,
   onEditEvent,
   onDeleteEvent,
+  onEditMedia,
   onRefresh,
 }: EventsManagementProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -52,13 +60,24 @@ export function EventsManagement({
   const columns: Column<EventRecord>[] = [
     {
       key: "title",
-      header: "Event Name & Category",
+      header: "Event & Cover Photo",
       render: (row) => (
-        <div>
-          <p className="font-extrabold text-white text-xs tracking-wide">{row.title}</p>
-          <span className="text-[9px] font-bold uppercase tracking-wider text-festival-gold">
-            {row.category || "General"}
-          </span>
+        <div className="flex items-center gap-3">
+          <div className="relative w-10 h-10 rounded-xl overflow-hidden bg-zinc-800 border border-white/10 shrink-0">
+            {row.coverImage ? (
+              <img src={row.coverImage} alt={row.title} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-zinc-500">
+                <RiImageLine size={18} />
+              </div>
+            )}
+          </div>
+          <div>
+            <p className="font-extrabold text-white text-xs tracking-wide">{row.title}</p>
+            <span className="text-[9px] font-bold uppercase tracking-wider text-festival-gold">
+              {row.category || "General"}
+            </span>
+          </div>
         </div>
       ),
     },
@@ -88,13 +107,25 @@ export function EventsManagement({
       ),
     },
     {
-      key: "seatsAvailable",
-      header: "Seats Available",
+      key: "media",
+      header: "Photo & Video Status",
       render: (row) => (
-        <span className="text-xs font-bold text-white/80 flex items-center gap-1">
-          <RiGroupLine size={13} className="text-indigo-400" />
-          <span>{row.seatsAvailable ?? 50} Seats</span>
-        </span>
+        <div className="flex items-center gap-2 text-[10px]">
+          <span
+            className={`px-2 py-0.5 rounded font-bold flex items-center gap-1 ${
+              row.coverImage ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-zinc-800 text-zinc-500"
+            }`}
+          >
+            <RiImageLine size={11} /> {row.coverImage ? "Photo Set" : "No Photo"}
+          </span>
+          <span
+            className={`px-2 py-0.5 rounded font-bold flex items-center gap-1 ${
+              row.videoUrl ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" : "bg-zinc-800 text-zinc-500"
+            }`}
+          >
+            <RiVideoLine size={11} /> {row.videoUrl ? "Video Set" : "No Video"}
+          </span>
+        </div>
       ),
     },
   ];
@@ -139,6 +170,14 @@ export function EventsManagement({
         exportFileName="macfiesta_events_roster"
         actions={(row) => (
           <div className="flex items-center justify-end gap-1.5">
+            <button
+              onClick={() => (onEditMedia ? onEditMedia(row) : onEditEvent(row))}
+              className="px-2.5 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/25 hover:bg-amber-500/20 text-amber-300 text-xs font-semibold cursor-pointer flex items-center gap-1.5"
+              title="Change event photos or video"
+            >
+              <RiFilmLine size={14} />
+              <span className="hidden md:inline">Photos/Video</span>
+            </button>
             <button
               onClick={() => onEditEvent(row)}
               className="p-1.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-white/70 hover:text-white text-xs cursor-pointer"

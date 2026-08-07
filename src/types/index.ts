@@ -24,6 +24,8 @@ export interface Event {
   description: string;
   rules: string[];
   coverImage: string;
+  videoUrl?: string;
+  photos?: string[];
   date: string;
   time: string;
   venue: string;

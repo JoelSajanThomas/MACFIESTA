@@ -420,29 +420,29 @@ body {
 
 /* Standard glass */
 .glass {
-  background: rgba(17, 17, 24, 0.75);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: rgba(17, 17, 24, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(0, 212, 255, 0.12);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 /* Strong glass */
 .glass-strong {
-  background: rgba(12, 12, 18, 0.92);
-  backdrop-filter: blur(35px);
-  -webkit-backdrop-filter: blur(35px);
+  background: rgba(12, 12, 18, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(0, 212, 255, 0.18);
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
 }
 
 /* Interactive glass card */
 .glass-card {
-  background: rgba(15, 15, 22, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(15, 15, 22, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(0, 212, 255, 0.10);
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .glass-card:hover {
@@ -451,14 +451,14 @@ body {
     0 0 25px rgba(237, 29, 36, 0.15),
     0 0 50px rgba(0, 212, 255, 0.08),
     0 20px 40px rgba(0, 0, 0, 0.6);
-  transform: translateY(-5px) scale(1.01);
+  transform: translateY(-4px);
 }
 
 /* --- Marvel Glass (Arc Reactor tinted) --- */
 .marvel-glass {
-  background: rgba(10, 15, 25, 0.8);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: rgba(10, 15, 25, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(0, 212, 255, 0.15);
   box-shadow:
     0 0 20px rgba(0, 212, 255, 0.05),
@@ -467,9 +467,9 @@ body {
 
 /* --- Marvel Card (energy border + hover glow) --- */
 .marvel-card {
-  background: rgba(12, 14, 24, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(12, 14, 24, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(0, 212, 255, 0.12);
   border-radius: 1rem;
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);

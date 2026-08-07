@@ -66,13 +66,14 @@ export const MODULES: NavModule[] = [
     id: "festival",
     icon: RiCompass3Line,
     label: "Festival Management",
-    desc: "Master Control, Events, Schedule & Scorecards",
+    desc: "Events, Media, Schedule, Results & Festival Control",
     pages: [
-      { id: "festival.master", label: "Master Control & Timeline", badge: "Live", desc: "Dates, countdowns & toggles" },
-      { id: "events", label: "Events & Competitions", desc: "Create, edit, queue sheets & rules" },
+      { id: "events", label: "Events & Competitions", badge: "Live", desc: "Create, edit, queue sheets & rules" },
+      { id: "events.media", label: "Event Photos & Video Manager", badge: "Media", desc: "Change cover photo, teaser video & gallery for events" },
       { id: "schedule", label: "Festival Schedule Builder", desc: "Drag & drop day timeline manager" },
       { id: "results", label: "Results & Winner Scorecards", desc: "Publish results & objection management" },
       { id: "certificates", label: "Certificate Generator", desc: "Auto-issue participation & winner PDFs" },
+      { id: "festival.master", label: "Festival Control & Branding", desc: "Dates, countdowns, theme & toggles" },
     ],
   },
   {
@@ -81,10 +82,10 @@ export const MODULES: NavModule[] = [
     label: "Website CMS & Media",
     desc: "Media Gallery, Banners & Website Content",
     pages: [
-      { id: "cms.hero", label: "Homepage Hero & Video Banner", desc: "Headline copy & video loop" },
+      { id: "cms.hero", label: "Homepage Hero & Video Banner", badge: "Live", desc: "Headline copy & video loop" },
       { id: "cms.about", label: "About Page Content", desc: "History, vision, mission & team" },
       { id: "cms.sponsors", label: "Sponsor Logos & Links", desc: "Platinum, Gold & Silver partners" },
-      { id: "cms.gallery", label: "Photo & Video Gallery Studio", badge: "Live", desc: "Upload photos & videos separately" },
+      { id: "cms.gallery", label: "Photo & Video Gallery Studio", desc: "Upload photos & videos separately" },
       { id: "cms.faqs", label: "FAQ Manager", desc: "Frequently asked questions" },
       { id: "cms.contact", label: "Footer & Contact Details", desc: "Campus address, email & social links" },
     ],
@@ -162,6 +163,7 @@ export const MODULES: NavModule[] = [
     label: "System Settings",
     desc: "User Roles, Payment Keys & Backup",
     pages: [
+      { id: "cms.site_controls", label: "Site Controls", badge: "⚡", desc: "Registration open/close & maintenance mode toggles" },
       { id: "settings.roles", label: "User Roles & Permissions", desc: "Super admin, finance & event leads" },
       { id: "settings.payment", label: "Payment Gateway Credentials", desc: "Razorpay API keys" },
       { id: "settings.system", label: "Backup & System Logs", desc: "One-click DB backup & audit trail" },

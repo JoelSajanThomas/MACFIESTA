@@ -30,14 +30,18 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
 
     lenisRef.current = lenis;
 
+    let rafId: number;
     function raf(time: number) {
       lenis.raf(time);
-      requestAnimationFrame(raf);
+      rafId = requestAnimationFrame(raf);
     }
 
-    requestAnimationFrame(raf);
+    rafId = requestAnimationFrame(raf);
 
     return () => {
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+      }
       if (lenisRef.current) {
         lenisRef.current.destroy();
         lenisRef.current = null;

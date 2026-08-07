@@ -6,6 +6,8 @@ export interface IEvent extends Document {
   description: string;
   rules: string[];
   coverImage: string;
+  videoUrl?: string;
+  photos?: string[];
   date: string;
   time: string;
   venue: string;
@@ -28,6 +30,8 @@ const EventSchema = new Schema<IEvent>({
   description: { type: String, required: true },
   rules: [{ type: String }],
   coverImage: { type: String, required: true },
+  videoUrl: { type: String },
+  photos: [{ type: String }],
   date: { type: String, required: true },
   time: { type: String, required: true },
   venue: { type: String, required: true },

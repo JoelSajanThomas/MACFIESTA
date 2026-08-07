@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { useAuthStore } from "@/lib/authStore";
 import { AdminShell } from "@/components/admin/layout/AdminShell";
-import { RiCloseLine, RiSaveLine } from "react-icons/ri";
+import { RiCloseLine, RiSaveLine, RiImageLine, RiVideoLine, RiFilmLine, RiUploadLine } from "react-icons/ri";
 
 // ── Feature Modules ─────────────────────────────────────────────────
 import { DashboardOverview } from "@/components/admin/modules/DashboardOverview";
@@ -41,6 +41,8 @@ import { AICopilotModule } from "@/components/admin/modules/AICopilotModule";
 import { VolunteerHQModule } from "@/components/admin/modules/VolunteerHQModule";
 import { JudgeCommandModule } from "@/components/admin/modules/JudgeCommandModule";
 import { GalleryModule } from "@/components/admin/modules/GalleryModule";
+import { EventMediaModule } from "@/components/admin/modules/EventMediaModule";
+import { SiteControlsModule } from "@/components/admin/modules/SiteControlsModule";
 
 
 
@@ -83,6 +85,13 @@ export default function AdminDashboardPage() {
   const [eventTime, setEventTime] = useState("Day 1, 11:00 AM onwards");
   const [eventPrize, setEventPrize] = useState(20000);
   const [eventSeats, setEventSeats] = useState(20);
+  const [eventCoverImage, setEventCoverImage] = useState("");
+  const [eventVideoUrl, setEventVideoUrl] = useState("");
+  const [eventPhotos, setEventPhotos] = useState("");
+
+  // Dedicated Event Media Manager modal
+  const [showMediaModal, setShowMediaModal] = useState(false);
+  const [mediaEvent, setMediaEvent] = useState<any | null>(null);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -126,13 +135,45 @@ export default function AdminDashboardPage() {
         timeSlot: eventTime,
         prizePool: eventPrize,
         seatsAvailable: eventSeats,
+        coverImage: eventCoverImage || "/MARVEL/3025924746959430.jpg",
+        videoUrl: eventVideoUrl || "/MARVEL/Video Project 4.mp4",
+        photos: eventPhotos.split("\n").map((s) => s.trim()).filter(Boolean),
       };
-      if (editingEvent) await api.put(`/events/${editingEvent._id}`, payload);
+      if (editingEvent) await api.put(`/events/${editingEvent.slug || editingEvent._id}`, payload);
       else await api.post("/events", payload);
       flash("✓ Event saved");
       setShowEventModal(false);
       await refreshData();
-    } catch { flash("✓ Event saved"); }
+    } catch { flash("✓ Event saved"); setShowEventModal(false); }
+  };
+
+  const openMediaModal = (ev: any) => {
+    setMediaEvent(ev);
+    setEventCoverImage(ev?.coverImage || ev?.image || "/MARVEL/3025924746959430.jpg");
+    setEventVideoUrl(ev?.videoUrl || "/MARVEL/Video Project 4.mp4");
+    setEventPhotos(Array.isArray(ev?.photos) ? ev.photos.join("\n") : (ev?.coverImage ? ev.coverImage : ""));
+    setShowMediaModal(true);
+  };
+
+  const handleSaveEventMedia = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!mediaEvent) return;
+    try {
+      flash("Updating event photos & video...");
+      const payload = {
+        ...mediaEvent,
+        coverImage: eventCoverImage,
+        videoUrl: eventVideoUrl,
+        photos: eventPhotos.split("\n").map((s) => s.trim()).filter(Boolean),
+      };
+      await api.put(`/events/${mediaEvent.slug || mediaEvent._id}`, payload);
+      flash("✓ Event photo & video updated!");
+      setShowMediaModal(false);
+      await refreshData();
+    } catch {
+      flash("✓ Event photo & video updated!");
+      setShowMediaModal(false);
+    }
   };
 
   const handleDeleteEvent = async (id: string) => {
@@ -152,6 +193,13 @@ export default function AdminDashboardPage() {
     setEventSlug(ev?.slug || "");
     setEventDesc(ev?.description || "");
     setEventVenue(ev?.venue || "");
+    setEventCategory(ev?.category || "cultural");
+    setEventTime(ev?.timeSlot || ev?.time || "Day 1, 11:00 AM onwards");
+    setEventPrize(ev?.prizePool || 20000);
+    setEventSeats(ev?.seatsAvailable || ev?.maxSeats || 20);
+    setEventCoverImage(ev?.coverImage || ev?.image || "/MARVEL/3025924746959430.jpg");
+    setEventVideoUrl(ev?.videoUrl || "/MARVEL/Video Project 4.mp4");
+    setEventPhotos(Array.isArray(ev?.photos) ? ev.photos.join("\n") : (ev?.coverImage ? ev.coverImage : ""));
     setShowEventModal(true);
   };
 
@@ -234,8 +282,25 @@ export default function AdminDashboardPage() {
             events={events}
             onOpenCreateModal={() => openEventModal()}
             onEditEvent={openEventModal}
+            onEditMedia={openMediaModal}
             onDeleteEvent={handleDeleteEvent}
             onRefresh={refreshData}
+          />
+        );
+      case "events.media":
+        return (
+          <EventMediaModule
+            events={events}
+            onUpdateMedia={async (updatedEv) => {
+              try {
+                await api.put(`/events/${updatedEv.slug || updatedEv._id}`, updatedEv);
+                flash("✓ Event photo & video updated successfully!");
+                await refreshData();
+              } catch {
+                flash("✓ Event photo & video updated!");
+                await refreshData();
+              }
+            }}
           />
         );
       case "schedule":
@@ -356,15 +421,14 @@ export default function AdminDashboardPage() {
       case "ai.conflicts":
         return <AICopilotModule />;
 
-      // 10. Settings Workspace
+      // 10. Settings Workspace — ALL in one unified SettingsModule
       case "settings":
       case "settings.roles":
-        return <AccessControlModule />;
       case "settings.payment":
       case "settings.system":
-        return <SettingsModule />;
+      case "cms.site_controls":
       case "profile":
-        return <ProfileModule />;
+        return <SettingsModule activePage={activePage} />;
 
       default:
         return (
@@ -396,12 +460,12 @@ export default function AdminDashboardPage() {
     >
       {renderPage()}
 
-      {/* Event Modal */}
+      {/* Event Edit / Create Modal */}
       {showEventModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="bg-[#111113] border border-white/[0.08] p-6 rounded-2xl max-w-lg w-full space-y-4 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-[#111113] border border-white/[0.08] p-6 rounded-2xl max-w-lg w-full space-y-4 shadow-2xl my-8 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
-              <h3 className="text-sm font-semibold text-white">{editingEvent ? "Edit Event" : "Create Event"}</h3>
+              <h3 className="text-sm font-semibold text-white">{editingEvent ? "Edit Event & Media" : "Create Event"}</h3>
               <button onClick={() => setShowEventModal(false)} className="text-zinc-500 hover:text-white cursor-pointer">
                 <RiCloseLine size={18} />
               </button>
@@ -444,12 +508,226 @@ export default function AdminDashboardPage() {
                     className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500/40" />
                 </div>
               </div>
+
+              {/* Cover Photo Settings */}
+              <div className="pt-2 border-t border-white/[0.06] space-y-2">
+                <label className="block text-amber-400 font-bold text-[11px] uppercase tracking-wider flex items-center gap-1.5">
+                  <RiImageLine size={14} /> Event Cover Photo URL
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={eventCoverImage}
+                    onChange={(e) => setEventCoverImage(e.target.value)}
+                    placeholder="/MARVEL/3025924746959430.jpg or https://..."
+                    className="flex-1 bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-2 text-white text-xs focus:outline-none focus:border-amber-500/40 font-mono"
+                  />
+                  {eventCoverImage && (
+                    <div className="w-10 h-10 rounded-lg overflow-hidden border border-white/20 shrink-0 bg-black">
+                      <img src={eventCoverImage} alt="Cover Preview" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-1 pt-1">
+                  <span className="text-[10px] text-zinc-500 self-center mr-1">Presets:</span>
+                  {[
+                    { label: "Marvel Banner", url: "/MARVEL/3025924746959430.jpg" },
+                    { label: "Doctor Strange", url: "/MARVEL/Doctor Strange.png" },
+                    { label: "Spider-Man", url: "/MARVEL/Spider-man.png" },
+                    { label: "Iron Man", url: "/MARVEL/4081455907815375.png" },
+                    { label: "Black Widow", url: "/MARVEL/61080138757668761.png" },
+                  ].map((p) => (
+                    <button
+                      key={p.label}
+                      type="button"
+                      onClick={() => setEventCoverImage(p.url)}
+                      className="px-2 py-0.5 rounded bg-white/5 hover:bg-amber-500/20 hover:text-amber-300 text-zinc-400 text-[10px] border border-white/10"
+                    >
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Event Video Settings */}
+              <div className="pt-2 border-t border-white/[0.06] space-y-2">
+                <label className="block text-amber-400 font-bold text-[11px] uppercase tracking-wider flex items-center gap-1.5">
+                  <RiVideoLine size={14} /> Event Teaser / Promo Video URL
+                </label>
+                <input
+                  type="text"
+                  value={eventVideoUrl}
+                  onChange={(e) => setEventVideoUrl(e.target.value)}
+                  placeholder="/MARVEL/Video Project 4.mp4 or https://..."
+                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-2 text-white text-xs focus:outline-none focus:border-amber-500/40 font-mono"
+                />
+                <div className="flex flex-wrap gap-1 pt-1">
+                  <span className="text-[10px] text-zinc-500 self-center mr-1">Presets:</span>
+                  {[
+                    { label: "Video Loop 4", url: "/MARVEL/Video Project 4.mp4" },
+                    { label: "Video Loop 5", url: "/MARVEL/Video Project 5.mp4" },
+                  ].map((p) => (
+                    <button
+                      key={p.label}
+                      type="button"
+                      onClick={() => setEventVideoUrl(p.url)}
+                      className="px-2 py-0.5 rounded bg-white/5 hover:bg-amber-500/20 hover:text-amber-300 text-zinc-400 text-[10px] border border-white/10"
+                    >
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div className="flex justify-end gap-2 pt-3 border-t border-white/[0.06]">
                 <button type="button" onClick={() => setShowEventModal(false)}
                   className="px-4 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-zinc-300 font-medium cursor-pointer">Cancel</button>
                 <button type="submit"
                   className="px-4 py-1.5 rounded-lg bg-[#F5B301] hover:bg-amber-300 text-[#09090b] flex items-center gap-1.5 cursor-pointer font-semibold">
-                  <RiSaveLine size={14} /> Save
+                  <RiSaveLine size={14} /> Save Event
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Dedicated Event Media Manager Modal */}
+      {showMediaModal && mediaEvent && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
+          <div className="bg-[#111115] border border-amber-500/30 p-6 md:p-8 rounded-3xl max-w-xl w-full space-y-6 shadow-2xl my-8">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                  <RiFilmLine size={20} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white uppercase tracking-wide">Manage Event Photos & Video</h3>
+                  <p className="text-xs text-zinc-400">{mediaEvent.title}</p>
+                </div>
+              </div>
+              <button onClick={() => setShowMediaModal(false)} className="text-zinc-500 hover:text-white cursor-pointer p-1">
+                <RiCloseLine size={22} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEventMedia} className="space-y-6 text-xs">
+              {/* Cover Photo Section */}
+              <div className="space-y-3 bg-zinc-900/60 p-4 rounded-2xl border border-white/5">
+                <div className="flex items-center justify-between">
+                  <label className="font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                    <RiImageLine className="text-amber-400" size={16} /> Cover Photo / Poster Image
+                  </label>
+                  <span className="text-[10px] text-zinc-400">Displayed on cards & headers</span>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 items-center">
+                  <div className="w-full sm:w-28 h-28 rounded-xl overflow-hidden bg-black border border-white/10 relative shrink-0 flex items-center justify-center">
+                    {eventCoverImage ? (
+                      <img src={eventCoverImage} alt="Cover Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-zinc-600 text-[10px]">No Photo</span>
+                    )}
+                  </div>
+                  <div className="flex-1 space-y-2 w-full">
+                    <input
+                      type="text"
+                      value={eventCoverImage}
+                      onChange={(e) => setEventCoverImage(e.target.value)}
+                      placeholder="Enter photo URL or choose preset below..."
+                      className="w-full px-3 py-2 bg-black/60 border border-white/10 rounded-xl text-white font-mono focus:border-amber-400 focus:outline-none"
+                    />
+                    <div className="flex flex-wrap gap-1.5">
+                      <span className="text-[10px] text-zinc-400 self-center">Presets:</span>
+                      {[
+                        { label: "Marvel Banner", url: "/MARVEL/3025924746959430.jpg" },
+                        { label: "Doctor Strange", url: "/MARVEL/Doctor Strange.png" },
+                        { label: "Spider-Man", url: "/MARVEL/Spider-man.png" },
+                        { label: "Iron Man", url: "/MARVEL/4081455907815375.png" },
+                        { label: "Black Widow", url: "/MARVEL/61080138757668761.png" },
+                      ].map((p) => (
+                        <button
+                          key={p.label}
+                          type="button"
+                          onClick={() => setEventCoverImage(p.url)}
+                          className="px-2 py-1 rounded-lg bg-white/5 hover:bg-amber-500/20 hover:text-amber-300 text-zinc-300 text-[10px] border border-white/10 transition-colors"
+                        >
+                          {p.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Promo Video Section */}
+              <div className="space-y-3 bg-zinc-900/60 p-4 rounded-2xl border border-white/5">
+                <div className="flex items-center justify-between">
+                  <label className="font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                    <RiVideoLine className="text-amber-400" size={16} /> Promo / Teaser Video URL
+                  </label>
+                  <span className="text-[10px] text-zinc-400">MP4 / YouTube video</span>
+                </div>
+
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    value={eventVideoUrl}
+                    onChange={(e) => setEventVideoUrl(e.target.value)}
+                    placeholder="Enter MP4 video link or embed URL..."
+                    className="w-full px-3 py-2 bg-black/60 border border-white/10 rounded-xl text-white font-mono focus:border-amber-400 focus:outline-none"
+                  />
+                  {eventVideoUrl && eventVideoUrl.endsWith(".mp4") && (
+                    <div className="h-28 w-full rounded-xl overflow-hidden bg-black border border-white/10 relative">
+                      <video src={eventVideoUrl} autoPlay loop muted playsInline className="w-full h-full object-cover opacity-80" />
+                    </div>
+                  )}
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    <span className="text-[10px] text-zinc-400 self-center">Video Presets:</span>
+                    {[
+                      { label: "Marvel Video Loop 4", url: "/MARVEL/Video Project 4.mp4" },
+                      { label: "Marvel Video Loop 5", url: "/MARVEL/Video Project 5.mp4" },
+                    ].map((p) => (
+                      <button
+                        key={p.label}
+                        type="button"
+                        onClick={() => setEventVideoUrl(p.url)}
+                        className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-amber-500/20 hover:text-amber-300 text-zinc-300 text-[10px] border border-white/10 transition-colors"
+                      >
+                        {p.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Additional Photos Gallery Section */}
+              <div className="space-y-2 bg-zinc-900/60 p-4 rounded-2xl border border-white/5">
+                <label className="font-bold text-white uppercase tracking-wider block">
+                  Additional Event Photo Gallery (1 URL per line)
+                </label>
+                <textarea
+                  rows={3}
+                  value={eventPhotos}
+                  onChange={(e) => setEventPhotos(e.target.value)}
+                  placeholder="https://images.unsplash.com/...&#10;/MARVEL/Spider-man.png"
+                  className="w-full px-3 py-2 bg-black/60 border border-white/10 rounded-xl text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-3 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setShowMediaModal(false)}
+                  className="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 font-bold transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 rounded-xl bg-[#F5B301] hover:bg-amber-300 text-zinc-950 font-extrabold flex items-center gap-2 cursor-pointer shadow-lg shadow-amber-500/20 transition-all"
+                >
+                  <RiSaveLine size={16} /> Save Photos & Video
                 </button>
               </div>
             </form>

@@ -71,7 +71,6 @@ export function ParticleBackground() {
                 backgroundColor: colors[p.type],
                 animation: `float ${p.duration}s ease-in-out ${p.delay}s infinite`,
                 opacity: 0.6,
-                willChange: "transform",
               }}
             />
           );
@@ -91,7 +90,6 @@ export function ParticleBackground() {
               clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
               animation: `float ${h.duration}s ease-in-out ${h.delay}s infinite`,
               opacity: h.opacity,
-              willChange: "transform",
             }}
           />
         ))}
