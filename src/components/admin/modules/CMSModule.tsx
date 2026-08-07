@@ -211,11 +211,10 @@ export function CMSModule({ activePage }: CMSModuleProps) {
       name: heroTitle,
       tagline: heroTagline,
       motto: heroMotto,
-      homepageBanner: heroBannerUrl,
-      registrationOpen: regOpen,
     });
-    triggerSaved("✓ Hero Banner Copy & Registration Settings Updated!");
+    triggerSaved("✓ Hero Headline & Motto Settings Updated Live!");
   };
+
 
   // About Submit
   const handleSaveAbout = (e: React.FormEvent) => {
@@ -359,7 +358,7 @@ export function CMSModule({ activePage }: CMSModuleProps) {
             <div>
               <span className="text-[10px] text-arc-cyan font-bold uppercase tracking-wider block">CMS TAB 1</span>
               <h3 className="text-xl font-black text-white uppercase tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
-                Homepage Hero Headline & Video Loop Banner
+                Homepage Hero Headline & Copy Settings
               </h3>
             </div>
 
@@ -392,7 +391,7 @@ export function CMSModule({ activePage }: CMSModuleProps) {
               />
             </div>
 
-            <div>
+            <div className="md:col-span-2">
               <label className="block text-white/70 font-bold mb-1">Subtitle Motto (e.g. Legends Cup 2026)</label>
               <input
                 type="text"
@@ -402,35 +401,9 @@ export function CMSModule({ activePage }: CMSModuleProps) {
                 className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white font-bold focus:border-arc-cyan focus:outline-none"
               />
             </div>
-
-            <div>
-              <label className="block text-white/70 font-bold mb-1">Registration Gate Status</label>
-              <div className="flex items-center gap-2 pt-1">
-                <button
-                  type="button"
-                  onClick={() => setRegOpen(!regOpen)}
-                  className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase transition-all cursor-pointer border ${regOpen
-                      ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.3)]"
-                      : "bg-rose-500/20 text-rose-400 border-rose-500/50"
-                    }`}
-                >
-                  {regOpen ? "● REGISTRATION OPEN LIVE" : "○ REGISTRATION CLOSED"}
-                </button>
-              </div>
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-white/70 font-bold mb-1">Homepage Promo Video Loop URL (MP4 / Direct Link)</label>
-              <input
-                type="text"
-                value={heroBannerUrl}
-                onChange={(e) => setHeroBannerUrl(e.target.value)}
-                placeholder="https://domain.com/trailer.mp4"
-                className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-xl text-white font-mono focus:border-arc-cyan focus:outline-none"
-              />
-            </div>
           </div>
         </form>
+
       )}
 
       {/* 2. ABOUT FESTIVAL & MISSION TAB */}

@@ -17,14 +17,6 @@ export function normalizeMediaPath(rawPath: string): string {
   if (!rawPath) return "";
   let clean = rawPath.trim();
 
-  // Strip leading/trailing double or single quotes (Windows "Copy as path")
-  if (
-    (clean.startsWith('"') && clean.endsWith('"')) ||
-    (clean.startsWith("'") && clean.endsWith("'"))
-  ) {
-    clean = clean.slice(1, -1).trim();
-  }
-
   // If YouTube URL, convert to embed URL or keep
   if (clean.includes("youtube.com/watch?v=")) {
     const videoId = clean.split("v=")[1]?.split("&")[0];
@@ -136,7 +128,7 @@ if (typeof window !== "undefined" && "BroadcastChannel" in window) {
     syncChannel.onmessage = () => {
       galleryListeners.forEach((l) => l());
     };
-  } catch {}
+  } catch { }
 }
 
 function notifyGalleryListeners() {
@@ -144,7 +136,7 @@ function notifyGalleryListeners() {
   if (syncChannel) {
     try {
       syncChannel.postMessage("updated");
-    } catch {}
+    } catch { }
   }
 }
 
@@ -166,7 +158,7 @@ export function saveGalleryItems(items: GalleryItem[]): void {
   }));
   try {
     localStorage.setItem("macfiesta_gallery_items", JSON.stringify(normalized));
-  } catch {}
+  } catch { }
   notifyGalleryListeners();
 }
 
@@ -181,20 +173,6 @@ export function addGalleryItem(item: Omit<GalleryItem, "id" | "date">): GalleryI
   };
   saveGalleryItems([newItem, ...current]);
   return newItem;
-}
-
-export function updateGalleryItem(updatedItem: GalleryItem): void {
-  const current = getGalleryItems();
-  const updated = current.map((i) =>
-    i.id === updatedItem.id
-      ? {
-          ...updatedItem,
-          url: normalizeMediaPath(updatedItem.url),
-          thumbnailUrl: updatedItem.thumbnailUrl ? normalizeMediaPath(updatedItem.thumbnailUrl) : undefined,
-        }
-      : i
-  );
-  saveGalleryItems(updated);
 }
 
 export function deleteGalleryItem(id: string): void {
@@ -238,7 +216,6 @@ export function useGalleryItems() {
     items,
     refresh,
     addItem: addGalleryItem,
-    updateItem: updateGalleryItem,
     deleteItem: deleteGalleryItem,
     saveItems: saveGalleryItems,
   };
