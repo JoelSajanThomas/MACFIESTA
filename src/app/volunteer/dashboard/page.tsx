@@ -146,12 +146,17 @@ export default function VolunteerDashboardPage() {
           </button>
 
           <Link
-            href="/volunteer/login"
+            href="/"
+            onClick={() => {
+              sessionStorage.clear();
+              localStorage.removeItem("macfiesta_volunteer_user");
+            }}
             className="p-2.5 rounded-xl bg-white/5 hover:bg-marvel-red/20 border border-white/10 hover:border-marvel-red text-white/70 hover:text-marvel-red transition-colors cursor-pointer"
-            title="Log Out Session"
+            title="Log Out Session to Main Homepage"
           >
             <RiLogoutBoxRLine className="text-base" />
           </Link>
+
         </div>
       </header>
 

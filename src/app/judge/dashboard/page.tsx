@@ -146,12 +146,17 @@ export default function JudgeDashboardPage() {
           </div>
 
           <Link
-            href="/judge/login"
+            href="/"
+            onClick={() => {
+              sessionStorage.clear();
+              localStorage.removeItem("macfiesta_judge_user");
+            }}
             className="p-2.5 rounded-xl bg-white/5 hover:bg-marvel-red/20 border border-white/10 hover:border-marvel-red text-white/70 hover:text-marvel-red transition-colors cursor-pointer"
-            title="Log Out Jury Session"
+            title="Log Out Jury Session to Main Homepage"
           >
             <RiLogoutBoxRLine className="text-base" />
           </Link>
+
         </div>
       </header>
 

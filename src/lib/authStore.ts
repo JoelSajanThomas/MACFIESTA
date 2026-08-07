@@ -150,8 +150,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       document.cookie = "macfiesta_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       document.cookie = "macfiesta_user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       set({ token: null, user: null, registrations: [] });
-      window.location.href = "/admin/login";
+      window.location.href = "/";
     } else {
+
       set({ token: null, user: null, registrations: [] });
     }
   },
