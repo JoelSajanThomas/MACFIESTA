@@ -3,11 +3,11 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-export default function JudgesPluralPage() {
+export default function JudgesDashboardRedirect() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace("/judge/login");
+    router.replace("/judge/dashboard");
   }, [router]);
 
   return (

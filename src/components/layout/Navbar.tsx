@@ -41,7 +41,13 @@ export function Navbar() {
   const { settings } = useFestivalControl();
   const pathname = usePathname();
   const isAdminPage = pathname?.startsWith("/admin");
-  const isStandalonePage = pathname?.startsWith("/admin") || pathname?.startsWith("/volunteer") || pathname?.startsWith("/volunteers");
+  const isStandalonePage =
+    pathname?.startsWith("/admin") ||
+    pathname?.startsWith("/volunteer") ||
+    pathname?.startsWith("/volunteers") ||
+    pathname?.startsWith("/judge") ||
+    pathname?.startsWith("/judges");
+
 
 
 

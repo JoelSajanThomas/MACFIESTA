@@ -23,7 +23,8 @@ const portals = [
   { label: "Command Console", href: "/admin" },
   { label: "Mission Control", href: "/admin/console" },
   { label: "Volunteer HQ", href: "/volunteer/login" },
-  { label: "Judge Command", href: "/admin/console" },
+  { label: "Judge Command", href: "/judge/login" },
+
 ];
 
 
@@ -45,7 +46,15 @@ const socialIcons: Record<string, React.ComponentType<{ size?: number }>> = {
 export function Footer() {
   const { settings } = useFestivalControl();
   const pathname = usePathname();
-  if (pathname?.startsWith("/admin") || pathname?.startsWith("/volunteer") || pathname?.startsWith("/volunteers")) return null;
+  if (
+    pathname?.startsWith("/admin") ||
+    pathname?.startsWith("/volunteer") ||
+    pathname?.startsWith("/volunteers") ||
+    pathname?.startsWith("/judge") ||
+    pathname?.startsWith("/judges")
+  )
+    return null;
+
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });

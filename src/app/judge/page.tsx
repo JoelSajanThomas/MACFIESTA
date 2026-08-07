@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-export default function JudgesPluralPage() {
+export default function JudgeRootPage() {
   const router = useRouter();
 
   useEffect(() => {
