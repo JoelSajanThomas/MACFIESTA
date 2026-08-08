@@ -9,15 +9,25 @@ const Event_1 = require("./models/Event");
 const Score_1 = require("./models/Score");
 const User_1 = require("./models/User");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const MONGODB_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/macfiesta";
+const MONGODB_URI = process.env.MONGODB_URI ||
+    process.env.MONGO_URI ||
+    "mongodb://127.0.0.1:27017/macfiesta";
 async function connectDB() {
+    const mongoUri = MONGODB_URI;
+    if (!mongoUri || mongoUri === "mongodb://127.0.0.1:27017/macfiesta") {
+        console.warn("⚠️ No remote MongoDB URI configured. Running in Local In-Memory Fallback Mode.");
+        return;
+    }
     try {
-        await mongoose_1.default.connect(MONGODB_URI, { serverSelectionTimeoutMS: 3000 });
-        console.log("Connected to MongoDB database successfully.");
+        await mongoose_1.default.connect(mongoUri, {
+            serverSelectionTimeoutMS: 10000,
+        });
+        console.log("✅ Connected to MongoDB successfully.");
         await seedDatabase();
     }
     catch (error) {
-        console.warn("Database connection failure. Running server in Local In-Memory Fallback Mode.");
+        console.error("❌ MongoDB connection failed:", error);
+        console.warn("⚠️ Running server in Local In-Memory Fallback Mode.");
     }
 }
 async function seedDatabase() {
@@ -39,7 +49,7 @@ async function seedDatabase() {
                         "Decisions of the gaming coordinators are final and binding."
                     ],
                     coverImage: "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=800&auto=format&fit=crop",
-                    date: "13 Nov 2026",
+                    date: "24 Sep 2026",
                     time: "Day 1, 11:00 AM onwards",
                     venue: "MACFAST Esports Lounge",
                     category: "gaming",
@@ -65,7 +75,7 @@ async function seedDatabase() {
                         "Re-entry is allowed only under coordinator authorization."
                     ],
                     coverImage: "https://images.unsplash.com/photo-1506157786151-b8491531f063?q=80&w=800&auto=format&fit=crop",
-                    date: "14 Nov 2026",
+                    date: "25 Sep 2026",
                     time: "Day 2, 06:00 PM - 10:00 PM",
                     venue: "Main Campus Athletic Grounds",
                     category: "cultural",
@@ -91,7 +101,7 @@ async function seedDatabase() {
                         "Use of open source libraries is encouraged with attribution."
                     ],
                     coverImage: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=800&auto=format&fit=crop",
-                    date: "13 Nov 2026",
+                    date: "24 Sep 2026",
                     time: "Day 1, 10:00 AM onwards",
                     venue: "MACFAST Computer Labs",
                     category: "technical",
@@ -149,16 +159,19 @@ async function seedDatabase() {
                 console.log("Seeded default scores successfully.");
             }
         }
-        // 3. Seed Default Admin & Student Users
-        const adminUser = await User_1.User.findOne({ role: "admin" });
-        if (!adminUser) {
-            console.log("Seeding default admin user...");
-            const salt = await bcryptjs_1.default.genSalt(10);
-            const hashedPassword = await bcryptjs_1.default.hash("admin123", salt);
-            await User_1.User.create({
+        // 3. Seed / Upsert Default Admin & Student Users
+        // Using upsert ensures the "old id and password" accounts ALWAYS exist on
+        // Atlas, even if they were deleted or the DB was re-created/shared. The
+        // hashed passwords are refreshed each connect so the known default
+        // credentials always authenticate.
+        const salt = await bcryptjs_1.default.genSalt(10);
+        const adminHash = await bcryptjs_1.default.hash("admin123", salt);
+        const studentHash = await bcryptjs_1.default.hash("student123", salt);
+        const adminUser = await User_1.User.findOneAndUpdate({ email: "admin@macfast.org" }, {
+            $set: {
                 name: "Admin User",
                 email: "admin@macfast.org",
-                password: hashedPassword,
+                password: adminHash,
                 phone: "+91 99999 99999",
                 college: "MACFAST Tiruvalla",
                 department: "Management",
@@ -166,18 +179,14 @@ async function seedDatabase() {
                 role: "admin",
                 xpPoints: 1000,
                 badges: [{ id: "god-mode", name: "Grand Organizer" }]
-            });
-            console.log("Seeded default admin user successfully.");
-        }
-        const studentUser = await User_1.User.findOne({ email: "student@macfast.org" });
-        if (!studentUser) {
-            console.log("Seeding default student user...");
-            const salt = await bcryptjs_1.default.genSalt(10);
-            const hashedPassword = await bcryptjs_1.default.hash("student123", salt);
-            await User_1.User.create({
+            }
+        }, { upsert: true, new: true, setDefaultsOnInsert: true });
+        console.log(`Seeded default admin user (${adminUser.email}) successfully.`);
+        const studentUser = await User_1.User.findOneAndUpdate({ email: "student@macfast.org" }, {
+            $set: {
                 name: "Joel Shaji",
                 email: "student@macfast.org",
-                password: hashedPassword,
+                password: studentHash,
                 phone: "+91 94470 99999",
                 college: "MACFAST Tiruvalla",
                 department: "Computer Applications",
@@ -185,9 +194,9 @@ async function seedDatabase() {
                 role: "student",
                 xpPoints: 120,
                 badges: [{ id: "newcomer", name: "Festival Pioneer" }]
-            });
-            console.log("Seeded default student user successfully.");
-        }
+            }
+        }, { upsert: true, new: true, setDefaultsOnInsert: true });
+        console.log(`Seeded default student user (${studentUser.email}) successfully.`);
     }
     catch (error) {
         console.error("Database seeding failure:", error);

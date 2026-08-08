@@ -4,15 +4,30 @@ import { Score } from "./models/Score";
 import { User } from "./models/User";
 import bcrypt from "bcryptjs";
 
-const MONGODB_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/macfiesta";
+const MONGODB_URI =
+  process.env.MONGODB_URI ||
+  process.env.MONGO_URI ||
+  "mongodb://127.0.0.1:27017/macfiesta";
 
 export async function connectDB() {
+  const mongoUri = MONGODB_URI;
+
+  if (!mongoUri || mongoUri === "mongodb://127.0.0.1:27017/macfiesta") {
+    console.warn("⚠️ No remote MongoDB URI configured. Running in Local In-Memory Fallback Mode.");
+    return;
+  }
+
   try {
-    await mongoose.connect(MONGODB_URI, { serverSelectionTimeoutMS: 3000 });
-    console.log("Connected to MongoDB database successfully.");
+    await mongoose.connect(mongoUri, {
+      serverSelectionTimeoutMS: 10000,
+    });
+
+    console.log("✅ Connected to MongoDB successfully.");
+
     await seedDatabase();
   } catch (error) {
-    console.warn("Database connection failure. Running server in Local In-Memory Fallback Mode.");
+    console.error("❌ MongoDB connection failed:", error);
+    console.warn("⚠️ Running server in Local In-Memory Fallback Mode.");
   }
 }
 
@@ -150,46 +165,58 @@ async function seedDatabase() {
       }
     }
 
-    // 3. Seed Default Admin & Student Users
-    const adminUser = await User.findOne({ role: "admin" });
-    if (!adminUser) {
-      console.log("Seeding default admin user...");
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash("admin123", salt);
-      await User.create({
-        name: "Admin User",
-        email: "admin@macfast.org",
-        password: hashedPassword,
-        phone: "+91 99999 99999",
-        college: "MACFAST Tiruvalla",
-        department: "Management",
-        year: "Faculty",
-        role: "admin",
-        xpPoints: 1000,
-        badges: [{ id: "god-mode", name: "Grand Organizer" }]
-      });
-      console.log("Seeded default admin user successfully.");
-    }
+    // 3. Seed / Upsert Default Admin & Student Users
+    // Using upsert ensures the "old id and password" accounts ALWAYS exist on
+    // Atlas, even if they were deleted or the DB was re-created/shared. The
+    // hashed passwords are refreshed each connect so the known default
+    // credentials always authenticate.
+    const salt = await bcrypt.genSalt(10);
+    const adminHash = await bcrypt.hash("admin123", salt);
+    const studentHash = await bcrypt.hash("student123", salt);
 
-    const studentUser = await User.findOne({ email: "student@macfast.org" });
-    if (!studentUser) {
-      console.log("Seeding default student user...");
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash("student123", salt);
-      await User.create({
-        name: "Joel Shaji",
-        email: "student@macfast.org",
-        password: hashedPassword,
-        phone: "+91 94470 99999",
-        college: "MACFAST Tiruvalla",
-        department: "Computer Applications",
-        year: "MCA 2nd Year",
-        role: "student",
-        xpPoints: 120,
-        badges: [{ id: "newcomer", name: "Festival Pioneer" }]
-      });
-      console.log("Seeded default student user successfully.");
-    }
+    const adminUser = await User.findOneAndUpdate(
+      { email: "admin@macfast.org" },
+      {
+        $set: {
+          name: "Admin User",
+          email: "admin@macfast.org",
+          password: adminHash,
+          phone: "+91 99999 99999",
+          college: "MACFAST Tiruvalla",
+          department: "Management",
+          year: "Faculty",
+          role: "admin",
+          xpPoints: 1000,
+          badges: [{ id: "god-mode", name: "Grand Organizer" }]
+        }
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+    console.log(
+      `Seeded default admin user (${adminUser.email}) successfully.`
+    );
+
+    const studentUser = await User.findOneAndUpdate(
+      { email: "student@macfast.org" },
+      {
+        $set: {
+          name: "Joel Shaji",
+          email: "student@macfast.org",
+          password: studentHash,
+          phone: "+91 94470 99999",
+          college: "MACFAST Tiruvalla",
+          department: "Computer Applications",
+          year: "MCA 2nd Year",
+          role: "student",
+          xpPoints: 120,
+          badges: [{ id: "newcomer", name: "Festival Pioneer" }]
+        }
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+    console.log(
+      `Seeded default student user (${studentUser.email}) successfully.`
+    );
   } catch (error) {
     console.error("Database seeding failure:", error);
   }

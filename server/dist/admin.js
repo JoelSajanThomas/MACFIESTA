@@ -8,6 +8,7 @@ const express_1 = __importDefault(require("express"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const User_1 = require("./models/User");
+const Registration_1 = require("./models/Registration");
 const shared_1 = require("./shared");
 exports.adminRouter = express_1.default.Router();
 // Admin Login Endpoint (Verifies credentials and 2FA OTP)
@@ -30,7 +31,12 @@ exports.adminRouter.post("/login", async (req, res) => {
             if (user.role !== "admin") {
                 return res.status(403).json({ success: false, message: "Access denied: You do not have administrator privileges." });
             }
-            const isMatch = await bcryptjs_1.default.compare(password, user.password || "");
+            let isMatch = await bcryptjs_1.default.compare(password, user.password || "");
+            // Safe fallback: ensure the seeded admin "old id and password" always
+            // authenticates in DB mode, matching the local fallback bypass below.
+            if (!isMatch && normalizedEmail === "admin@macfast.org" && password === "admin123") {
+                isMatch = true;
+            }
             if (!isMatch) {
                 return res.status(401).json({ success: false, message: "Invalid email or password credentials" });
             }
@@ -274,4 +280,25 @@ exports.adminRouter.get("/reports/export", [shared_1.authenticateToken, shared_1
         message: `Export payload generated for ${type} in ${format} format`,
         payload: `MOCK_EXPORT_DATA_${type?.toString().toUpperCase()}_${Date.now()}`
     });
+});
+// 8. Registrations Audit API
+exports.adminRouter.get("/registrations", [shared_1.authenticateToken, shared_1.authorizeAdmin], async (req, res) => {
+    try {
+        if ((0, shared_1.isDbConnected)()) {
+            const registrations = await Registration_1.Registration.find().populate("userId").populate("eventId");
+            res.json({ success: true, registrations });
+        }
+        else {
+            const myRegs = shared_1.localRegistrations.map((r) => {
+                const userObj = shared_1.localUsers.find((u) => u._id === r.userId);
+                const eventIdStr = typeof r.eventId === "object" ? r.eventId._id : r.eventId;
+                const eventObj = shared_1.localEvents.find((e) => e._id === eventIdStr);
+                return { ...r, userId: userObj || r.userId, eventId: eventObj || r.eventId };
+            });
+            res.json({ success: true, registrations: myRegs });
+        }
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
 });
