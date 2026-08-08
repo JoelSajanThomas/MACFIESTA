@@ -40,9 +40,10 @@
 - [x] Deploy backend to Render (commit `25b7f02` pushed to `origin/main` — Render auto-deploy triggered)
 - [x] Point frontend to Render backend (commit `86d3119`: `src/lib/constants.ts` now uses `https://macfiesta-api.onrender.com`)
 - [x] Verified Render backend is live → `/api/health` returns HTTP 200
-- [ ] **CRITICAL**: Render backend reports `mode: "fallback"` (NOT connected to Atlas). The `server/.env` with `MONGO_URI` is gitignored, so Atlas URI is missing on Render. Must add `MONGODB_URI`/`MONGO_URI` env var in Render dashboard → redeploy.
-- [ ] Add `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_SOCKET_URL` in Vercel project settings (user action) — optional now that constants.ts is hardcoded
-- [ ] Redeploy frontend on Vercel (user action)
+- [x] **Verified backend login WORKS on Render** (node test): `student@macfast.org`/`student123` and `admin@macfast.org`/`admin123` both return success + JWT tokens. Backend is fully functional.
+- [x] **Verified frontend build bakes in Render URL**: ran `npm run build` → `out/_next/static/chunks/36ydp4amhu_s3.js` contains `https://macfiesta-api.onrender.com/api`. Build is correct.
+- [ ] **ACTION NEEDED (Vercel)**: Redeploy frontend on Vercel from latest `main` (commit `7c69155`). The current Vercel site serves a STALE build pointing to `localhost:5000`. Pushing to `main` triggers auto-deploy if connected; otherwise click "Redeploy" in Vercel.
+- [ ] **ACTION NEEDED (Render, optional for Atlas)**: Render reports `mode: "fallback"` (NOT connected to Atlas). `server/.env` with Atlas `MONGO_URI` is gitignored. To use real Atlas data, add `MONGODB_URI`/`MONGO_URI` env var in Render dashboard → redeploy. (Not required for seeded login to work.)
 - [ ] Verify login with `admin@macfast.org`/`admin123` and `student@macfast.org`/`student123` from all panels
 
 ## Dependent Files Edited
