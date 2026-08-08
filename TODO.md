@@ -43,7 +43,9 @@
 - [x] **Verified backend login WORKS on Render** (node test): `student@macfast.org`/`student123` and `admin@macfast.org`/`admin123` both return success + JWT tokens. Backend is fully functional.
 - [x] **Verified frontend build bakes in Render URL**: ran `npm run build` → `out/_next/static/chunks/36ydp4amhu_s3.js` contains `https://macfiesta-api.onrender.com/api`. Build is correct.
 - [ ] **ACTION NEEDED (Vercel)**: Redeploy frontend on Vercel from latest `main` (commit `7c69155`). The current Vercel site serves a STALE build pointing to `localhost:5000`. Pushing to `main` triggers auto-deploy if connected; otherwise click "Redeploy" in Vercel.
-- [ ] **ACTION NEEDED (Render, optional for Atlas)**: Render reports `mode: "fallback"` (NOT connected to Atlas). `server/.env` with Atlas `MONGO_URI` is gitignored. To use real Atlas data, add `MONGODB_URI`/`MONGO_URI` env var in Render dashboard → redeploy. (Not required for seeded login to work.)
+- [x] **Diagnosed Atlas `bad auth`**: Render logs show `MongoServerError: bad auth : Authentication failed` (Atlas code 8000). Backend code & login endpoints are correct; the connection string on Render is being rejected by Atlas.
+- [x] **Added password-redacted Atlas target logging** (`server/src/db.ts`, committed `190da6f`): next Render deploy will print `mongodb+srv://<user>:******@<host>/<db>` so the exact host/username/credential can be verified. No password is ever logged.
+- [ ] **ACTION NEEDED (Render dashboard)**: Confirm the `MONGO_URI`/`MONGODB_URI` env var value. The `bad auth` means either (a) the Atlas database user password in the URI is wrong/expired, or (b) the Atlas Network Access does not allow Render's IP. Fix the URI in Render → redeploy. Logs will now show the redacted target to compare with the working local `server/.env`.
 - [ ] Verify login with `admin@macfast.org`/`admin123` and `student@macfast.org`/`student123` from all panels
 
 ## Dependent Files Edited
