@@ -16,11 +16,24 @@ async function connectDB() {
     const mongoUri = MONGODB_URI;
     if (!mongoUri || mongoUri === "mongodb://127.0.0.1:27017/macfiesta") {
         console.warn("⚠️ No remote MongoDB URI configured. Running in Local In-Memory Fallback Mode.");
+        console.warn("   → Set the MONGODB_URI (or MONGO_URI) environment variable in the Render dashboard");
+        console.warn("     to your MongoDB Atlas connection string, e.g. mongodb+srv://<user>:<password>@<cluster>.mongodb.net/<db>");
         return;
+    }
+    // Print a SAFE, password-redacted summary of the Atlas target so the
+    // server logs make it easy to diagnose a wrong host/username/password.
+    try {
+        const safe = mongoUri.replace(/\/\/([^:@\/]+):[^@\/]*@/, "//$1:******@");
+        console.log("🔌 Attempting MongoDB connection →", safe);
+    }
+    catch {
+        console.log("🔌 Attempting MongoDB connection...");
     }
     try {
         await mongoose_1.default.connect(mongoUri, {
             serverSelectionTimeoutMS: 10000,
+            // Atlas uses SCRAM auth; authSource defaults to 'admin' for SRV URIs.
+            // Not forcing authSource here so both local and SRV URIs keep working.
         });
         console.log("✅ Connected to MongoDB successfully.");
         await seedDatabase();
