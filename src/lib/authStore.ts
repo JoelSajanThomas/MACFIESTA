@@ -165,8 +165,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         sessionStorage.setItem("macfiesta_user", JSON.stringify(user));
       }
       set({ user });
-    } catch (err) {
-      console.error("Failed to fetch profile", err);
+    } catch (err: any) {
+      const status = err?.response?.status;
+      // 404 = user deleted from DB, 401 = token expired/invalid → clear stale session
+      if (status === 404 || status === 401 || status === 403) {
+        console.warn("Session invalid or user not found — clearing stale session.");
+        if (typeof window !== "undefined") {
+          sessionStorage.removeItem("macfiesta_token");
+          sessionStorage.removeItem("macfiesta_user");
+        }
+        set({ token: null, user: null });
+      } else {
+        console.error("Failed to fetch profile", err);
+      }
     }
   },
 
