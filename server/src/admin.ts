@@ -119,8 +119,16 @@ adminRouter.post("/login", async (req: Request, res: Response) => {
 });
 
 // 1. User Management APIs
-adminRouter.get("/users", [authenticateToken, authorizeAdmin] as any, (req: Request, res: Response) => {
-  res.json({ success: true, users: localUsers });
+adminRouter.get("/users", [authenticateToken, authorizeAdmin] as any, async (req: Request, res: Response) => {
+  try {
+    if (isDbConnected()) {
+      const users = await User.find().select("-password").lean();
+      return res.json({ success: true, users });
+    }
+    res.json({ success: true, users: localUsers });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 });
 
 adminRouter.put("/users/:id", [authenticateToken, authorizeAdmin] as any, (req: Request, res: Response) => {
