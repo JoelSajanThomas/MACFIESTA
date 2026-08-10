@@ -1,20 +1,23 @@
+import dotenv from "dotenv";
 import mongoose from "mongoose";
 import { Event } from "./models/Event";
 import { Score } from "./models/Score";
 import { User } from "./models/User";
 import bcrypt from "bcryptjs";
 
-const MONGODB_URI =
-  process.env.MONGODB_URI ||
-  process.env.MONGO_URI ||
-  "mongodb://127.0.0.1:27017/macfiesta";
+// Load .env before anything reads process.env
+dotenv.config();
 
 export async function connectDB() {
-  const mongoUri = MONGODB_URI;
+  // Read URI inside the function so it's always evaluated after dotenv.config()
+  const mongoUri =
+    process.env.MONGODB_URI ||
+    process.env.MONGO_URI ||
+    "mongodb://127.0.0.1:27017/macfiesta";
 
   if (!mongoUri || mongoUri === "mongodb://127.0.0.1:27017/macfiesta") {
     console.warn("⚠️ No remote MongoDB URI configured. Running in Local In-Memory Fallback Mode.");
-    console.warn("   → Set the MONGODB_URI (or MONGO_URI) environment variable in the Render dashboard");
+    console.warn("   → Set the MONGODB_URI (or MONGO_URI) environment variable in server/.env");
     console.warn("     to your MongoDB Atlas connection string, e.g. mongodb+srv://<user>:<password>@<cluster>.mongodb.net/<db>");
     return;
   }
