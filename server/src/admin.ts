@@ -337,6 +337,11 @@ adminRouter.get("/logs", [authenticateToken, authorizeAdmin] as any, (req: Reque
   res.json({ success: true, logs: localAuditLogs });
 });
 
+// Alias: /audit-logs (used by the admin console frontend)
+adminRouter.get("/audit-logs", [authenticateToken, authorizeAdmin] as any, (req: Request, res: Response) => {
+  res.json({ success: true, logs: localAuditLogs });
+});
+
 // 7. Mock Report Export API
 adminRouter.get("/reports/export", [authenticateToken, authorizeAdmin] as any, (req: Request, res: Response) => {
   const { format, type } = req.query;
@@ -366,3 +371,55 @@ adminRouter.get("/registrations", [authenticateToken, authorizeAdmin] as any, as
     res.status(500).json({ success: false, message: error.message });
   }
 });
+
+// 9. QR Check-In API (used by admin console for participant check-in)
+adminRouter.post("/qr-checkin", [authenticateToken, authorizeAdmin] as any, async (req: Request, res: Response) => {
+  try {
+    const { passCode } = req.body;
+    if (!passCode) {
+      return res.status(400).json({ success: false, message: "passCode is required" });
+    }
+
+    const adminEmail = (req as any).user?.email || "admin@macfast.org";
+
+    if (isDbConnected()) {
+      const registration = await Registration.findOne({ passCode });
+      if (!registration) {
+        return res.status(404).json({ success: false, message: "Registration not found for this passCode" });
+      }
+      if ((registration as any).status === "CHECKED_IN") {
+        return res.status(400).json({ success: false, message: "Participant already checked in" });
+      }
+      (registration as any).status = "CHECKED_IN";
+      (registration as any).qrCheckedIn = true;
+      await (registration as any).save();
+      localAuditLogs.unshift({
+        _id: `log-${Date.now()}`,
+        admin: adminEmail,
+        action: `QR Check-In: passCode ${passCode}`,
+        timestamp: new Date().toISOString()
+      });
+      return res.json({ success: true, message: "Participant checked in successfully", registration });
+    } else {
+      const regIdx = localRegistrations.findIndex((r) => r.passCode === passCode);
+      if (regIdx === -1) {
+        return res.status(404).json({ success: false, message: "Registration not found for this passCode" });
+      }
+      if (localRegistrations[regIdx].status === "CHECKED_IN") {
+        return res.status(400).json({ success: false, message: "Participant already checked in" });
+      }
+      localRegistrations[regIdx].status = "CHECKED_IN";
+      localRegistrations[regIdx].qrCheckedIn = true;
+      localAuditLogs.unshift({
+        _id: `log-${Date.now()}`,
+        admin: adminEmail,
+        action: `QR Check-In: passCode ${passCode}`,
+        timestamp: new Date().toISOString()
+      });
+      return res.json({ success: true, message: "Participant checked in successfully", registration: localRegistrations[regIdx] });
+    }
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+

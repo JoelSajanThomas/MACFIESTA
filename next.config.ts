@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: 'export',
   images: {
     unoptimized: true,
     remotePatterns: [
@@ -23,9 +22,6 @@ const nextConfig: NextConfig = {
   // Enable experimental features for better performance
   experimental: {
     optimizeCss: false,
-    serverActions: {
-      allowedOrigins: ["192.168.0.101:3000", "localhost:3000"],
-    },
   },
 };
 

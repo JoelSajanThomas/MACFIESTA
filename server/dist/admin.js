@@ -99,8 +99,17 @@ exports.adminRouter.post("/login", async (req, res) => {
     }
 });
 // 1. User Management APIs
-exports.adminRouter.get("/users", [shared_1.authenticateToken, shared_1.authorizeAdmin], (req, res) => {
-    res.json({ success: true, users: shared_1.localUsers });
+exports.adminRouter.get("/users", [shared_1.authenticateToken, shared_1.authorizeAdmin], async (req, res) => {
+    try {
+        if ((0, shared_1.isDbConnected)()) {
+            const users = await User_1.User.find().select("-password").lean();
+            return res.json({ success: true, users });
+        }
+        res.json({ success: true, users: shared_1.localUsers });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
 });
 exports.adminRouter.put("/users/:id", [shared_1.authenticateToken, shared_1.authorizeAdmin], (req, res) => {
     const { id } = req.params;
@@ -272,6 +281,10 @@ exports.adminRouter.post("/announcements", [shared_1.authenticateToken, shared_1
 exports.adminRouter.get("/logs", [shared_1.authenticateToken, shared_1.authorizeAdmin], (req, res) => {
     res.json({ success: true, logs: shared_1.localAuditLogs });
 });
+// Alias: /audit-logs (used by the admin console frontend)
+exports.adminRouter.get("/audit-logs", [shared_1.authenticateToken, shared_1.authorizeAdmin], (req, res) => {
+    res.json({ success: true, logs: shared_1.localAuditLogs });
+});
 // 7. Mock Report Export API
 exports.adminRouter.get("/reports/export", [shared_1.authenticateToken, shared_1.authorizeAdmin], (req, res) => {
     const { format, type } = req.query;
@@ -296,6 +309,56 @@ exports.adminRouter.get("/registrations", [shared_1.authenticateToken, shared_1.
                 return { ...r, userId: userObj || r.userId, eventId: eventObj || r.eventId };
             });
             res.json({ success: true, registrations: myRegs });
+        }
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+// 9. QR Check-In API (used by admin console for participant check-in)
+exports.adminRouter.post("/qr-checkin", [shared_1.authenticateToken, shared_1.authorizeAdmin], async (req, res) => {
+    try {
+        const { passCode } = req.body;
+        if (!passCode) {
+            return res.status(400).json({ success: false, message: "passCode is required" });
+        }
+        const adminEmail = req.user?.email || "admin@macfast.org";
+        if ((0, shared_1.isDbConnected)()) {
+            const registration = await Registration_1.Registration.findOne({ passCode });
+            if (!registration) {
+                return res.status(404).json({ success: false, message: "Registration not found for this passCode" });
+            }
+            if (registration.status === "CHECKED_IN") {
+                return res.status(400).json({ success: false, message: "Participant already checked in" });
+            }
+            registration.status = "CHECKED_IN";
+            registration.qrCheckedIn = true;
+            await registration.save();
+            shared_1.localAuditLogs.unshift({
+                _id: `log-${Date.now()}`,
+                admin: adminEmail,
+                action: `QR Check-In: passCode ${passCode}`,
+                timestamp: new Date().toISOString()
+            });
+            return res.json({ success: true, message: "Participant checked in successfully", registration });
+        }
+        else {
+            const regIdx = shared_1.localRegistrations.findIndex((r) => r.passCode === passCode);
+            if (regIdx === -1) {
+                return res.status(404).json({ success: false, message: "Registration not found for this passCode" });
+            }
+            if (shared_1.localRegistrations[regIdx].status === "CHECKED_IN") {
+                return res.status(400).json({ success: false, message: "Participant already checked in" });
+            }
+            shared_1.localRegistrations[regIdx].status = "CHECKED_IN";
+            shared_1.localRegistrations[regIdx].qrCheckedIn = true;
+            shared_1.localAuditLogs.unshift({
+                _id: `log-${Date.now()}`,
+                admin: adminEmail,
+                action: `QR Check-In: passCode ${passCode}`,
+                timestamp: new Date().toISOString()
+            });
+            return res.json({ success: true, message: "Participant checked in successfully", registration: shared_1.localRegistrations[regIdx] });
         }
     }
     catch (error) {

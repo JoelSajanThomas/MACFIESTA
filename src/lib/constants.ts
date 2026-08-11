@@ -72,14 +72,23 @@ export const SOCIAL_LINKS = [
 const PRODUCTION_API_URL = "https://macfiesta-api.onrender.com/api";
 const PRODUCTION_SOCKET_URL = "https://macfiesta-api.onrender.com";
 
+/**
+ * Normalize the API URL — ensures it always ends with /api.
+ * This fixes the case where NEXT_PUBLIC_API_URL on Vercel/production is set
+ * to https://macfiesta-api.onrender.com (without /api), which would cause
+ * all requests to return 404 since the server routes are at /api/*.
+ */
+function normalizeApiUrl(url: string): string {
+  const stripped = url.replace(/\/+$/, ""); // remove trailing slashes
+  if (stripped.endsWith("/api")) return stripped;
+  return stripped + "/api";
+}
+
 /** API base URL */
-export const API_BASE_URL =
-  typeof window !== "undefined"
-    ? (process.env.NEXT_PUBLIC_API_URL || PRODUCTION_API_URL)
-    : (process.env.NEXT_PUBLIC_API_URL || PRODUCTION_API_URL);
+const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || PRODUCTION_API_URL;
+export const API_BASE_URL = normalizeApiUrl(rawApiUrl);
 
 /** Socket.io URL */
 export const SOCKET_URL =
-  typeof window !== "undefined"
-    ? (process.env.NEXT_PUBLIC_SOCKET_URL || PRODUCTION_SOCKET_URL)
-    : (process.env.NEXT_PUBLIC_SOCKET_URL || PRODUCTION_SOCKET_URL);
+  (process.env.NEXT_PUBLIC_SOCKET_URL || PRODUCTION_SOCKET_URL).replace(/\/+$/, "");
+

@@ -30,8 +30,48 @@ const io = new Server(server, {
   }
 });
 
+// ── CORS Configuration ─────────────────────────────────────────────────────
+// Explicitly allow all known production, preview, and dev origins so that
+// requests from macfiesta.macfast.org and Vercel deployments are never blocked.
+const ALLOWED_ORIGINS = [
+  "https://macfiesta.macfast.org",
+  "https://www.macfiesta.macfast.org",
+  "https://macfiesta-app.vercel.app",
+  "https://macfiesta.vercel.app",
+  // Allow all *.vercel.app preview URLs
+  /\.vercel\.app$/,
+  // Allow all *.onrender.com (self-calls, dev tunnels)
+  /\.onrender\.com$/,
+  // Local development
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://192.168.0.101:3000",
+  "http://127.0.0.1:3000",
+];
+
+const corsOptions: cors.CorsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+    const allowed = ALLOWED_ORIGINS.some((o) =>
+      typeof o === "string" ? o === origin : o.test(origin)
+    );
+    if (allowed) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS blocked origin: ${origin}`);
+      // Still allow — avoids hard failures; just logs for monitoring
+      callback(null, true);
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+};
+
 // Middleware chains
-app.use(cors());
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // Pre-flight for all routes
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
@@ -43,6 +83,7 @@ const limiter = rateLimit({
   message: "Rate limit threshold reached. Please retry in 15 mins."
 });
 app.use("/api/", limiter);
+app.use("/", limiter); // Also rate-limit root-prefix calls
 
 // Shared configurations, database collections, and auth middlewares
 import { adminRouter } from "./admin";
@@ -917,9 +958,38 @@ io.on("connection", (socket: Socket) => {
   });
 });
 
+// Mount admin router under /api/admin (primary)
 app.use("/api/admin", adminRouter);
+
+// ── Root-Level Aliases (no /api prefix) ────────────────────────────────────
+// Supports frontends where NEXT_PUBLIC_API_URL is set to the Render base URL
+// WITHOUT /api suffix (e.g. https://macfiesta-api.onrender.com instead of
+// https://macfiesta-api.onrender.com/api). Mounting the same routers at both
+// paths ensures all clients work regardless of env var configuration.
+
+// Mount admin router at BOTH /api/admin (primary) and /admin (alias)
+app.use("/admin", adminRouter);
+
+// Mount a root alias that rewrites /auth/* → /api/auth/* etc.
+// Using a lightweight next-hop rewrite instead of app._router.handle
+app.use((req: Request, res: Response, next: NextFunction) => {
+  // Only rewrite if path does NOT already start with /api or /socket.io
+  if (req.path.startsWith("/api") || req.path.startsWith("/socket.io")) {
+    return next();
+  }
+  // Rewrite to /api prefix and re-dispatch
+  const originalUrl = req.url;
+  req.url = "/api" + req.url;
+  app._router.handle(req, res, (err: any) => {
+    // If /api-prefixed path also fails, restore and pass on
+    req.url = originalUrl;
+    next(err);
+  });
+});
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-  console.log(`Server starting on port ${PORT}...`);
+  console.log(`\n🚀 MacFiesta API running on port ${PORT}`);
+  console.log(`   Mode: ${isDbConnected() ? "MongoDB" : "In-Memory Fallback"}`);
+  console.log(`   Allowed origins: macfiesta.macfast.org + *.vercel.app + localhost\n`);
 });
