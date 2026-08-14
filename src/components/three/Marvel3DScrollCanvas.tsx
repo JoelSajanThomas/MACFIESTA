@@ -31,6 +31,7 @@ export function Marvel3DScrollCanvas({
   const imagesRef = useRef<HTMLImageElement[]>([]);
   const currentFrameRef = useRef(1);
   const targetFrameRef = useRef(1);
+  const lastDrawnFrameRef = useRef(0);
   const rafRef = useRef<number | null>(null);
 
   // Generate frame path
@@ -39,7 +40,7 @@ export function Marvel3DScrollCanvas({
     return `/MARVEL/${seq}/frame_${padded}.jpg`;
   }, []);
 
-  // Preload frames
+  // Preload frames in chunks to keep main thread and network responsive
   useEffect(() => {
     let isCancelled = false;
     imagesRef.current = new Array(TOTAL_FRAMES + 1);
@@ -60,9 +61,15 @@ export function Marvel3DScrollCanvas({
       drawFrame(1);
     };
 
-    // Load remaining frames in batches
-    const loadRemaining = () => {
-      for (let i = 2; i <= TOTAL_FRAMES; i++) {
+    // Load remaining frames in batches of 12
+    let currentBatchStart = 2;
+    const CHUNK_SIZE = 12;
+
+    const loadNextBatch = () => {
+      if (isCancelled || currentBatchStart > TOTAL_FRAMES) return;
+
+      const end = Math.min(TOTAL_FRAMES, currentBatchStart + CHUNK_SIZE);
+      for (let i = currentBatchStart; i <= end; i++) {
         const img = new Image();
         img.src = getFramePath(sequence, i);
         img.onload = () => {
@@ -77,10 +84,13 @@ export function Marvel3DScrollCanvas({
           setLoadedCount(count);
         };
       }
+      currentBatchStart = end + 1;
+      if (currentBatchStart <= TOTAL_FRAMES) {
+        setTimeout(loadNextBatch, 30);
+      }
     };
 
-    // Trigger after a tiny tick to prioritize first frame
-    const timer = setTimeout(loadRemaining, 50);
+    const timer = setTimeout(loadNextBatch, 100);
 
     return () => {
       isCancelled = true;
@@ -95,10 +105,9 @@ export function Marvel3DScrollCanvas({
     const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) return;
 
-    // Fallback search if current frame isn't loaded yet: search nearest loaded frame
+    // Fallback search if current frame isn't loaded yet
     let imgToDraw = imagesRef.current[frameIdx];
     if (!imgToDraw || !imgToDraw.complete || imgToDraw.naturalWidth === 0) {
-      // Find nearest loaded frame
       for (let offset = 1; offset < TOTAL_FRAMES; offset++) {
         const prev = imagesRef.current[frameIdx - offset];
         if (prev && prev.complete && prev.naturalWidth > 0) {
@@ -117,8 +126,6 @@ export function Marvel3DScrollCanvas({
 
     const width = canvas.width;
     const height = canvas.height;
-
-    // Calculate aspect ratio cover
     const imgWidth = imgToDraw.naturalWidth;
     const imgHeight = imgToDraw.naturalHeight;
     const imgAspect = imgWidth / imgHeight;
@@ -130,29 +137,28 @@ export function Marvel3DScrollCanvas({
     let offsetY = 0;
 
     if (canvasAspect > imgAspect) {
-      // Canvas is wider than image
       renderHeight = width / imgAspect;
       offsetY = (height - renderHeight) / 2;
     } else {
-      // Canvas is taller than image
       renderWidth = height * imgAspect;
       offsetX = (width - renderWidth) / 2;
     }
 
     ctx.drawImage(imgToDraw, offsetX, offsetY, renderWidth, renderHeight);
+    lastDrawnFrameRef.current = frameIdx;
   }, []);
 
-  // Resize handler
+  // Resize handler — capped DPR for peak GPU performance
   useEffect(() => {
     const handleResize = () => {
       const canvas = canvasRef.current;
       if (!canvas) return;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.25);
       const w = window.innerWidth;
       const h = window.innerHeight;
 
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
       canvas.style.width = `${w}px`;
       canvas.style.height = `${h}px`;
 
@@ -164,13 +170,20 @@ export function Marvel3DScrollCanvas({
     return () => window.removeEventListener("resize", handleResize);
   }, [drawFrame]);
 
-  // Mouse move tilt handler
+  // Mouse move tilt handler (debounced)
   useEffect(() => {
+    let ticking = false;
     const handleMouseMove = (e: MouseEvent) => {
-      const nx = (e.clientX / window.innerWidth - 0.5) * 2;
-      const ny = (e.clientY / window.innerHeight - 0.5) * 2;
-      mouseTiltRef.current.targetX = nx * 5; // max 5deg tilt
-      mouseTiltRef.current.targetY = ny * -5;
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const nx = (e.clientX / window.innerWidth - 0.5) * 2;
+          const ny = (e.clientY / window.innerHeight - 0.5) * 2;
+          mouseTiltRef.current.targetX = nx * 3; // max 3deg subtle tilt
+          mouseTiltRef.current.targetY = ny * -3;
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
@@ -183,8 +196,6 @@ export function Marvel3DScrollCanvas({
       const scrollY = window.scrollY || document.documentElement.scrollTop;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
       const progress = docHeight > 0 ? Math.min(1, Math.max(0, scrollY / docHeight)) : 0;
-
-      setScrollProgress(progress);
 
       // Map progress [0, 1] to frame index [1, TOTAL_FRAMES]
       const targetIdx = Math.max(1, Math.min(TOTAL_FRAMES, Math.floor(progress * (TOTAL_FRAMES - 1)) + 1));
@@ -201,20 +212,21 @@ export function Marvel3DScrollCanvas({
 
       // Smooth frame scrubbing
       const diff = targetFrameRef.current - currentFrameRef.current;
-      if (Math.abs(diff) > 0.01) {
-        currentFrameRef.current += diff * 0.12; // Physics lerp
+      if (Math.abs(diff) > 0.05) {
+        currentFrameRef.current += diff * 0.18; // Responsive lerp
         const frameToDraw = Math.max(1, Math.min(TOTAL_FRAMES, Math.round(currentFrameRef.current)));
-        setCurrentFrameIndex(frameToDraw);
-        drawFrame(frameToDraw);
+        if (frameToDraw !== lastDrawnFrameRef.current) {
+          drawFrame(frameToDraw);
+        }
       }
 
       // Smooth mouse tilt
       const tilt = mouseTiltRef.current;
-      tilt.x += (tilt.targetX - tilt.x) * 0.05;
-      tilt.y += (tilt.targetY - tilt.y) * 0.05;
+      tilt.x += (tilt.targetX - tilt.x) * 0.06;
+      tilt.y += (tilt.targetY - tilt.y) * 0.06;
 
       if (containerRef.current) {
-        containerRef.current.style.transform = `perspective(1200px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg) scale(1.02)`;
+        containerRef.current.style.transform = `perspective(1000px) rotateX(${tilt.y.toFixed(2)}deg) rotateY(${tilt.x.toFixed(2)}deg)`;
       }
 
       rafRef.current = requestAnimationFrame(renderLoop);
