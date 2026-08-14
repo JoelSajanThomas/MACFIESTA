@@ -15,7 +15,7 @@ export function MusicVisualizer({ isPlaying = false }: { isPlaying?: boolean }) 
         const duration = `${0.8 + ((i * 13) % 9) * 0.08}s`;
         const height = 30 + ((i * 17) % 8) * 8;
 
-        const animationStyle = isPlaying 
+        const animationStyle = isPlaying
           ? `visualizer-bar ${duration} ease-in-out ${delay} infinite`
           : "none";
         const heightStyle = isPlaying ? `${height}%` : "15%";
@@ -27,10 +27,10 @@ export function MusicVisualizer({ isPlaying = false }: { isPlaying?: boolean }) 
             style={{
               height: heightStyle,
               background: `linear-gradient(to top, 
-                ${i % 5 === 0 ? "#EAB308" : 
-                  i % 5 === 1 ? "#7C3AED" : 
-                  i % 5 === 2 ? "#06B6D4" : 
-                  i % 5 === 3 ? "#EC4899" : "#F97316"
+                ${i % 5 === 0 ? "#EAB308" :
+                  i % 5 === 1 ? "#7C3AED" :
+                    i % 5 === 2 ? "#06B6D4" :
+                      i % 5 === 3 ? "#EC4899" : "#F97316"
                 },
                 transparent
               )`,

@@ -23,6 +23,8 @@ import {
 import { useAuthStore } from "@/lib/authStore";
 import { downloadEventTicketPDF, generateQRCodeDataUrl } from "@/lib/ticketGenerator";
 
+import { getSocket } from "@/lib/socket";
+
 export default function DashboardPage() {
   const router = useRouter();
   const { user, token, registrations, cancelRegistration, fetchProfile, fetchRegistrations, isInitialized } = useAuthStore();
@@ -49,6 +51,22 @@ export default function DashboardPage() {
     if (token) {
       fetchProfile();
       fetchRegistrations();
+
+      const socket = getSocket();
+      const handleSync = () => {
+        fetchProfile();
+        fetchRegistrations();
+      };
+
+      socket.on("registrations-changed", handleSync);
+      socket.on("qr-checked-in", handleSync);
+      socket.on("users-changed", handleSync);
+
+      return () => {
+        socket.off("registrations-changed", handleSync);
+        socket.off("qr-checked-in", handleSync);
+        socket.off("users-changed", handleSync);
+      };
     }
   }, [token, fetchProfile, fetchRegistrations]);
 

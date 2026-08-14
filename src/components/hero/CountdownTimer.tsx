@@ -3,22 +3,26 @@
 import { useState, useEffect } from "react";
 import { getTimeRemaining } from "@/lib/utils";
 import { FESTIVAL_CONFIG } from "@/lib/constants";
+import { useFestivalControl } from "@/lib/festivalStore";
 
 /**
  * Animated flip-clock style countdown timer.
  * Each unit (days/hours/minutes/seconds) is displayed in a glassmorphism card.
  */
 export function CountdownTimer() {
+  const { timeline } = useFestivalControl();
   const [timeLeft, setTimeLeft] = useState({ total: 0, days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [mounted, setMounted] = useState(false);
+
+  const targetDate = timeline.festStartDate ? new Date(timeline.festStartDate) : FESTIVAL_CONFIG.festivalDate;
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
     const frameId = requestAnimationFrame(() => {
       setMounted(true);
-      setTimeLeft(getTimeRemaining(FESTIVAL_CONFIG.festivalDate));
+      setTimeLeft(getTimeRemaining(targetDate));
       timer = setInterval(() => {
-        setTimeLeft(getTimeRemaining(FESTIVAL_CONFIG.festivalDate));
+        setTimeLeft(getTimeRemaining(targetDate));
       }, 1000);
     });
 
@@ -26,7 +30,7 @@ export function CountdownTimer() {
       cancelAnimationFrame(frameId);
       if (timer) clearInterval(timer);
     };
-  }, []);
+  }, [timeline.festStartDate]);
 
   if (!mounted) {
     return (

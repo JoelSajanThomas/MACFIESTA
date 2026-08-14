@@ -1,351 +1,385 @@
 "use client";
 
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useState, useRef } from "react";
+import { useLoading } from "@/providers/LoadingProvider";
 import { motion, AnimatePresence } from "framer-motion";
-import { Canvas, useFrame, useLoader } from "@react-three/fiber";
-import { Float, Box, Sphere, MeshDistortMaterial, Plane } from "@react-three/drei";
-import * as THREE from "three";
 
-// Rotating status messages during cinematic loading
-const LOADING_STATUSES = [
-  "Initializing MacFiesta Pro...",
-  "Loading Festival Universe...",
-  "Preparing Event Systems...",
-  "Calibrating Web Matrix...",
-  "Assembling Festival Squads...",
-];
-
-/**
- * 3D Nighttime City Skyline with Illuminated Skyscraper Windows
- */
-function CitySkyline3D() {
-  const cityRef = useRef<THREE.Group>(null!);
-
-  const buildings = useMemo(() => {
-    const list = [];
-    const count = 28;
-    for (let i = 0; i < count; i++) {
-      const height = 3 + Math.random() * 6;
-      const width = 0.8 + Math.random() * 1.2;
-      const depth = 0.8 + Math.random() * 1.2;
-      const x = (Math.random() - 0.5) * 16;
-      const z = -2 - Math.random() * 8;
-      const color = i % 3 === 0 ? "#0A0D1A" : "#050710";
-      const windowGlow = i % 2 === 0 ? "#00D4FF" : "#FFD700";
-      list.push({ id: i, height, width, depth, x, z, color, windowGlow });
-    }
-    return list;
-  }, []);
-
-  useFrame((_, delta) => {
-    if (cityRef.current) {
-      cityRef.current.position.z += delta * 0.2;
-      if (cityRef.current.position.z > 2) {
-        cityRef.current.position.z = 0;
-      }
-    }
-  });
-
-  return (
-    <group ref={cityRef}>
-      {buildings.map((b) => (
-        <group key={b.id} position={[b.x, b.height / 2 - 4, b.z]}>
-          {/* Main Building Structure */}
-          <Box args={[b.width, b.height, b.depth]}>
-            <meshStandardMaterial color={b.color} roughness={0.8} metalness={0.5} />
-          </Box>
-          {/* Glowing Window Accents */}
-          <mesh position={[0, b.height / 4, b.depth / 2 + 0.01]}>
-            <planeGeometry args={[b.width * 0.7, b.height * 0.4]} />
-            <meshBasicMaterial color={b.windowGlow} transparent opacity={0.35} />
-          </mesh>
-        </group>
-      ))}
-    </group>
-  );
+// ─── Types ────────────────────────────────────────────────────────────────────
+interface BurstParticle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  radius: number;
+  alpha: number;
+  decay: number;
+  color: string;
+  trail: { x: number; y: number }[];
 }
 
-/**
- * 3D Swinging Superhero Character & Web Tension Physics
- */
-function WebSwinger3D({ progress }: { progress: number }) {
-  const heroGroupRef = useRef<THREE.Group>(null!);
-  const texture = useLoader(THREE.TextureLoader, "/MARVEL/Spider-man.png");
+// ─── Gold palette ─────────────────────────────────────────────────────────────
+const GOLD = ["#D4AF37", "#F5D76E", "#FFE680", "#C8960C", "#FFC200", "#FFFFFF"];
 
-  // Create THREE.Line instance safely with primitive
-  const lineObj = useMemo(() => {
-    const geom = new THREE.BufferGeometry();
-    geom.setAttribute("position", new THREE.BufferAttribute(new Float32Array(6), 3));
-    const mat = new THREE.LineBasicMaterial({
-      color: "#00D4FF",
-      transparent: true,
-      opacity: 0.85,
-    });
-    return new THREE.Line(geom, mat);
-  }, []);
-
-  // Dynamic swing pendulum physics
-  useFrame((state) => {
-    const time = state.clock.elapsedTime * 2.2;
-    const swingX = Math.sin(time) * 2.8;
-    const swingY = Math.cos(time * 2) * 0.8 + 0.5;
-    const swingZ = Math.cos(time) * 0.6;
-    const tiltZ = Math.cos(time) * 0.4;
-
-    if (heroGroupRef.current) {
-      heroGroupRef.current.position.set(swingX, swingY, swingZ);
-      heroGroupRef.current.rotation.z = tiltZ;
-      heroGroupRef.current.rotation.y = Math.sin(time) * 0.3;
-    }
-
-    // Dynamic 3D Web Strand connected to building top anchor
-    if (lineObj) {
-      const anchorX = swingX > 0 ? 3.5 : -3.5;
-      const points = new Float32Array([
-        anchorX, 4.0, -1.0,  // Anchor point high on skyscraper
-        swingX, swingY + 0.8, swingZ // Hero hand attachment point
-      ]);
-      lineObj.geometry.setAttribute(
-        "position",
-        new THREE.BufferAttribute(points, 3)
-      );
-      lineObj.geometry.attributes.position.needsUpdate = true;
-    }
+function spawnBurst(cx: number, cy: number, count: number): BurstParticle[] {
+  return Array.from({ length: count }, () => {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = Math.random() * 4.5 + 1.2;
+    return {
+      x: cx, y: cy,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      radius: Math.random() * 2.5 + 0.8,
+      alpha: 1,
+      decay: Math.random() * 0.012 + 0.006,
+      color: GOLD[Math.floor(Math.random() * GOLD.length)],
+      trail: [],
+    };
   });
-
-  return (
-    <group>
-      {/* 3D Dynamic Tension Web Line */}
-      <primitive object={lineObj} />
-
-      {/* 3D Superhero Mesh — Complete Unobstructed Spider-Man Body with Sharp Alpha Clipping */}
-      <group ref={heroGroupRef}>
-        <Float speed={5} rotationIntensity={0.5} floatIntensity={0.5}>
-          <Plane args={[3.0, 3.0]} position={[0, 0, 0.2]}>
-            <meshBasicMaterial
-              map={texture}
-              transparent
-              alphaTest={0.05}
-              depthWrite={false}
-              side={THREE.DoubleSide}
-            />
-          </Plane>
-        </Float>
-      </group>
-    </group>
-  );
 }
 
-/**
- * 3D Atmospheric Rain & Fog Particles
- */
-function RainAndFog3D() {
-  const pointsRef = useRef<THREE.Points>(null!);
-  const count = 300;
-
-  const positions = useMemo(() => {
-    const pos = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      pos[i * 3] = (Math.random() - 0.5) * 16;
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 12;
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 10;
-    }
-    return pos;
-  }, []);
-
-  useFrame((_, delta) => {
-    if (pointsRef.current) {
-      const posAttr = pointsRef.current.geometry.attributes.position as THREE.BufferAttribute;
-      for (let i = 0; i < count; i++) {
-        let y = posAttr.getY(i);
-        y -= delta * 8.0; // Falling rain speed
-        if (y < -6) y = 6;
-        posAttr.setY(i, y);
-      }
-      posAttr.needsUpdate = true;
-    }
-  });
-
-  return (
-    <points ref={pointsRef}>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
-      </bufferGeometry>
-      <pointsMaterial
-        size={0.04}
-        color="#00D4FF"
-        transparent
-        opacity={0.6}
-        blending={THREE.AdditiveBlending}
-      />
-    </points>
-  );
-}
-
-/**
- * Ultra-Realistic Spider-Man Web Swinging Loading Screen
- */
+// ─── LoadingScreen ────────────────────────────────────────────────────────────
 export function LoadingScreen() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [progress, setProgress] = useState(0);
-  const [statusIndex, setStatusIndex] = useState(0);
-  const [isMounted, setIsMounted] = useState(false);
-  const [isWebSplatted, setIsWebSplatted] = useState(false);
+  const [isMounted, setIsMounted]   = useState(false);
+  const [phase, setPhase]           = useState<"intro" | "reveal" | "done">("intro");
+  const [progress, setProgress]     = useState(0);
+  const [isDismissed, setIsDismissed] = useState(false);
+  const { markDone } = useLoading();
 
+  const canvasRef     = useRef<HTMLCanvasElement | null>(null);
+  const burstRef      = useRef<BurstParticle[]>([]);
+  const burstFiredRef = useRef(false);
+
+  // ── Mount ────────────────────────────────────────────────────────────────
+  useEffect(() => setIsMounted(true), []);
+
+  // ── Canvas: ambient dust + burst particles ───────────────────────────────
   useEffect(() => {
-    setIsMounted(true);
+    if (!isMounted) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-    // Rotate status messages every 500ms
-    const statusInterval = setInterval(() => {
-      setStatusIndex((prev) => (prev + 1) % LOADING_STATUSES.length);
-    }, 550);
+    let rafId: number;
+    const resize = () => {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener("resize", resize);
 
-    // Charge progress smoothly from 0 to 100%
-    const progressInterval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(progressInterval);
-          setIsWebSplatted(true);
-          return 100;
-        }
-        return prev + Math.random() * 18 + 8;
+    // Ambient floating dust
+    type Dust = { x: number; y: number; vx: number; vy: number; r: number; a: number; c: string };
+    const dust: Dust[] = Array.from({ length: 70 }, () => ({
+      x:  Math.random() * window.innerWidth,
+      y:  Math.random() * window.innerHeight,
+      vx: (Math.random() - 0.5) * 0.35,
+      vy: -(Math.random() * 0.45 + 0.1),
+      r:  Math.random() * 1.4 + 0.3,
+      a:  Math.random() * 0.45 + 0.08,
+      c:  GOLD[Math.floor(Math.random() * GOLD.length)],
+    }));
+
+    const render = () => {
+      const w = canvas.width, h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      // dust
+      ctx.shadowBlur = 8;
+      dust.forEach((d) => {
+        d.x += d.vx; d.y += d.vy;
+        if (d.y < -4) { d.y = h + 4; d.x = Math.random() * w; }
+        if (d.x < -4) d.x = w + 4;
+        if (d.x > w + 4) d.x = -4;
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+        ctx.fillStyle = d.c;
+        ctx.globalAlpha = d.a;
+        ctx.shadowColor = d.c;
+        ctx.fill();
       });
-    }, 110);
+      ctx.globalAlpha = 1;
+      ctx.shadowBlur = 0;
 
-    // Complete loading after final web splat transition
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2700);
+      // burst
+      burstRef.current = burstRef.current.filter((p) => p.alpha > 0.01);
+      burstRef.current.forEach((p) => {
+        p.trail.push({ x: p.x, y: p.y });
+        if (p.trail.length > 8) p.trail.shift();
+        p.x += p.vx; p.y += p.vy;
+        p.vx *= 0.97; p.vy *= 0.97;
+        p.alpha -= p.decay;
+
+        p.trail.forEach((t, i) => {
+          ctx.beginPath();
+          ctx.arc(t.x, t.y, p.radius * 0.55, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = (i / p.trail.length) * p.alpha * 0.38;
+          ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.shadowBlur = 16;
+        ctx.shadowColor = p.color;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        ctx.shadowBlur = 0;
+      });
+
+      rafId = requestAnimationFrame(render);
+    };
+    render();
 
     return () => {
-      clearInterval(statusInterval);
-      clearInterval(progressInterval);
-      clearTimeout(timer);
+      window.removeEventListener("resize", resize);
+      cancelAnimationFrame(rafId);
     };
-  }, []);
+  }, [isMounted]);
+
+  // ── Sequence: intro → reveal (stays until user clicks) ─────────────────
+  useEffect(() => {
+    if (!isMounted) return;
+
+    // Brief pause then show logo
+    const t1 = setTimeout(() => setPhase("reveal"), 300);
+
+    // Progress bar fills to 99% and holds — never auto-dismisses
+    const pInt = setInterval(() => {
+      setProgress((p) => {
+        if (p >= 99) { clearInterval(pInt); return 99; }
+        return Math.min(99, p + Math.floor(Math.random() * 10) + 6);
+      });
+    }, 80);
+
+    return () => { clearTimeout(t1); clearInterval(pInt); };
+  }, [isMounted]);
+
+  // ── Fire burst when logo reveals ─────────────────────────────────────────
+  useEffect(() => {
+    if (phase !== "reveal" || burstFiredRef.current) return;
+    burstFiredRef.current = true;
+
+    const cx = window.innerWidth / 2;
+    const cy = window.innerHeight / 2;
+
+    const t1 = setTimeout(() => {
+      burstRef.current.push(...spawnBurst(cx, cy, 200));
+    }, 380);
+    const t2 = setTimeout(() => {
+      burstRef.current.push(...spawnBurst(cx, cy, 90));
+    }, 950);
+
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, [phase]);
+
+  if (!isMounted) return null;
+
+  const isVisible = phase !== "done" && !isDismissed;
+
+  // ── Animation variants ───────────────────────────────────────────────────
+  const logoVariants: Record<string, any> = {
+    hidden: { opacity: 0, scale: 0.7, y: 24 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      y: 0,
+      transition: { duration: 0.95, ease: [0.16, 1, 0.3, 1] },
+    },
+  };
+  const wordmarkVariants: Record<string, any> = {
+    hidden: { opacity: 0, y: 14 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.7, delay: 0.38, ease: "easeOut" },
+    },
+  };
+  const lineVariants: Record<string, any> = {
+    hidden: { scaleX: 0 },
+    visible: {
+      scaleX: 1,
+      transition: { duration: 0.65, delay: 0.65 },
+    },
+  };
+  const barVariants: Record<string, any> = {
+    hidden: { opacity: 0, y: 14 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, delay: 0.75 },
+    },
+  };
 
   return (
     <AnimatePresence>
-      {isLoading && (
+      {isVisible && (
         <motion.div
-          className="fixed inset-0 z-[9998] flex flex-col items-center justify-between bg-[#030308] text-white overflow-hidden select-none py-10 px-4"
-          exit={{ opacity: 0, scale: 1.1, filter: "blur(12px)" }}
-          transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+          key="macfiesta-loader"
+          initial={{ opacity: 1 }}
+          exit={{
+            opacity: 0,
+            scale: 1.06,
+            filter: "blur(20px)",
+            transition: { duration: 0.75, ease: [0.16, 1, 0.3, 1] },
+          }}
+          className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-[#070608] text-white select-none overflow-hidden"
         >
-          {/* Ambient Crimson & Arc Cyan Glow Backdrop */}
-          <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-            <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-marvel-red/10 blur-[140px]" />
-            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[500px] h-[300px] rounded-full bg-arc-cyan/10 blur-[130px]" />
-          </div>
+          {/* Canvas */}
+          <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-0" />
 
-          {/* Top Laser Diagnostic Scanning Line */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-marvel-red via-arc-cyan to-transparent animate-scan-line z-30 opacity-90 shadow-[0_0_20px_#ED1D24]" />
+          {/* Subtle radial gold glow behind logo */}
+          <div
+            className="absolute inset-0 pointer-events-none z-0"
+            style={{
+              background:
+                "radial-gradient(ellipse 55% 50% at 50% 50%, rgba(212,175,55,0.09) 0%, transparent 70%)",
+            }}
+          />
 
-          {/* 3D WebGL Canvas Layer (City + Swinger + Rain) */}
-          <div className="absolute inset-0 z-0 pointer-events-none">
-            {isMounted && (
-              <Canvas camera={{ position: [0, 0, 5.0], fov: 60 }}>
-                <ambientLight intensity={0.4} />
-                <directionalLight position={[5, 8, 5]} intensity={2.0} color="#00D4FF" />
-                <pointLight position={[-5, -4, -3]} color="#ED1D24" intensity={3.0} />
-                <pointLight position={[5, -4, 3]} color="#FFD700" intensity={2.5} />
-                <CitySkyline3D />
-                <WebSwinger3D progress={progress} />
-                <RainAndFog3D />
-              </Canvas>
-            )}
-          </div>
+          {/* ── Main content ───────────────────────────────────────────── */}
+          <div className="relative z-10 flex flex-col items-center gap-8 sm:gap-10 px-6">
 
-          {/* Final Web Shot Screen Transition Overlay */}
-          <AnimatePresence>
-            {isWebSplatted && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.2 }}
-                animate={{ opacity: 1, scale: 1.8 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-                className="absolute inset-0 z-40 bg-radial from-[#00D4FF]/40 via-marvel-red/30 to-black pointer-events-none flex items-center justify-center"
-              >
-                <div className="w-96 h-96 rounded-full border-4 border-arc-cyan/80 shadow-[0_0_100px_#00D4FF] animate-ping" />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Top Header Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="relative z-20 text-center space-y-1 mt-4 pointer-events-none"
-          >
-            <div className="inline-block bg-marvel-red px-4 py-1 rounded text-[10px] font-extrabold tracking-[0.45em] uppercase text-white shadow-[0_0_25px_#ED1D24] font-mono">
-              MACFAST TIRUVALLA • CINEMATIC 3D EXPERIENCE
-            </div>
-            <p className="text-[10px] tracking-[0.35em] text-arc-cyan font-bold uppercase font-mono">
-              AVENGERS TOWER SPIDER-NET DIRECTIVE
-            </p>
-          </motion.div>
-
-          {/* Bottom Futuristic Tech HUD Indicator */}
-          <div className="relative z-20 flex flex-col items-center justify-center space-y-5 w-full max-w-sm pointer-events-none mb-6">
-            {/* Circular Futuristic HUD Counter */}
+            {/* Logo */}
             <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.8 }}
-              className="relative flex items-center justify-center w-36 h-36 rounded-full border border-arc-cyan/30 bg-black/60 backdrop-blur-md shadow-[0_0_35px_rgba(0,212,255,0.25)]"
+              variants={logoVariants}
+              initial="hidden"
+              animate={phase === "intro" ? "hidden" : "visible"}
+              className="flex flex-col items-center gap-5"
             >
-              {/* Outer Spinning Ring */}
-              <div
-                className="absolute inset-0 rounded-full border-2 border-dashed border-marvel-red/60"
-                style={{ animation: "arc-reactor-spin 6s linear infinite" }}
-              />
+              <div className="relative flex items-center justify-center">
+                {/* Pulsing ambient ring */}
+                <motion.div
+                  animate={{ opacity: [0.25, 0.65, 0.25], scale: [0.94, 1.06, 0.94] }}
+                  transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+                  className="absolute w-72 h-72 sm:w-96 sm:h-96 rounded-full"
+                  style={{
+                    background: "radial-gradient(circle, rgba(212,175,55,0.18) 0%, transparent 70%)",
+                  }}
+                />
 
-              {/* Middle Counter-Rotating Ring */}
-              <div
-                className="absolute inset-2 rounded-full border-2 border-arc-cyan/50"
-                style={{ animation: "arc-reactor-spin 4s linear infinite reverse" }}
-              />
-
-              {/* Central Tabular Percentage */}
-              <div className="text-center font-mono">
-                <span className="block text-3xl font-black text-white tracking-wider drop-shadow-[0_0_10px_#00D4FF] tabular-nums">
-                  {Math.min(Math.round(progress), 100)}%
-                </span>
-                <span className="text-[9px] text-metallic-gold font-bold tracking-widest uppercase block">
-                  WEB CHARGE
-                </span>
+                {/* Logo image */}
+                <motion.img
+                  src="/logo.png"
+                  alt="MACFIESTA"
+                  animate={{
+                    filter: [
+                      "drop-shadow(0 0 18px rgba(212,175,55,0.55))",
+                      "drop-shadow(0 0 52px rgba(212,175,55,0.9))",
+                      "drop-shadow(0 0 22px rgba(212,175,55,0.6))",
+                    ],
+                  }}
+                  transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+                  className="w-52 sm:w-72 md:w-80 relative z-10 object-contain"
+                />
               </div>
+
+              {/* Wordmark */}
+              <motion.div
+                variants={wordmarkVariants}
+                initial="hidden"
+                animate={phase === "intro" ? "hidden" : "visible"}
+                className="flex flex-col items-center gap-2"
+              >
+                <span
+                  className="text-2xl sm:text-4xl font-black tracking-[0.18em] uppercase"
+                  style={{
+                    fontFamily: "var(--font-orbitron, 'Orbitron', sans-serif)",
+                    background:
+                      "linear-gradient(135deg, #F5D76E 0%, #D4AF37 45%, #FFE680 70%, #C8960C 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                    filter: "drop-shadow(0 0 14px rgba(212,175,55,0.5))",
+                  }}
+                >
+                  MACFIESTA 2K26
+                </span>
+
+                {/* Gold separator */}
+                <motion.div
+                  variants={lineVariants}
+                  initial="hidden"
+                  animate={phase === "intro" ? "hidden" : "visible"}
+                  className="h-px w-48 sm:w-64"
+                  style={{
+                    background: "linear-gradient(90deg, transparent, #D4AF37, transparent)",
+                    originX: 0.5,
+                  }}
+                />
+
+                <span
+                  className="text-[10px] sm:text-xs tracking-[0.4em] uppercase text-white/45"
+                  style={{ fontFamily: "var(--font-orbitron, 'Orbitron', sans-serif)" }}
+                >
+                  UNITED TO EXCEL
+                </span>
+              </motion.div>
             </motion.div>
 
-            {/* Rotating Status Messages */}
-            <div className="h-6 overflow-hidden text-center">
-              <AnimatePresence mode="wait">
-                <motion.p
-                  key={statusIndex}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.25 }}
-                  className="text-xs font-mono font-bold text-arc-cyan tracking-[0.25em] uppercase drop-shadow-[0_0_10px_#00D4FF]"
-                >
-                  {LOADING_STATUSES[statusIndex]}
-                </motion.p>
-              </AnimatePresence>
-            </div>
+            {/* Progress + skip */}
+            <motion.div
+              variants={barVariants}
+              initial="hidden"
+              animate={phase === "intro" ? "hidden" : "visible"}
+              className="w-64 sm:w-80 flex flex-col items-center gap-3"
+            >
+              {/* Track */}
+              <div className="w-full h-[3px] rounded-full bg-white/10 overflow-hidden relative">
+                <motion.div
+                  className="h-full rounded-full"
+                  style={{
+                    width: `${progress}%`,
+                    background: "linear-gradient(90deg, #C8960C, #D4AF37, #FFE680, #D4AF37)",
+                    boxShadow: "0 0 12px rgba(212,175,55,0.7)",
+                  }}
+                  transition={{ ease: "easeOut" }}
+                />
+                {/* Shimmer sweep */}
+                <motion.div
+                  animate={{ x: ["-100%", "220%"] }}
+                  transition={{ repeat: Infinity, duration: 1.7, ease: "linear" }}
+                  className="absolute inset-y-0 w-1/3 pointer-events-none"
+                  style={{
+                    background:
+                      "linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent)",
+                  }}
+                />
+              </div>
 
-            {/* Linear Charging Bar */}
-            <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden border border-white/20 p-0.5 shadow-[0_0_15px_rgba(237,29,36,0.3)]">
-              <motion.div
-                className="h-full rounded-full"
-                style={{
-                  background: "linear-gradient(90deg, #ED1D24, #00D4FF, #FFD700)",
+              {/* Enter button — only way to proceed */}
+              <button
+                onClick={() => {
+                  setProgress(100);
+                  setTimeout(() => { setIsDismissed(true); markDone(); }, 200);
                 }}
-                initial={{ width: "0%" }}
-                animate={{ width: `${Math.min(progress, 100)}%` }}
-                transition={{ duration: 0.2, ease: "easeOut" }}
-              />
-            </div>
+                className="text-[11px] tracking-[0.3em] uppercase text-white/50 hover:text-[#D4AF37] border border-white/15 hover:border-[#D4AF37]/60 px-5 py-2 rounded-full transition-all duration-300 cursor-pointer mt-1 hover:shadow-[0_0_18px_rgba(212,175,55,0.35)]"
+                style={{ fontFamily: "var(--font-orbitron, 'Orbitron', sans-serif)" }}
+              >
+                ENTER SITE →
+              </button>
+            </motion.div>
+          </div>
+
+          {/* ── Corner bracket decorations ──────────────────────────────── */}
+          <div className="absolute top-5 left-5 opacity-30 pointer-events-none">
+            <div className="w-9 h-px bg-gradient-to-r from-[#D4AF37] to-transparent" />
+            <div className="w-px h-9 bg-gradient-to-b from-[#D4AF37] to-transparent" />
+          </div>
+          <div className="absolute top-5 right-5 opacity-30 pointer-events-none flex flex-col items-end">
+            <div className="w-9 h-px bg-gradient-to-l from-[#D4AF37] to-transparent" />
+            <div className="w-px h-9 bg-gradient-to-b from-[#D4AF37] to-transparent self-end" />
+          </div>
+          <div className="absolute bottom-5 left-5 opacity-30 pointer-events-none flex flex-col-reverse">
+            <div className="w-9 h-px bg-gradient-to-r from-[#D4AF37] to-transparent" />
+            <div className="w-px h-9 bg-gradient-to-t from-[#D4AF37] to-transparent" />
+          </div>
+          <div className="absolute bottom-5 right-5 opacity-30 pointer-events-none flex flex-col-reverse items-end">
+            <div className="w-9 h-px bg-gradient-to-l from-[#D4AF37] to-transparent" />
+            <div className="w-px h-9 bg-gradient-to-t from-[#D4AF37] to-transparent self-end" />
           </div>
         </motion.div>
       )}

@@ -48,6 +48,18 @@ export const authorizeAdmin = (req: AuthRequest, res: Response, next: NextFuncti
 // Check if database is active
 export const isDbConnected = () => mongoose.connection.readyState === 1;
 
+// Global Socket.io instance reference & broadcaster
+let ioInstance: any = null;
+export const setSocketIO = (io: any) => {
+  ioInstance = io;
+};
+export const getSocketIO = () => ioInstance;
+export const broadcastEvent = (eventName: string, payload: any) => {
+  if (ioInstance) {
+    ioInstance.emit(eventName, payload);
+  }
+};
+
 // --- Local In-Memory Fallback Database ---
 export let localUsers: any[] = [
   {
@@ -216,3 +228,65 @@ export let localAuditLogs: any[] = [
   { _id: "log-1", admin: "admin@macfast.org", action: "Seeded Default Database", timestamp: new Date().toISOString() },
   { _id: "log-2", admin: "admin@macfast.org", action: "Modified Scoreboard Standings", timestamp: new Date().toISOString() }
 ];
+
+export let localFestivalSettings: any = {
+  name: "MacFiesta",
+  edition: "2K26",
+  tagline: "Every Hero Has A Mission",
+  subtitle: "Marvelverse Avengers Command Center",
+  motto: "United to Excel",
+  logoUrl: "/logo.png",
+  faviconUrl: "/favicon.ico",
+  homepageBanner: "/MARVEL/3025924746959430.jpg",
+  aboutText: "MACFIESTA 2K26 is the ultimate inter-collegiate Marvelverse festival at MACFAST Tiruvalla.",
+  contactEmail: "macfiesta@macfast.org",
+  contactPhone: "+91 94470 12345",
+  venueAddress: "MACFAST Campus, Tiruvalla, Kerala - 689101",
+  registrationOpen: true,
+  maintenanceMode: false,
+  countdownEnabled: true,
+  socialInstagram: "https://www.instagram.com/macfiestaofficial",
+  socialYoutube: "https://youtube.com/@macfiesta",
+  socialLinkedin: "https://linkedin.com/company/macfast",
+  heroTitle: "MACFIESTA 2K26",
+  heroName: "MARVELVERSE",
+  heroSubtitle: "EVERY HERO HAS A MISSION",
+  heroDesc: "The premier national inter-collegiate Marvel Cinematic Universe cultural and technical festival.",
+  bgType: "video",
+  videoBgUrl: "/MARVEL/Video Project 4.mp4",
+  wallpaperUrl: "/MARVEL/3025924746959430.jpg",
+  themeToggle: "marvel",
+  ctaPrimaryText: "Enter The Arena",
+  ctaPrimaryUrl: "/events",
+  ctaSecondaryText: "Live Scoreboard",
+  ctaSecondaryUrl: "/scoreboard",
+  floatingIronManEnabled: true,
+  heroOverlayOpacity: 70,
+};
+
+export let localTimelineSettings: any = {
+  festStartDate: "2026-09-24T09:00:00+05:30",
+  festEndDate: "2026-09-25T22:00:00+05:30",
+  regOpenDate: "2026-08-01T00:00:00+05:30",
+  regCloseDate: "2026-09-23T23:59:59+05:30",
+  spotRegDate: "2026-09-24T08:00:00+05:30",
+  resultPubDate: "2026-09-25T20:00:00+05:30",
+  certificateDate: "2026-09-26T10:00:00+05:30",
+  autoCloseRegistration: false,
+  autoPublishResults: true,
+  countdownStyle: "marvel",
+};
+
+export let localThemeSettings: any = {
+  primaryColor: "#ED1D24",
+  secondaryColor: "#00D4FF",
+  backgroundColor: "#05050A",
+  fontFamily: "Space Grotesk",
+  borderRadius: "16px",
+  shadowIntensity: "heavy",
+  animationSpeed: "normal",
+  presetTheme: "marvel",
+  glassmorphismBlur: 20,
+  neonGlowIntensity: 85,
+};
+

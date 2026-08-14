@@ -1,10 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useRef } from "react";
+import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { RiMapPinLine, RiTimeLine, RiArrowRightLine, RiFlashlightLine } from "react-icons/ri";
+
+const typeColors: Record<string, { bg: string; text: string; border: string; rgb: string }> = {
+  General:    { bg: "bg-arc-cyan/15",         text: "text-arc-cyan",     border: "border-arc-cyan/30",     rgb: "0,212,255"   },
+  Gaming:     { bg: "bg-vibranium-purple/15",  text: "text-vibranium-purple", border: "border-vibranium-purple/30", rgb: "123,47,190" },
+  Technical:  { bg: "bg-metallic-gold/15",     text: "text-metallic-gold", border: "border-metallic-gold/30", rgb: "212,175,55" },
+  Management: { bg: "bg-marvel-red/15",         text: "text-marvel-red",  border: "border-marvel-red/30",   rgb: "237,29,36"   },
+  Cultural:   { bg: "bg-vibranium-purple/15",  text: "text-vibranium-purple", border: "border-vibranium-purple/30", rgb: "123,47,190" },
+};
 
 const scheduleData = {
   day1: [
@@ -21,128 +29,199 @@ const scheduleData = {
   ],
 };
 
+/* ─── Individual 3D schedule row card ─── */
+function ScheduleCard({ slot, idx }: { slot: typeof scheduleData.day1[0]; idx: number }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const tc = typeColors[slot.type] ?? typeColors.General;
+
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [5, -5]), { stiffness: 200, damping: 25 });
+  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-6, 6]), { stiffness: 200, damping: 25 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = cardRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    mouseX.set((e.clientX - rect.left) / rect.width - 0.5);
+    mouseY.set((e.clientY - rect.top) / rect.height - 0.5);
+  };
+
+  const handleMouseLeave = () => {
+    mouseX.set(0);
+    mouseY.set(0);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -40, scale: 0.95 }}
+      animate={{ opacity: 1, x: 0, scale: 1 }}
+      exit={{ opacity: 0, x: 40, scale: 0.95 }}
+      transition={{ duration: 0.4, delay: idx * 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
+      className="relative group"
+      style={{ perspective: "1000px" }}
+    >
+      {/* Timeline point */}
+      <div
+        className="absolute -left-[31px] md:-left-[39px] top-5 w-4 h-4 rounded-full border-2 bg-black group-hover:scale-150 transition-all duration-300 z-10"
+        style={{
+          borderColor: `rgba(${tc.rgb},0.8)`,
+          boxShadow: `0 0 10px rgba(${tc.rgb},0.6)`,
+          backgroundColor: `rgba(${tc.rgb},0.1)`,
+        }}
+      />
+
+      <motion.div
+        ref={cardRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+        className="glass-aurora p-5 rounded-2xl border border-white/10 group-hover:border-white/20 transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-default"
+      >
+        {/* Accent top border on hover */}
+        <div
+          className="absolute top-0 left-0 right-0 h-px rounded-t-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-400"
+          style={{ background: `linear-gradient(90deg, transparent, rgba(${tc.rgb},0.8), transparent)` }}
+        />
+
+        <div className="space-y-1.5" style={{ transform: "translateZ(8px)" }}>
+          <div className="flex items-center gap-2 flex-wrap">
+            <RiTimeLine className="text-arc-cyan text-sm shrink-0" />
+            <span className="text-metallic-gold text-xs font-bold tracking-wider font-space">{slot.time}</span>
+            <span
+              className={`px-2.5 py-0.5 rounded text-[9px] uppercase tracking-widest font-extrabold border font-space ${tc.bg} ${tc.text} ${tc.border}`}
+            >
+              {slot.type}
+            </span>
+          </div>
+          <h3
+            className="text-base font-black text-white uppercase tracking-wide group-hover:text-metallic-gold transition-colors duration-300"
+            style={{ fontFamily: "var(--font-syne)" }}
+          >
+            {slot.title}
+          </h3>
+        </div>
+
+        <div
+          className="flex items-center gap-2 text-xs font-bold text-white/80 bg-white/5 px-3 py-2 rounded-xl border border-white/10 md:self-center shrink-0 font-space"
+          style={{ transform: "translateZ(8px)" }}
+        >
+          <RiMapPinLine className="text-arc-cyan text-sm shrink-0" />
+          <span>{slot.venue}</span>
+        </div>
+
+        {/* Hover glow shadow */}
+        <motion.div
+          className="absolute inset-0 rounded-2xl pointer-events-none"
+          initial={{ boxShadow: "none" }}
+          whileHover={{ boxShadow: `0 0 30px rgba(${tc.rgb},0.15)` }}
+          transition={{ duration: 0.3 }}
+        />
+      </motion.div>
+    </motion.div>
+  );
+}
+
 export function SchedulePreview() {
   const [activeDay, setActiveDay] = useState<"day1" | "day2">("day1");
 
   return (
-    <section className="relative bg-[#05050A] section-padding border-t border-metallic-gold/20 overflow-hidden min-h-[600px] font-mono">
-      {/* Background Marvel Doctor Strange Artwork — Smooth Color Edge Blending */}
-      <div className="absolute inset-0 z-0 opacity-90 pointer-events-none overflow-hidden">
+    <section className="relative bg-[#05050A]/60 backdrop-blur-md section-padding border-t border-metallic-gold/20 overflow-hidden min-h-[600px]">
+      {/* Parallax Background */}
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         <Image
           src="/MARVEL/Doctor Strange.png"
           alt="Doctor Strange Schedule Background"
           fill
           priority
-          className="object-cover object-top filter brightness-105 contrast-125 saturate-135 drop-shadow-[0_0_50px_rgba(0,212,255,0.4)] scale-[1.02]"
+          className="object-cover object-top filter brightness-105 contrast-125 saturate-135 scale-[1.05]"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#05050A] via-transparent to-[#05050A] z-[1]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_50%,rgba(5,5,10,0.8)_95%)] z-[1]" />
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[350px] rounded-full bg-arc-cyan/15 blur-[140px] z-[1]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#05050A] via-[#05050A]/50 to-[#05050A]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_50%,rgba(5,5,10,0.8)_95%)]" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[350px] rounded-full bg-arc-cyan/10 blur-[140px]" />
       </div>
 
-
       <div className="max-w-4xl mx-auto relative z-10">
-        {/* Header Container */}
-        <div className="text-center space-y-4 mb-10 bg-black/75 backdrop-blur-md border border-white/15 p-6 rounded-3xl shadow-[0_0_40px_rgba(0,0,0,0.8)]">
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-arc-cyan/40 bg-arc-cyan/15 text-arc-cyan text-xs font-mono font-bold tracking-widest uppercase shadow-[0_0_15px_rgba(0,212,255,0.3)]"
-          >
+
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 40, rotateX: 10 }}
+          whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+          className="text-center space-y-4 mb-10 glass-aurora border border-white/15 p-6 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.8),0_0_20px_rgba(0,212,255,0.08)]"
+          style={{ perspective: "1000px" }}
+        >
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-arc-cyan/40 bg-arc-cyan/15 text-arc-cyan text-xs font-bold tracking-widest uppercase shadow-[0_0_15px_rgba(0,212,255,0.3)] font-space">
             <RiFlashlightLine className="animate-pulse" />
             <span>SANCTUM TIME REALM CHRONOLOGY</span>
-          </motion.div>
-
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="section-title text-white uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]"
-            style={{ fontFamily: "var(--font-heading)" }}
-          >
-            Schedule <span className="marvel-bang-comic-gradient font-black">Preview</span>
-          </motion.h2>
-
-          {/* Day selectors */}
-          <div className="flex justify-center gap-4 pt-2">
-            <button
-              onClick={() => setActiveDay("day1")}
-              className={`px-6 py-2.5 rounded-full border text-xs font-bold uppercase tracking-widest transition-all duration-300 cursor-pointer ${
-                activeDay === "day1"
-                  ? "bg-marvel-red text-white border-marvel-red shadow-[0_0_20px_#ED1D24] scale-105"
-                  : "bg-black/60 text-white/70 border-white/15 hover:border-white/40 hover:text-white"
-              }`}
-              style={{ fontFamily: "var(--font-heading)" }}
-            >
-              Day 01 — 24 Sep
-            </button>
-            <button
-              onClick={() => setActiveDay("day2")}
-              className={`px-6 py-2.5 rounded-full border text-xs font-bold uppercase tracking-widest transition-all duration-300 cursor-pointer ${
-                activeDay === "day2"
-                  ? "bg-marvel-red text-white border-marvel-red shadow-[0_0_20px_#ED1D24] scale-105"
-                  : "bg-black/60 text-white/70 border-white/15 hover:border-white/40 hover:text-white"
-              }`}
-              style={{ fontFamily: "var(--font-heading)" }}
-            >
-              Day 02 — 25 Sep
-            </button>
           </div>
-        </div>
+
+          <h2 className="section-title text-white uppercase" style={{ fontFamily: "var(--font-syne)" }}>
+            Schedule <span className="marvel-bang-comic-gradient font-black">Preview</span>
+          </h2>
+
+          {/* Day toggle with 3D spring */}
+          <div className="flex justify-center gap-3 pt-2">
+            {(["day1", "day2"] as const).map((day, i) => (
+              <motion.button
+                key={day}
+                onClick={() => setActiveDay(day)}
+                whileHover={{ scale: 1.06, y: -2 }}
+                whileTap={{ scale: 0.96 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className={`px-6 py-2.5 rounded-full border text-xs font-bold uppercase tracking-widest transition-colors duration-300 cursor-pointer font-space ${
+                  activeDay === day
+                    ? "bg-marvel-red text-white border-marvel-red shadow-[0_0_20px_#ED1D24]"
+                    : "bg-black/60 text-white/70 border-white/15 hover:border-white/40 hover:text-white"
+                }`}
+              >
+                {i === 0 ? "Day 01 — 24 Sep" : "Day 02 — 25 Sep"}
+              </motion.button>
+            ))}
+          </div>
+        </motion.div>
 
         {/* Schedule List */}
-        <div className="relative border-l-2 border-arc-cyan/40 ml-4 md:ml-6 pl-6 md:pl-8 space-y-6">
+        <div className="relative border-l-2 border-arc-cyan/30 ml-4 md:ml-6 pl-6 md:pl-8 space-y-5">
+          {/* Animated scan line */}
+          <motion.div
+            className="absolute left-0 w-0.5 h-16 bg-gradient-to-b from-transparent via-arc-cyan to-transparent"
+            animate={{ y: ["0%", "calc(100% - 64px)", "0%"] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          />
+
           <AnimatePresence mode="wait">
             <motion.div
               key={activeDay}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              transition={{ duration: 0.3 }}
-              className="space-y-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="space-y-5"
             >
               {scheduleData[activeDay].map((slot, idx) => (
-                <div key={idx} className="relative group">
-                  {/* Timeline point */}
-                  <div className="absolute -left-[31px] md:-left-[39px] top-4 w-4 h-4 rounded-full border-2 border-arc-cyan bg-black shadow-[0_0_12px_#00D4FF] group-hover:bg-arc-cyan group-hover:scale-125 transition-all duration-300" />
-                  
-                  {/* Timeline card */}
-                  <div className="marvel-card p-5 rounded-2xl border border-white/15 bg-black/80 backdrop-blur-md group-hover:border-arc-cyan/60 group-hover:shadow-[0_0_25px_rgba(0,212,255,0.3)] transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-metallic-gold text-xs font-bold tracking-wider">
-                        <RiTimeLine className="text-arc-cyan" />
-                        <span>{slot.time}</span>
-                        <span className="px-2.5 py-0.5 rounded bg-arc-cyan/15 text-[9px] uppercase tracking-widest text-arc-cyan font-extrabold border border-arc-cyan/30 ml-2">
-                          {slot.type}
-                        </span>
-                      </div>
-                      <h3 className="text-lg font-black text-white uppercase tracking-wide group-hover:text-metallic-gold transition-colors duration-300" style={{ fontFamily: "var(--font-heading)" }}>
-                        {slot.title}
-                      </h3>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-xs font-bold text-white/90 bg-white/5 px-3 py-1.5 rounded-lg border border-white/10 md:self-center">
-                      <RiMapPinLine className="text-arc-cyan text-sm" />
-                      <span>{slot.venue}</span>
-                    </div>
-                  </div>
-                </div>
+                <ScheduleCard key={idx} slot={slot} idx={idx} />
               ))}
             </motion.div>
           </AnimatePresence>
         </div>
 
-        <div className="text-center mt-10">
-          <Link
-            href="/schedule"
-            className="btn-primary px-8 py-3 text-xs tracking-widest uppercase inline-flex items-center gap-2 shadow-[0_0_25px_#ED1D24]"
-            style={{ fontFamily: "var(--font-heading)" }}
-          >
-            <span>View Full Interactive Schedule</span>
-            <RiArrowRightLine className="text-sm" />
-          </Link>
-        </div>
+        <motion.div
+          className="text-center mt-10"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          <motion.div whileHover={{ scale: 1.05, y: -3 }} whileTap={{ scale: 0.97 }}>
+            <Link
+              href="/schedule"
+              className="btn-primary px-8 py-3 text-xs tracking-widest uppercase inline-flex items-center gap-2 shadow-[0_0_25px_#ED1D24] font-space"
+            >
+              <span>View Full Interactive Schedule</span>
+              <RiArrowRightLine className="text-sm" />
+            </Link>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );

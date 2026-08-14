@@ -93,6 +93,8 @@ import {
   authenticateToken,
   authorizeAdmin,
   isDbConnected,
+  setSocketIO,
+  broadcastEvent,
   localUsers,
   localEvents,
   localRegistrations,
@@ -101,12 +103,50 @@ import {
   localVolunteers,
   localPayments,
   localAnnouncements,
-  localAuditLogs
+  localAuditLogs,
+  localFestivalSettings,
+  localTimelineSettings,
+  localThemeSettings
 } from "./shared";
+
+app.set("io", io);
+setSocketIO(io);
 
 // Health check
 app.get("/api/health", (req: Request, res: Response) => {
   res.json({ status: "online", time: new Date(), mode: isDbConnected() ? "db" : "fallback" });
+});
+
+// --- Festival Settings Endpoints ---
+app.get("/api/festival-settings", (req: Request, res: Response) => {
+  res.json({
+    success: true,
+    settings: localFestivalSettings,
+    timeline: localTimelineSettings,
+    theme: localThemeSettings,
+  });
+});
+
+app.put("/api/festival-settings", (req: Request, res: Response) => {
+  const { settings, timeline, theme } = req.body;
+  if (settings) {
+    Object.assign(localFestivalSettings, settings);
+  }
+  if (timeline) {
+    Object.assign(localTimelineSettings, timeline);
+  }
+  if (theme) {
+    Object.assign(localThemeSettings, theme);
+  }
+
+  const payload = {
+    settings: localFestivalSettings,
+    timeline: localTimelineSettings,
+    theme: localThemeSettings,
+  };
+
+  broadcastEvent("festival-settings-changed", payload);
+  res.json({ success: true, ...payload });
 });
 
 // --- Auth Endpoints ---
@@ -492,6 +532,7 @@ app.post("/api/events", [authenticateToken, authorizeAdmin] as any, async (req: 
         isLive: false
       });
 
+      broadcastEvent("events-changed", { action: "create", event: newEvent });
       res.status(201).json({ success: true, event: newEvent });
     } else {
       const existingEvent = localEvents.find(e => e.slug === slug);
@@ -526,6 +567,7 @@ app.post("/api/events", [authenticateToken, authorizeAdmin] as any, async (req: 
         isLive: false
       });
 
+      broadcastEvent("events-changed", { action: "create", event: newEvent });
       res.status(201).json({ success: true, event: newEvent });
     }
   } catch (error: any) {
@@ -545,6 +587,7 @@ app.put("/api/events/:slug", [authenticateToken, authorizeAdmin] as any, async (
       if (!updatedEvent) {
         return res.status(404).json({ success: false, message: "Event not found to update" });
       }
+      broadcastEvent("events-changed", { action: "update", event: updatedEvent });
       res.json({ success: true, event: updatedEvent });
     } else {
       let idx = localEvents.findIndex(e => e.slug === param || e._id === param);
@@ -552,6 +595,7 @@ app.put("/api/events/:slug", [authenticateToken, authorizeAdmin] as any, async (
         return res.status(404).json({ success: false, message: "Event not found to update" });
       }
       localEvents[idx] = { ...localEvents[idx], ...req.body };
+      broadcastEvent("events-changed", { action: "update", event: localEvents[idx] });
       res.json({ success: true, event: localEvents[idx] });
     }
   } catch (error: any) {
@@ -568,6 +612,7 @@ app.delete("/api/events/:slug", [authenticateToken, authorizeAdmin] as any, asyn
       }
       await Score.deleteOne({ eventId: deletedEvent._id });
       await Registration.deleteMany({ eventId: deletedEvent._id });
+      broadcastEvent("events-changed", { action: "delete", slug: req.params.slug });
       res.json({ success: true, message: "Event and associated records deleted successfully" });
     } else {
       const idx = localEvents.findIndex(e => e.slug === req.params.slug);
@@ -578,6 +623,7 @@ app.delete("/api/events/:slug", [authenticateToken, authorizeAdmin] as any, asyn
       localEvents.splice(idx, 1);
       localScores.splice(0, localScores.length, ...localScores.filter(s => s.eventId !== eventId));
       localRegistrations.splice(0, localRegistrations.length, ...localRegistrations.filter(r => r.eventId !== eventId));
+      broadcastEvent("events-changed", { action: "delete", slug: req.params.slug });
       res.json({ success: true, message: "Event and associated records deleted successfully in fallback" });
     }
   } catch (error: any) {
@@ -670,6 +716,10 @@ Verification Link: https://macfiesta.macfast.org/verify/${entryPass}
         await user.save();
       }
 
+      broadcastEvent("registrations-changed", { action: "create", registration: newReg });
+      broadcastEvent("events-changed", { action: "update", event });
+      broadcastEvent("payments-changed", { action: "create" });
+
       res.status(201).json({ success: true, registration: newReg, txId });
     } else {
       const event = localEvents.find(e => e._id === eventId);
@@ -736,6 +786,10 @@ Verification Link: https://macfiesta.macfast.org/verify/${entryPass}
         }
       }
 
+      broadcastEvent("registrations-changed", { action: "create", registration: newReg });
+      broadcastEvent("events-changed", { action: "update", event });
+      broadcastEvent("payments-changed", { action: "create" });
+
       res.status(201).json({ success: true, registration: newReg, txId });
     }
   } catch (error: any) {
@@ -794,6 +848,9 @@ app.post("/api/registrations/:id/cancel", authenticateToken as any, async (req: 
         await event.save();
       }
 
+      broadcastEvent("registrations-changed", { action: "cancel", id: regId, registration });
+      broadcastEvent("events-changed", { action: "update" });
+
       res.json({
         success: true,
         message: "Event registration cancelled successfully. As per festival policy, no refund of money is provided.",
@@ -823,6 +880,9 @@ app.post("/api/registrations/:id/cancel", authenticateToken as any, async (req: 
       if (event && event.registeredCount > 0) {
         event.registeredCount -= 1;
       }
+
+      broadcastEvent("registrations-changed", { action: "cancel", id: regId, registration: reg });
+      broadcastEvent("events-changed", { action: "update" });
 
       res.json({
         success: true,
@@ -923,7 +983,7 @@ io.on("connection", (socket: Socket) => {
     try {
       const { eventId, teams, isLive } = data;
       let populated;
-      
+
       if (isDbConnected()) {
         let score = await Score.findOne({ eventId });
         if (!score) {
@@ -946,10 +1006,29 @@ io.on("connection", (socket: Socket) => {
         const event = localEvents.find(e => e._id === score.eventId);
         populated = { ...score, eventId: event };
       }
-      
+
       io.emit("score-live", populated);
     } catch (error) {
       console.error("Socket update-score failed:", error);
+    }
+  });
+
+  socket.on("update-festival-settings", (data: any) => {
+    try {
+      if (data) {
+        if (data.settings) Object.assign(localFestivalSettings, data.settings);
+        if (data.timeline) Object.assign(localTimelineSettings, data.timeline);
+        if (data.theme) Object.assign(localThemeSettings, data.theme);
+      }
+      const payload = {
+        settings: localFestivalSettings,
+        timeline: localTimelineSettings,
+        theme: localThemeSettings,
+        ...data,
+      };
+      io.emit("festival-settings-changed", payload);
+    } catch (error) {
+      console.error("Socket update-festival-settings failed:", error);
     }
   });
 

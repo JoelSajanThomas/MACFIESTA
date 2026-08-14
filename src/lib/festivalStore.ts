@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getSocket } from "./socket";
+import { api } from "./api";
 
 // ── 1. Festival Core & Hero Settings ─────────────────────────────────
 export interface FestivalSettings {
@@ -333,7 +335,7 @@ const DEFAULT_MEDIA: MediaLibraryItem[] = [
   { id: "m-2", name: "Video Project 4 Loop", url: "/MARVEL/Video Project 4.mp4", type: "video", folder: "Videos", tags: ["promo", "video"] },
 ];
 
-// ── 15. Broadcast Sync Channel ────────────────────────────────────────
+// ── 15. Broadcast Sync Channel & Socket Sync ────────────────────────
 let listeners: Array<() => void> = [];
 let syncChannel: BroadcastChannel | null = null;
 
@@ -341,17 +343,35 @@ if (typeof window !== "undefined" && "BroadcastChannel" in window) {
   try {
     syncChannel = new BroadcastChannel("macfiesta_cms_sync");
     syncChannel.onmessage = () => {
-      notifyListeners();
+      notifyListeners(false);
     };
-  } catch {}
+  } catch { }
 }
 
-function notifyListeners() {
+function notifyListeners(emitSocket: boolean = true) {
   listeners.forEach((l) => l());
   if (syncChannel) {
     try {
       syncChannel.postMessage("updated");
-    } catch {}
+    } catch { }
+  }
+  if (emitSocket && typeof window !== "undefined") {
+    try {
+      const socket = getSocket();
+      if (socket) {
+        socket.emit("update-festival-settings", {
+          settings: getFestivalSettings(),
+          timeline: getTimelineSettings(),
+          theme: getThemeSettings(),
+        });
+      }
+      // Best-effort async server sync
+      api.put("/festival-settings", {
+        settings: getFestivalSettings(),
+        timeline: getTimelineSettings(),
+        theme: getThemeSettings(),
+      }).catch(() => {});
+    } catch { }
   }
 }
 
@@ -371,7 +391,7 @@ export function saveFestivalSettings(settings: Partial<FestivalSettings>) {
   const updated = { ...current, ...settings };
   try {
     localStorage.setItem("macfiesta_control_settings", JSON.stringify(updated));
-  } catch {}
+  } catch { }
   notifyListeners();
   return updated;
 }
@@ -391,7 +411,7 @@ export function saveTimelineSettings(timeline: Partial<TimelineSettings>) {
   const updated = { ...current, ...timeline };
   try {
     localStorage.setItem("macfiesta_control_timeline", JSON.stringify(updated));
-  } catch {}
+  } catch { }
   notifyListeners();
   return updated;
 }
@@ -411,7 +431,7 @@ export function saveThemeSettings(theme: Partial<ThemeSettings>) {
   const updated = { ...current, ...theme };
   try {
     localStorage.setItem("macfiesta_control_theme", JSON.stringify(updated));
-  } catch {}
+  } catch { }
   notifyListeners();
   return updated;
 }
@@ -431,7 +451,7 @@ export function saveNavbarSettings(navbar: Partial<NavbarSettings>) {
   const updated = { ...current, ...navbar };
   try {
     localStorage.setItem("macfiesta_control_navbar", JSON.stringify(updated));
-  } catch {}
+  } catch { }
   notifyListeners();
   return updated;
 }
@@ -449,7 +469,7 @@ export function getHomepageSections(): HomepageSection[] {
 export function saveHomepageSections(sections: HomepageSection[]) {
   try {
     localStorage.setItem("macfiesta_homepage_sections", JSON.stringify(sections));
-  } catch {}
+  } catch { }
   notifyListeners();
   return sections;
 }
@@ -467,7 +487,7 @@ export function getDepartmentList(): DepartmentItem[] {
 export function saveDepartmentList(depts: DepartmentItem[]) {
   try {
     localStorage.setItem("macfiesta_control_departments", JSON.stringify(depts));
-  } catch {}
+  } catch { }
   notifyListeners();
   return depts;
 }
@@ -485,7 +505,7 @@ export function getSponsorsList(): SponsorItem[] {
 export function saveSponsorsList(sponsors: SponsorItem[]) {
   try {
     localStorage.setItem("macfiesta_control_sponsors", JSON.stringify(sponsors));
-  } catch {}
+  } catch { }
   notifyListeners();
   return sponsors;
 }
@@ -503,7 +523,7 @@ export function getTestimonialsList(): TestimonialItem[] {
 export function saveTestimonialsList(items: TestimonialItem[]) {
   try {
     localStorage.setItem("macfiesta_control_testimonials", JSON.stringify(items));
-  } catch {}
+  } catch { }
   notifyListeners();
   return items;
 }
@@ -521,7 +541,7 @@ export function getFaqsList(): FaqItem[] {
 export function saveFaqsList(faqs: FaqItem[]) {
   try {
     localStorage.setItem("macfiesta_control_faqs", JSON.stringify(faqs));
-  } catch {}
+  } catch { }
   notifyListeners();
   return faqs;
 }
@@ -539,7 +559,7 @@ export function getAnnouncementsList(): AnnouncementItem[] {
 export function saveAnnouncementsList(announcements: AnnouncementItem[]) {
   try {
     localStorage.setItem("macfiesta_control_announcements", JSON.stringify(announcements));
-  } catch {}
+  } catch { }
   notifyListeners();
   return announcements;
 }
@@ -559,7 +579,7 @@ export function saveAnimationSettings(anims: Partial<AnimationSettings>) {
   const updated = { ...current, ...anims };
   try {
     localStorage.setItem("macfiesta_control_animations", JSON.stringify(updated));
-  } catch {}
+  } catch { }
   notifyListeners();
   return updated;
 }
@@ -579,7 +599,7 @@ export function saveSeoSettings(seo: Partial<SeoSettings>) {
   const updated = { ...current, ...seo };
   try {
     localStorage.setItem("macfiesta_control_seo", JSON.stringify(updated));
-  } catch {}
+  } catch { }
   notifyListeners();
   return updated;
 }
@@ -597,7 +617,7 @@ export function getFormFields(): CustomFormField[] {
 export function saveFormFields(fields: CustomFormField[]) {
   try {
     localStorage.setItem("macfiesta_control_form_fields", JSON.stringify(fields));
-  } catch {}
+  } catch { }
   notifyListeners();
   return fields;
 }
@@ -615,7 +635,7 @@ export function getMediaLibrary(): MediaLibraryItem[] {
 export function saveMediaLibrary(media: MediaLibraryItem[]) {
   try {
     localStorage.setItem("macfiesta_control_media", JSON.stringify(media));
-  } catch {}
+  } catch { }
   notifyListeners();
   return media;
 }
@@ -657,6 +677,22 @@ export function useFestivalControl() {
   useEffect(() => {
     refreshAll();
 
+    // Fetch initial server state
+    api.get("/festival-settings").then((res) => {
+      if (res.data && res.data.success) {
+        if (res.data.settings) {
+          localStorage.setItem("macfiesta_control_settings", JSON.stringify(res.data.settings));
+        }
+        if (res.data.timeline) {
+          localStorage.setItem("macfiesta_control_timeline", JSON.stringify(res.data.timeline));
+        }
+        if (res.data.theme) {
+          localStorage.setItem("macfiesta_control_theme", JSON.stringify(res.data.theme));
+        }
+        refreshAll();
+      }
+    }).catch(() => {});
+
     const handleChange = () => {
       refreshAll();
     };
@@ -673,11 +709,32 @@ export function useFestivalControl() {
       window.addEventListener("storage", handleStorageEvent);
     }
 
+    // Socket real-time synchronization
+    const socket = getSocket();
+    const handleRemoteSync = (payload: any) => {
+      if (payload) {
+        if (payload.settings) {
+          localStorage.setItem("macfiesta_control_settings", JSON.stringify({ ...getFestivalSettings(), ...payload.settings }));
+        }
+        if (payload.timeline) {
+          localStorage.setItem("macfiesta_control_timeline", JSON.stringify({ ...getTimelineSettings(), ...payload.timeline }));
+        }
+        if (payload.theme) {
+          localStorage.setItem("macfiesta_control_theme", JSON.stringify({ ...getThemeSettings(), ...payload.theme }));
+        }
+        refreshAll();
+        notifyListeners(false);
+      }
+    };
+
+    socket.on("festival-settings-changed", handleRemoteSync);
+
     return () => {
       listeners = listeners.filter((l) => l !== handleChange);
       if (typeof window !== "undefined") {
         window.removeEventListener("storage", handleStorageEvent);
       }
+      socket.off("festival-settings-changed", handleRemoteSync);
     };
   }, []);
 

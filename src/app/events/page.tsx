@@ -17,6 +17,8 @@ const HERO_MAPPING: Record<string, { hero: string; level: string; power: string;
   "black-widow-stealth": { hero: "Black Widow", level: "Level: Covert", power: "Power: 95/100", image: "/MARVEL/61080138757668761.png", avatar: "/MARVEL/61080138757668761.png" },
 };
 
+import { getSocket } from "@/lib/socket";
+
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [search, setSearch] = useState("");
@@ -38,6 +40,17 @@ export default function EventsPage() {
       }
     }
     fetchEvents();
+
+    const socket = getSocket();
+    const handleEventsChange = () => {
+      fetchEvents();
+    };
+
+    socket.on("events-changed", handleEventsChange);
+
+    return () => {
+      socket.off("events-changed", handleEventsChange);
+    };
   }, []);
 
   const filteredEvents = useMemo(() => {

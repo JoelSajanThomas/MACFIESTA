@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import {
   RiInstagramFill,
   RiYoutubeFill,
@@ -61,10 +62,14 @@ export function Footer() {
   };
 
   return (
-    <footer
+    <motion.footer
       className="relative bg-gradient-to-b from-[#05050A] via-[#0A0D1A] to-[#020205] border-t border-arc-cyan/20 overflow-hidden z-10 text-white"
       role="contentinfo"
       aria-label="Main Footer"
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
     >
       {/* Background Arc Reactor & Quantum Glow */}
       <div
@@ -98,17 +103,17 @@ export function Footer() {
                 />
               </div>
               <div>
-                <h3 className="text-xl font-black tracking-widest uppercase flex items-center gap-1" style={{ fontFamily: "var(--font-heading)" }}>
+                <h3 className="text-xl font-black tracking-widest uppercase flex items-center gap-1" style={{ fontFamily: "var(--font-syne, var(--font-heading))" }}>
                   <span className="gradient-text-gold neon-gold">{settings.name.slice(0, 3).toUpperCase()}</span>
                   <span className="text-white">{settings.name.slice(3).toUpperCase() || "FIESTA"}</span>
                 </h3>
-                <p className="text-[9px] text-arc-cyan tracking-[0.25em] uppercase font-mono font-bold">
+                <p className="text-[9px] text-arc-cyan tracking-[0.25em] uppercase font-bold font-space">
                   MARVELVERSE • {settings.edition}
                 </p>
               </div>
             </Link>
 
-            <p className="text-xs text-white/60 leading-relaxed max-w-sm font-mono">
+            <p className="text-xs text-white/60 leading-relaxed max-w-sm font-space">
               Avengers Headquarters Tactical Command Center. Host venue: {settings.venueAddress}. Connect your suit, assemble your team, and conquer missions.
             </p>
 
@@ -137,14 +142,14 @@ export function Footer() {
           {/* S.H.I.E.L.D. Portals & Resources Column */}
           <div className="flex flex-col items-center md:items-start text-center md:text-left space-y-6">
             <h4
-              className="text-xs font-bold text-arc-cyan uppercase tracking-[0.25em] relative pb-2 font-mono flex items-center gap-2"
-              style={{ fontFamily: "var(--font-heading)" }}
+              className="text-xs font-bold text-arc-cyan uppercase tracking-[0.25em] relative pb-2 font-space flex items-center gap-2"
+              style={{ fontFamily: "var(--font-space-grotesk, var(--font-body))" }}
             >
               <RiFlashlightLine /> S.H.I.E.L.D. Portals & Protocols
             </h4>
             <div className="grid grid-cols-2 gap-x-8 gap-y-3 w-full justify-items-center md:justify-items-start">
               <div className="space-y-3 text-left">
-                <p className="text-[9px] text-white/40 uppercase font-mono font-black tracking-wider">Portals</p>
+                <p className="text-[9px] text-white/40 uppercase font-space font-black tracking-wider">Portals</p>
                 <ul className="space-y-2.5">
                   {portals.map((link) => (
                     <li key={link.label}>
@@ -159,7 +164,7 @@ export function Footer() {
                 </ul>
               </div>
               <div className="space-y-3 text-left">
-                <p className="text-[9px] text-white/40 uppercase font-mono font-black tracking-wider">Resources</p>
+                <p className="text-[9px] text-white/40 uppercase font-space font-black tracking-wider">Resources</p>
                 <ul className="space-y-2.5">
                   {resources.map((link) => (
                     <li key={link.label}>
@@ -180,8 +185,7 @@ export function Footer() {
           {/* Stark Comms & Security Badge Column */}
           <div className="flex flex-col items-center md:items-start text-center md:text-left space-y-6">
             <h4
-              className="text-xs font-bold text-marvel-red uppercase tracking-[0.25em] relative pb-2 font-mono"
-              style={{ fontFamily: "var(--font-heading)" }}
+              className="text-xs font-bold text-marvel-red uppercase tracking-[0.25em] relative pb-2 font-space"
             >
               Stark Communications
             </h4>
@@ -189,7 +193,7 @@ export function Footer() {
             <div className="glass p-4 rounded-2xl border border-arc-cyan/20 space-y-3 w-full max-w-[300px] text-left">
               <div className="flex gap-2.5 items-start">
                 <RiMapPinLine className="text-arc-cyan text-base mt-0.5 shrink-0" />
-                <span className="text-xs text-white/70 leading-relaxed font-mono">
+                <span className="text-xs text-white/70 leading-relaxed font-space">
                   {settings.venueAddress}
                 </span>
               </div>
@@ -255,7 +259,7 @@ export function Footer() {
           </div>
         </div>
       </div>
-    </footer>
+    </motion.footer>
   );
 }
 

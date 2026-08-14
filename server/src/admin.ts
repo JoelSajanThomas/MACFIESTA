@@ -1,13 +1,16 @@
 import express, { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import QRCode from "qrcode";
 import { User } from "./models/User";
+import { Event } from "./models/Event";
 import { Registration } from "./models/Registration";
 import {
   JWT_SECRET,
   authenticateToken,
   authorizeAdmin,
   isDbConnected,
+  broadcastEvent,
   localUsers,
   localEvents,
   localRegistrations,
@@ -148,6 +151,7 @@ adminRouter.put("/users/:id", [authenticateToken, authorizeAdmin] as any, (req: 
       timestamp: new Date().toISOString()
     });
     
+    broadcastEvent("users-changed", { action: "update", user: localUsers[userIdx] });
     return res.json({ success: true, user: localUsers[userIdx] });
   }
   res.status(404).json({ success: false, message: "User not found" });
@@ -169,6 +173,7 @@ adminRouter.delete("/users/:id", [authenticateToken, authorizeAdmin] as any, (re
       timestamp: new Date().toISOString()
     });
     
+    broadcastEvent("users-changed", { action: "delete", id });
     return res.json({ success: true, message: "User deleted successfully" });
   }
   res.status(404).json({ success: false, message: "User not found" });
@@ -197,6 +202,7 @@ adminRouter.post("/users/bulk", [authenticateToken, authorizeAdmin] as any, (req
     timestamp: new Date().toISOString()
   });
 
+  broadcastEvent("users-changed", { action: "bulk" });
   res.json({ success: true, message: "Bulk users imported successfully", users: localUsers });
 });
 
@@ -299,6 +305,7 @@ adminRouter.post("/payments/refund/:id", [authenticateToken, authorizeAdmin] as 
       timestamp: new Date().toISOString()
     });
 
+    broadcastEvent("payments-changed", { action: "refund", id });
     return res.json({ success: true, payment: localPayments[idx] });
   }
   res.status(404).json({ success: false, message: "Transaction not found" });
@@ -329,6 +336,7 @@ adminRouter.post("/announcements", [authenticateToken, authorizeAdmin] as any, (
     timestamp: new Date().toISOString()
   });
 
+  broadcastEvent("announcement-new", newAnn);
   res.json({ success: true, announcement: newAnn });
 });
 
@@ -352,20 +360,324 @@ adminRouter.get("/reports/export", [authenticateToken, authorizeAdmin] as any, (
   });
 });
 
-// 8. Registrations Audit API
+// 8. Registrations Audit & Management APIs
 adminRouter.get("/registrations", [authenticateToken, authorizeAdmin] as any, async (req: Request, res: Response) => {
   try {
     if (isDbConnected()) {
-      const registrations = await Registration.find().populate("userId").populate("eventId");
-      res.json({ success: true, registrations });
-    } else {
-      const myRegs = localRegistrations.map((r) => {
-        const userObj = localUsers.find((u) => u._id === r.userId);
-        const eventIdStr = typeof r.eventId === "object" ? r.eventId._id : r.eventId;
-        const eventObj = localEvents.find((e) => e._id === eventIdStr);
-        return { ...r, userId: userObj || r.userId, eventId: eventObj || r.eventId };
+      const registrations = await Registration.find()
+        .populate("userId")
+        .populate("eventId")
+        .sort({ createdAt: -1 })
+        .lean();
+
+      const mapped = registrations.map((r: any) => {
+        const user = r.userId || {};
+        const event = r.eventId || {};
+        const pass = r.entryPass || r.passCode || (r._id ? `MF-${String(r._id).slice(-6).toUpperCase()}` : "MF-2K26-PASS");
+        return {
+          _id: String(r._id),
+          passCode: pass,
+          entryPass: pass,
+          userId: r.userId,
+          eventId: r.eventId,
+          userName: user.name || "Delegate User",
+          userEmail: user.email || "N/A",
+          userPhone: user.phone || "N/A",
+          college: user.college || "N/A",
+          department: user.department || "N/A",
+          year: user.year || "N/A",
+          eventTitle: event.title || "General Festival Pass",
+          eventCategory: event.category || "GENERAL",
+          eventVenue: event.venue || "Main Campus Arena",
+          eventDate: event.date || "24-25 Sep 2026",
+          status: r.status ? r.status.toUpperCase() : "ACTIVE",
+          paymentStatus: r.paymentStatus || "completed",
+          paymentId: r.paymentId || `TXN_${String(r._id || '').slice(-8)}`,
+          amountPaid: event.prizePool ? 150 : 150,
+          qrCheckedIn: r.status === "CHECKED_IN" || !!r.qrCheckedIn,
+          qrCode: r.qrCode || "",
+          createdAt: r.createdAt || new Date().toISOString(),
+        };
       });
-      res.json({ success: true, registrations: myRegs });
+
+      return res.json({ success: true, registrations: mapped });
+    } else {
+      const myRegs = localRegistrations.map((r: any) => {
+        const userObj = localUsers.find((u) => u._id === r.userId) || {};
+        const eventIdStr = typeof r.eventId === "object" ? r.eventId._id : r.eventId;
+        const eventObj = localEvents.find((e) => e._id === eventIdStr) || {};
+        const pass = r.entryPass || r.passCode || (r._id ? `MF-${String(r._id).slice(-6).toUpperCase()}` : "MF-2K26-PASS");
+        return {
+          _id: String(r._id),
+          passCode: pass,
+          entryPass: pass,
+          userId: userObj,
+          eventId: eventObj,
+          userName: userObj.name || "Delegate User",
+          userEmail: userObj.email || "N/A",
+          userPhone: userObj.phone || "N/A",
+          college: userObj.college || "MACFAST",
+          department: userObj.department || "General",
+          year: userObj.year || "1st Year",
+          eventTitle: eventObj.title || "General Festival Pass",
+          eventCategory: eventObj.category || "GENERAL",
+          eventVenue: eventObj.venue || "Main Campus Arena",
+          eventDate: eventObj.date || "24-25 Sep 2026",
+          status: r.status ? r.status.toUpperCase() : "ACTIVE",
+          paymentStatus: r.paymentStatus || "completed",
+          paymentId: r.paymentId || `TXN_${String(r._id || '').slice(-8)}`,
+          amountPaid: 150,
+          qrCheckedIn: r.status === "CHECKED_IN" || !!r.qrCheckedIn,
+          qrCode: r.qrCode || "",
+          createdAt: r.createdAt || new Date().toISOString(),
+        };
+      });
+      return res.json({ success: true, registrations: myRegs });
+    }
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Admin Spot Registration API
+adminRouter.post("/registrations", [authenticateToken, authorizeAdmin] as any, async (req: Request, res: Response) => {
+  try {
+    const { name, email, phone, college, department, year, eventId, amount } = req.body;
+    const adminEmail = (req as any).user?.email || "admin@macfast.org";
+
+    if (!name || !email) {
+      return res.status(400).json({ success: false, message: "Name and Email are required for spot registration" });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const entryPass = `MF-2K26-${Math.floor(1000 + Math.random() * 9000)}`;
+    const txId = `SPOT_TXN_${Math.floor(10000000 + Math.random() * 90000000)}`;
+
+    const qrPayload = `MACFIESTA 2K26 OFFICIAL ENTRY TICKET
+------------------------------------
+Pass Code: ${entryPass}
+Participant: ${name}
+Email: ${normalizedEmail}
+College: ${college || "MACFAST Tiruvalla"}
+Date Registered: ${new Date().toLocaleDateString()}
+Status: VERIFIED & PAID (SPOT REGISTRATION)
+Organized By: MACFAST Tiruvalla
+Verification Link: https://macfiesta.macfast.org/verify/${entryPass}
+------------------------------------`;
+
+    const qrCodeBase64 = await QRCode.toDataURL(qrPayload, { margin: 1, width: 300 });
+
+    if (isDbConnected()) {
+      // Find or create user
+      let user = await User.findOne({ email: normalizedEmail });
+      if (!user) {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash("macfiesta2026", salt);
+        user = await User.create({
+          name,
+          email: normalizedEmail,
+          password: hashedPassword,
+          phone: phone || "+91 90000 00000",
+          college: college || "MACFAST",
+          department: department || "General",
+          year: year || "1",
+          role: "student",
+          xpPoints: 50,
+          badges: [{ id: "spot", name: "Spot Registered Agent" }]
+        });
+      }
+
+      // Find event or fallback to first event
+      let targetEventId = eventId;
+      if (!targetEventId) {
+        const anyEvent = await Event.findOne();
+        targetEventId = anyEvent?._id;
+      }
+
+      const newReg = await Registration.create({
+        userId: user._id,
+        eventId: targetEventId,
+        paymentStatus: "completed",
+        paymentId: txId,
+        qrCode: qrCodeBase64,
+        entryPass,
+        status: "active"
+      });
+
+      localAuditLogs.unshift({
+        _id: `log-${Date.now()}`,
+        admin: adminEmail,
+        action: `Issued Spot Registration pass ${entryPass} to ${name} (${normalizedEmail})`,
+        timestamp: new Date().toISOString()
+      });
+
+      broadcastEvent("registrations-changed", { action: "create", entryPass });
+      broadcastEvent("users-changed", { action: "create" });
+      broadcastEvent("payments-changed", { action: "create" });
+
+      return res.status(201).json({
+        success: true,
+        message: "Spot registration pass generated successfully",
+        registration: {
+          _id: String(newReg._id),
+          passCode: entryPass,
+          entryPass,
+          userName: name,
+          userEmail: normalizedEmail,
+          userPhone: phone || user.phone,
+          college: college || user.college,
+          department: department || user.department,
+          eventTitle: "Spot Access Pass",
+          status: "ACTIVE",
+          paymentStatus: "completed",
+          paymentId: txId,
+          amountPaid: amount || 150,
+          qrCheckedIn: false,
+          qrCode: qrCodeBase64,
+          createdAt: new Date().toISOString()
+        }
+      });
+    } else {
+      let user = localUsers.find(u => u.email.toLowerCase() === normalizedEmail);
+      if (!user) {
+        user = {
+          _id: `user-${Date.now()}`,
+          name,
+          email: normalizedEmail,
+          password: "mock",
+          phone: phone || "+91 90000 00000",
+          college: college || "MACFAST",
+          department: department || "General",
+          year: year || "1",
+          role: "student",
+          xpPoints: 50,
+          badges: []
+        };
+        localUsers.push(user);
+      }
+
+      const newReg = {
+        _id: `reg-${Date.now()}`,
+        userId: user._id,
+        eventId: eventId || (localEvents[0] ? localEvents[0]._id : "event-default"),
+        paymentStatus: "completed",
+        paymentId: txId,
+        qrCode: qrCodeBase64,
+        entryPass,
+        status: "ACTIVE"
+      };
+      localRegistrations.push(newReg);
+
+      localAuditLogs.unshift({
+        _id: `log-${Date.now()}`,
+        admin: adminEmail,
+        action: `Issued Spot Registration pass ${entryPass} to ${name}`,
+        timestamp: new Date().toISOString()
+      });
+
+      broadcastEvent("registrations-changed", { action: "create", entryPass });
+      broadcastEvent("users-changed", { action: "create" });
+      broadcastEvent("payments-changed", { action: "create" });
+
+      return res.status(201).json({
+        success: true,
+        message: "Spot registration pass generated successfully",
+        registration: {
+          ...newReg,
+          passCode: entryPass,
+          userName: name,
+          userEmail: normalizedEmail,
+          userPhone: phone || user.phone,
+          college: college || user.college,
+          eventTitle: "Spot Access Pass",
+          amountPaid: amount || 150,
+          qrCheckedIn: false
+        }
+      });
+    }
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Update Registration Status / Details
+adminRouter.put("/registrations/:id", [authenticateToken, authorizeAdmin] as any, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { status, userName, amountPaid } = req.body;
+    const adminEmail = (req as any).user?.email || "admin@macfast.org";
+
+    if (isDbConnected()) {
+      const reg = await Registration.findById(id);
+      if (!reg) {
+        return res.status(404).json({ success: false, message: "Registration not found" });
+      }
+      if (status) {
+        reg.status = status.toLowerCase() === "checked_in" ? ("active" as any) : status.toLowerCase();
+      }
+      await reg.save();
+
+      localAuditLogs.unshift({
+        _id: `log-${Date.now()}`,
+        admin: adminEmail,
+        action: `Updated Registration pass (${reg.entryPass || id}) status to ${status || 'updated'}`,
+        timestamp: new Date().toISOString()
+      });
+
+      broadcastEvent("registrations-changed", { action: "update", id, status });
+      return res.json({ success: true, message: "Registration updated", registration: reg });
+    } else {
+      const idx = localRegistrations.findIndex(r => r._id === id);
+      if (idx !== -1) {
+        if (status) localRegistrations[idx].status = status;
+        broadcastEvent("registrations-changed", { action: "update", id, status });
+        return res.json({ success: true, registration: localRegistrations[idx] });
+      }
+      res.status(404).json({ success: false, message: "Registration not found" });
+    }
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Delete / Revoke Registration
+adminRouter.delete("/registrations/:id", [authenticateToken, authorizeAdmin] as any, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const adminEmail = (req as any).user?.email || "admin@macfast.org";
+
+    if (isDbConnected()) {
+      const deleted = await Registration.findByIdAndDelete(id);
+      if (!deleted) {
+        return res.status(404).json({ success: false, message: "Registration not found" });
+      }
+
+      localAuditLogs.unshift({
+        _id: `log-${Date.now()}`,
+        admin: adminEmail,
+        action: `Revoked & Removed Registration pass: ${deleted.entryPass || id}`,
+        timestamp: new Date().toISOString()
+      });
+
+      broadcastEvent("registrations-changed", { action: "delete", id });
+      return res.json({ success: true, message: "Registration pass revoked successfully" });
+    } else {
+      const idx = localRegistrations.findIndex(r => r._id === id);
+      if (idx !== -1) {
+        const deleted = localRegistrations[idx];
+        localRegistrations.splice(idx, 1);
+
+        localAuditLogs.unshift({
+          _id: `log-${Date.now()}`,
+          admin: adminEmail,
+          action: `Revoked & Removed Registration pass: ${deleted.entryPass || id}`,
+          timestamp: new Date().toISOString()
+        });
+
+        broadcastEvent("registrations-changed", { action: "delete", id });
+        return res.json({ success: true, message: "Registration pass revoked successfully" });
+      }
+      res.status(404).json({ success: false, message: "Registration not found" });
     }
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
@@ -381,42 +693,59 @@ adminRouter.post("/qr-checkin", [authenticateToken, authorizeAdmin] as any, asyn
     }
 
     const adminEmail = (req as any).user?.email || "admin@macfast.org";
+    const searchCode = passCode.trim();
 
     if (isDbConnected()) {
-      const registration = await Registration.findOne({ passCode });
+      const registration = await Registration.findOne({
+        $or: [
+          { entryPass: searchCode },
+          { entryPass: new RegExp(`^${searchCode}$`, "i") },
+          { paymentId: searchCode },
+          { _id: searchCode.match(/^[0-9a-fA-F]{24}$/) ? searchCode : undefined }
+        ].filter(Boolean)
+      }).populate("userId").populate("eventId");
+
       if (!registration) {
-        return res.status(404).json({ success: false, message: "Registration not found for this passCode" });
+        return res.status(404).json({ success: false, message: "Registration not found for this pass code" });
       }
-      if ((registration as any).status === "CHECKED_IN") {
-        return res.status(400).json({ success: false, message: "Participant already checked in" });
+      if ((registration as any).status === "CHECKED_IN" || (registration as any).qrCheckedIn) {
+        return res.status(400).json({ success: false, message: "Participant already checked in at gate" });
       }
       (registration as any).status = "CHECKED_IN";
       (registration as any).qrCheckedIn = true;
       await (registration as any).save();
+
       localAuditLogs.unshift({
         _id: `log-${Date.now()}`,
         admin: adminEmail,
-        action: `QR Check-In: passCode ${passCode}`,
+        action: `Gate QR Check-In Verified: Pass ${(registration as any).entryPass}`,
         timestamp: new Date().toISOString()
       });
-      return res.json({ success: true, message: "Participant checked in successfully", registration });
+      broadcastEvent("qr-checked-in", { passCode: searchCode, registration });
+      broadcastEvent("registrations-changed", { action: "checkin", passCode: searchCode });
+      return res.json({ success: true, message: "Participant gate check-in confirmed", registration });
     } else {
-      const regIdx = localRegistrations.findIndex((r) => r.passCode === passCode);
+      const regIdx = localRegistrations.findIndex(
+        (r) => r.passCode === searchCode || r.entryPass === searchCode || r._id === searchCode
+      );
       if (regIdx === -1) {
-        return res.status(404).json({ success: false, message: "Registration not found for this passCode" });
+        return res.status(404).json({ success: false, message: "Registration not found for this pass code" });
       }
-      if (localRegistrations[regIdx].status === "CHECKED_IN") {
-        return res.status(400).json({ success: false, message: "Participant already checked in" });
+      if (localRegistrations[regIdx].status === "CHECKED_IN" || localRegistrations[regIdx].qrCheckedIn) {
+        return res.status(400).json({ success: false, message: "Participant already checked in at gate" });
       }
       localRegistrations[regIdx].status = "CHECKED_IN";
       localRegistrations[regIdx].qrCheckedIn = true;
+
       localAuditLogs.unshift({
         _id: `log-${Date.now()}`,
         admin: adminEmail,
-        action: `QR Check-In: passCode ${passCode}`,
+        action: `Gate QR Check-In Verified: Pass ${localRegistrations[regIdx].entryPass || searchCode}`,
         timestamp: new Date().toISOString()
       });
-      return res.json({ success: true, message: "Participant checked in successfully", registration: localRegistrations[regIdx] });
+      broadcastEvent("qr-checked-in", { passCode: searchCode, registration: localRegistrations[regIdx] });
+      broadcastEvent("registrations-changed", { action: "checkin", passCode: searchCode });
+      return res.json({ success: true, message: "Participant gate check-in confirmed", registration: localRegistrations[regIdx] });
     }
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });

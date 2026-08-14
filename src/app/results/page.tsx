@@ -1,16 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { RiAwardLine, RiSearchLine, RiDownloadLine, RiCheckDoubleLine, RiTrophyLine, RiSparklingLine, RiShieldFlashLine } from "react-icons/ri";
+import { api } from "@/lib/api";
+import { getSocket } from "@/lib/socket";
 
-const resultsData = [
+const DEFAULT_RESULTS = [
   { event: "Thor Gaming Arena (Urumi BGMI & Valorant)", winner: "Apex Overlords (CET Trivandrum)", runner: "Silent Killers (MACFAST)", hero: "Thor", status: "verified" },
   { event: "Iron Man Byte & Code Hackathon", winner: "Byte Busters (MACFAST)", runner: "Syntax Sorcerers (AJCE)", hero: "Iron Man", status: "verified" },
   { event: "Sanctum Corporate Showdown", winner: "Aria George (MBA Dept)", runner: "Rohit Krishnan (SCMS)", hero: "Doctor Strange", status: "verified" }
 ];
 
-export function HallOfHeroesPodium() {
+export function HallOfHeroesPodium({ topTeams }: { topTeams?: Array<{ name: string; college: string; score: number }> }) {
+  const champion = topTeams?.[0]?.name || "Byte Busters";
+  const runner = topTeams?.[1]?.name || "Apex Squad";
+  const third = topTeams?.[2]?.name || "Syntax Team";
+
   return (
     <div className="marvel-card p-8 rounded-3xl border border-metallic-gold/40 text-center space-y-6 relative overflow-hidden bg-gradient-to-b from-[#0F0D05] to-[#05050A]">
       <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-metallic-gold/40 bg-metallic-gold/10 text-metallic-gold text-xs font-mono font-bold tracking-widest uppercase">
@@ -31,7 +37,7 @@ export function HallOfHeroesPodium() {
           </div>
           <div className="w-24 sm:w-32 h-28 bg-white/5 border border-white/20 rounded-t-2xl flex flex-col justify-center p-2 text-center">
             <span className="text-[10px] text-white/50 uppercase font-bold">2ND PLACE</span>
-            <span className="text-xs font-bold text-white truncate">Apex Squad</span>
+            <span className="text-xs font-bold text-white truncate">{runner}</span>
           </div>
         </div>
 
@@ -42,7 +48,7 @@ export function HallOfHeroesPodium() {
           </div>
           <div className="w-28 sm:w-36 h-36 bg-metallic-gold/10 border-2 border-metallic-gold/50 rounded-t-2xl flex flex-col justify-center p-2 text-center shadow-[0_0_30px_rgba(255,215,0,0.2)]">
             <span className="text-[10px] text-metallic-gold uppercase font-black tracking-widest">GRAND CHAMPION</span>
-            <span className="text-sm font-black text-white truncate">Byte Busters</span>
+            <span className="text-sm font-black text-white truncate">{champion}</span>
           </div>
         </div>
 
@@ -53,7 +59,7 @@ export function HallOfHeroesPodium() {
           </div>
           <div className="w-24 sm:w-32 h-20 bg-marvel-red/5 border border-marvel-red/20 rounded-t-2xl flex flex-col justify-center p-2 text-center">
             <span className="text-[10px] text-marvel-red uppercase font-bold">3RD PLACE</span>
-            <span className="text-xs font-bold text-white truncate">Syntax Team</span>
+            <span className="text-xs font-bold text-white truncate">{third}</span>
           </div>
         </div>
       </div>
@@ -63,8 +69,64 @@ export function HallOfHeroesPodium() {
 
 export default function ResultsPage() {
   const [search, setSearch] = useState("");
+  const [scores, setScores] = useState<any[]>([]);
 
-  const filtered = resultsData.filter((r) => r.event.toLowerCase().includes(search.toLowerCase()));
+  useEffect(() => {
+    async function loadScores() {
+      try {
+        const res = await api.get("/scoreboard");
+        if (res.data && res.data.success && Array.isArray(res.data.scores)) {
+          setScores(res.data.scores);
+        }
+      } catch {}
+    }
+    loadScores();
+
+    const socket = getSocket();
+    const handleScoreLive = (updatedScore: any) => {
+      setScores((prev) => {
+        const targetId = typeof updatedScore.eventId === "object" ? updatedScore.eventId._id : updatedScore.eventId;
+        const index = prev.findIndex((s) => {
+          const currentId = typeof s.eventId === "object" ? s.eventId._id : s.eventId;
+          return currentId === targetId;
+        });
+
+        if (index !== -1) {
+          const updated = [...prev];
+          updated[index] = updatedScore;
+          return updated;
+        } else {
+          return [...prev, updatedScore];
+        }
+      });
+    };
+
+    socket.on("score-live", handleScoreLive);
+    return () => {
+      socket.off("score-live", handleScoreLive);
+    };
+  }, []);
+
+  const dynamicResults = scores.length > 0
+    ? scores.map((s) => {
+        const eventTitle = typeof s.eventId === "object" ? s.eventId?.title : "Championship Tournament";
+        const teams = Array.isArray(s.teams) ? [...s.teams].sort((a: any, b: any) => b.score - a.score) : [];
+        const winner = teams[0] ? `${teams[0].name} (${teams[0].college || "Champion"})` : "TBD";
+        const runner = teams[1] ? `${teams[1].name} (${teams[1].college || "Runner-Up"})` : "TBD";
+        return {
+          event: eventTitle,
+          winner,
+          runner,
+          hero: "Marvel",
+          status: "verified"
+        };
+      })
+    : DEFAULT_RESULTS;
+
+  const filtered = dynamicResults.filter((r) => r.event.toLowerCase().includes(search.toLowerCase()));
+
+  const allTeams = scores.flatMap((s) => (Array.isArray(s.teams) ? s.teams : [])).sort((a: any, b: any) => b.score - a.score);
+
 
   return (
     <div className="bg-[#05050A] min-h-screen pt-28 pb-16 text-white font-mono relative overflow-hidden">
@@ -91,7 +153,7 @@ export default function ResultsPage() {
         </div>
 
         {/* Podium */}
-        <HallOfHeroesPodium />
+        <HallOfHeroesPodium topTeams={allTeams} />
 
         {/* Search */}
         <div className="glass p-4 rounded-xl border border-arc-cyan/20 relative">

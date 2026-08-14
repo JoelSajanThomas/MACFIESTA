@@ -1,21 +1,62 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { CountdownTimer } from "./CountdownTimer";
 import { MusicVisualizer } from "./MusicVisualizer";
-import { RiPlayLine, RiShieldFlashLine, RiFlashlightLine, RiCompass3Line } from "react-icons/ri";
+import {
+  RiPlayLine,
+  RiShieldFlashLine,
+  RiFlashlightLine,
+  RiCompass3Line,
+  RiArrowDownLine,
+} from "react-icons/ri";
 import { useFestivalControl } from "@/lib/festivalStore";
+
+/* ─── Stagger container ─── */
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.12, delayChildren: 0.1 },
+  },
+};
+
+const wordVariants = {
+  hidden: { opacity: 0, y: 60, rotateX: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    rotateX: 0,
+    transition: { duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] },
+  },
+};
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: "easeOut" as const },
+  },
+};
 
 export function HeroSection() {
   const { settings } = useFestivalControl();
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const sectionRef = useRef<HTMLElement | null>(null);
 
   const isPlayingRef = useRef(false);
   const scrollPausedRef = useRef(false);
+
+  /* ─── Parallax ─── */
+  const { scrollY } = useScroll();
+  const bgY = useTransform(scrollY, [0, 600], ["0%", "25%"]);
+  const bgScale = useTransform(scrollY, [0, 600], [1.02, 1.08]);
+  const contentOpacity = useTransform(scrollY, [0, 300], [1, 0]);
+  const contentY = useTransform(scrollY, [0, 300], [0, -40]);
 
   const setPlayState = (val: boolean) => {
     setIsPlaying(val);
@@ -101,90 +142,124 @@ export function HeroSection() {
     }
   };
 
+  const scrollToNext = () => {
+    window.scrollBy({ top: window.innerHeight, behavior: "smooth" });
+  };
+
   return (
-    <section className="relative w-full min-h-screen flex flex-col justify-between overflow-hidden bg-[#05050A] pt-24 md:pt-32">
-      {/* Background Marvel 3025924746959430.jpg Wallpaper & Dynamic Overlay */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <Image
-          src="/MARVEL/3025924746959430.jpg"
-          alt="Welcome to MacFiesta Marvel Wallpaper Background"
-          fill
-          priority
-          className="object-cover object-center filter brightness-110 contrast-125 opacity-90 scale-[1.02]"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#05050A] via-[#05050A]/30 to-[#05050A]/40 z-[1]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_50%,rgba(5,5,10,0.8)_95%)] z-[1]" />
+    <section
+      ref={sectionRef}
+      className="relative w-full min-h-screen flex flex-col justify-between overflow-hidden bg-transparent pt-24 md:pt-32"
+    >
+      {/* ─── Ambient Glow Accents (Translucent for 3D Canvas) ─── */}
+      <div className="absolute inset-0 z-[1] pointer-events-none">
+        <div className="absolute top-1/4 left-10 w-96 h-96 rounded-full bg-marvel-red/10 blur-[140px]" />
+        <div className="absolute top-1/3 right-10 w-96 h-96 rounded-full bg-arc-cyan/10 blur-[140px]" />
+      </div>
 
-
-
-        {/* Floating Iron Man Overlay Graphic */}
-        <div className="absolute top-10 right-8 opacity-35 hidden xl:block pointer-events-none z-[2]">
+      {/* Floating Iron Man */}
+      <div className="absolute top-10 right-8 opacity-35 hidden xl:block pointer-events-none z-[3]">
+        <motion.div
+          animate={{ y: [-8, 8, -8] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        >
           <Image
             src="/MARVEL/ironman.png"
             alt="Iron Man"
             width={360}
             height={360}
-            className="object-contain animate-float drop-shadow-[0_0_30px_rgba(237,29,36,0.7)]"
+            className="object-contain drop-shadow-[0_0_30px_rgba(237,29,36,0.7)]"
           />
-        </div>
+        </motion.div>
       </div>
 
-
-      {/* Main Content Area */}
-      <div className="relative z-10 flex-grow flex flex-col justify-center max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 md:py-16">
+      {/* ─── Main Content ─── */}
+      <motion.div
+        className="relative z-10 flex-grow flex flex-col justify-center max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 md:py-16"
+        style={{ opacity: contentOpacity, y: contentY }}
+      >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
 
-          {/* Hero Text Content */}
+          {/* Hero Text */}
           <div className="lg:col-span-8 space-y-6 text-center lg:text-left flex flex-col items-center lg:items-start">
+
+            {/* Badge */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-marvel-red/40 bg-marvel-red/10 text-marvel-red text-xs font-mono font-bold tracking-widest uppercase shadow-[0_0_15px_rgba(237,29,36,0.3)]"
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-marvel-red/40 bg-marvel-red/10 text-marvel-red text-xs font-bold tracking-widest uppercase shadow-[0_0_15px_rgba(237,29,36,0.3)] font-space"
             >
               <RiShieldFlashLine className="animate-pulse text-sm" />
               <span>AVENGERS HEADQUARTERS DIRECTIVE • {settings.edition}</span>
             </motion.div>
 
-            <div className="space-y-3 w-full">
-              <motion.h1
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
-                className="text-hero tracking-tight"
-                style={{ fontFamily: "var(--font-heading)" }}
-              >
-                <span className="block text-white text-3xl sm:text-4xl lg:text-5xl font-black uppercase font-mono tracking-widest text-arc-cyan">
+            {/* Main Title — Staggered words */}
+            <motion.div
+              className="space-y-1.5 w-full perspective-[1000px] overflow-hidden"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              <motion.div variants={wordVariants}>
+                <span
+                  className="block text-white text-xl sm:text-2xl lg:text-3xl font-black uppercase tracking-widest text-arc-cyan glow-text-cyan"
+                  style={{ fontFamily: "var(--font-orbitron)" }}
+                >
                   WELCOME TO
                 </span>
-                <span className="block marvel-bang-comic-gradient uppercase pr-4 text-5xl sm:text-7xl lg:text-8xl tracking-tight">
+              </motion.div>
+
+              <motion.div variants={wordVariants}>
+                <span
+                  className="block marvel-bang-comic-gradient uppercase tracking-normal break-words max-w-full font-black drop-shadow-[0_4px_25px_rgba(237,29,36,0.7)]"
+                  style={{
+                    fontFamily: "var(--font-syne)",
+                    fontSize: "clamp(1.8rem, 5.2vw, 4.2rem)",
+                    fontWeight: 900,
+                    lineHeight: 1.0,
+                  }}
+                >
                   {settings.name.toUpperCase()}
                 </span>
-                <span className="block text-marvel-red text-2xl sm:text-4xl lg:text-5xl font-black uppercase tracking-[0.2em] font-mono mt-1 drop-shadow-[0_0_20px_#ED1D24]">
+              </motion.div>
+
+              <motion.div variants={wordVariants}>
+                <span
+                  className="block text-marvel-red text-lg sm:text-2xl lg:text-3xl font-black uppercase tracking-[0.2em] mt-1 glow-text-red"
+                  style={{ fontFamily: "var(--font-orbitron)" }}
+                >
                   MARVELVERSE
                 </span>
-              </motion.h1>
+              </motion.div>
+            </motion.div>
 
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
-                className="text-subtitle font-medium text-white/80 max-w-xl mx-auto lg:mx-0 font-mono"
-              >
-                "Every Hero Has A Mission." — Earth's premier college festival at MACFAST. Prepare your suit, verify your squad, and assemble for victory across 26 high-level missions.
-              </motion.p>
-            </div>
+            {/* Subtitle */}
+            <motion.p
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              transition={{ delay: 0.5 }}
+              className="text-white/80 max-w-xl mx-auto lg:mx-0 font-space text-base leading-relaxed"
+            >
+              &ldquo;Every Hero Has A Mission.&rdquo; — Earth&apos;s premier college festival at MACFAST.
+              Prepare your suit, verify your squad, and assemble for victory across{" "}
+              <span className="text-arc-cyan font-semibold">26 high-level missions</span>.
+            </motion.p>
 
             {/* CTAs */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              transition={{ delay: 0.65 }}
               className="flex flex-wrap justify-center lg:justify-start gap-4 pt-4 w-full"
             >
-              <Link href="/signup" className="btn-primary group shadow-[0_0_25px_#ED1D24]">
-                <span>{settings.registrationOpen ? "Register Now" : "Registration Closed"}</span>
-                <RiPlayLine className="group-hover:translate-x-1 transition-transform" />
+              <Link href="/signup" className="btn-urgency group">
+                <span className="relative z-10">
+                  {settings.registrationOpen ? "Register Now" : "Registration Closed"}
+                </span>
+                <RiPlayLine className="group-hover:translate-x-1 transition-transform relative z-10" />
               </Link>
               <Link href="/events" className="btn-outline border-arc-cyan text-white hover:bg-arc-cyan/20">
                 <RiCompass3Line className="text-arc-cyan" />
@@ -193,13 +268,13 @@ export function HeroSection() {
             </motion.div>
           </div>
 
-          {/* Countdown & Music Visualizer Panel (Stark Industries HUD) */}
+          {/* Countdown & Music Visualizer — Stark HUD */}
           <div className="lg:col-span-4 flex flex-col items-center lg:items-end justify-center">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="stark-panel p-5 md:p-6 rounded-2xl w-[92%] sm:w-full max-w-[340px] space-y-5 flex flex-col items-center justify-center shadow-[0_0_40px_rgba(0,0,0,0.8),0_0_15px_rgba(0,212,255,0.2)] relative"
+              initial={{ opacity: 0, scale: 0.92, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="stark-panel p-5 md:p-6 rounded-2xl w-[92%] sm:w-full max-w-[340px] space-y-5 flex flex-col items-center justify-center shadow-[0_0_40px_rgba(0,0,0,0.8),0_0_20px_rgba(0,212,255,0.15)] relative border-glow-flow"
             >
               {/* Corner HUD Markers */}
               <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-arc-cyan/70 rounded-tl" />
@@ -209,12 +284,11 @@ export function HeroSection() {
 
               <div className="w-full text-center space-y-1">
                 <h3
-                  className="text-xs font-mono font-bold text-arc-cyan tracking-[0.25em] uppercase flex items-center justify-center gap-1.5"
-                  style={{ fontFamily: "var(--font-heading)" }}
+                  className="text-xs font-bold text-arc-cyan tracking-[0.25em] uppercase flex items-center justify-center gap-1.5 font-orbitron"
                 >
                   <RiFlashlightLine /> S.H.I.E.L.D. MISSION COUNTDOWN
                 </h3>
-                <p className="text-xs font-semibold text-metallic-gold font-mono">
+                <p className="text-xs font-semibold text-metallic-gold font-space">
                   {settings.motto}
                 </p>
               </div>
@@ -243,7 +317,7 @@ export function HeroSection() {
                       </svg>
                     )}
                   </button>
-                  <div className="text-left font-mono">
+                  <div className="text-left font-space">
                     <p className="text-[9px] text-white/40 tracking-widest uppercase">
                       AVENGERS AUDIO HUD
                     </p>
@@ -258,11 +332,11 @@ export function HeroSection() {
           </div>
 
         </div>
-      </div>
+      </motion.div>
 
-      {/* MCU Ticker Tape */}
+      {/* ─── MCU Ticker Tape ─── */}
       <div className="w-full glass py-2.5 border-y border-arc-cyan/20 overflow-hidden z-10 pointer-events-none bg-black/60">
-        <div className="flex animate-ticker whitespace-nowrap gap-10 text-[11px] font-mono font-bold tracking-[0.25em] uppercase text-white/60">
+        <div className="flex animate-ticker whitespace-nowrap gap-10 text-[11px] font-bold tracking-[0.25em] uppercase text-white/60 font-space">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="flex gap-10 items-center">
               <span className="text-marvel-red">★ 26 AVENGER MISSIONS</span>
@@ -274,6 +348,20 @@ export function HeroSection() {
           ))}
         </div>
       </div>
+
+      {/* ─── Scroll Indicator ─── */}
+      <motion.button
+        onClick={scrollToNext}
+        className="scroll-indicator absolute bottom-20 left-1/2 -translate-x-1/2 z-20"
+        aria-label="Scroll to next section"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5 }}
+      >
+        <span className="text-[9px] font-bold tracking-[0.3em] uppercase text-arc-cyan/60 font-space">SCROLL</span>
+        <div className="scroll-indicator-line" />
+        <RiArrowDownLine className="text-arc-cyan/60 text-lg animate-bounce" />
+      </motion.button>
     </section>
   );
 }

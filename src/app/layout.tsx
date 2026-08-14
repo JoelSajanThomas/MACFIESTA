@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Orbitron, Bebas_Neue, Rajdhani } from "next/font/google";
+import { Inter, Orbitron, Bebas_Neue, Rajdhani, Space_Grotesk, Syne } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -9,6 +9,8 @@ import { SmoothScrollProvider } from "@/providers/SmoothScrollProvider";
 import { MaintenanceGuard } from "@/components/layout/MaintenanceGuard";
 import { ParticleBackground } from "@/components/ui/ParticleBackground";
 import { JarvisAssistant } from "@/components/ui/JarvisAssistant";
+import { LoadingProvider } from "@/providers/LoadingProvider";
+import { PageGate } from "@/components/layout/PageGate";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -35,6 +37,20 @@ const rajdhani = Rajdhani({
   variable: "--font-rajdhani",
   display: "swap",
   weight: ["300", "400", "500", "600", "700"],
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
+});
+
+const syne = Syne({
+  subsets: ["latin"],
+  variable: "--font-syne",
+  display: "swap",
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -100,23 +116,27 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" suppressHydrationWarning={true}>
       <body
-        className={`${inter.variable} ${orbitron.variable} ${bebasNeue.variable} ${rajdhani.variable} antialiased noise-overlay`}
+        className={`${inter.variable} ${orbitron.variable} ${bebasNeue.variable} ${rajdhani.variable} ${spaceGrotesk.variable} ${syne.variable} antialiased noise-overlay`}
         suppressHydrationWarning={true}
       >
-        <LoadingScreen />
-        <CursorGlow />
-        <ParticleBackground />
-        <JarvisAssistant />
-        <a href="#main-content" className="skip-link">
-          Skip to main content
-        </a>
-        <MaintenanceGuard>
-          <SmoothScrollProvider>
-            <Navbar />
-            <main id="main-content">{children}</main>
-            <Footer />
-          </SmoothScrollProvider>
-        </MaintenanceGuard>
+        <LoadingProvider>
+          <LoadingScreen />
+          <CursorGlow />
+          <ParticleBackground />
+          <JarvisAssistant />
+          <a href="#main-content" className="skip-link">
+            Skip to main content
+          </a>
+          <MaintenanceGuard>
+            <SmoothScrollProvider>
+              <PageGate>
+                <Navbar />
+                <main id="main-content">{children}</main>
+                <Footer />
+              </PageGate>
+            </SmoothScrollProvider>
+          </MaintenanceGuard>
+        </LoadingProvider>
       </body>
     </html>
   );
