@@ -157,7 +157,7 @@ function TiltCard({ item, idx }: { item: typeof featured[0]; idx: number }) {
         </div>
 
         {/* Mission Details */}
-        <div className="p-4 sm:p-6 flex-grow flex flex-col justify-between bg-[#0A0D1A] relative z-20">
+        <div className="p-4 sm:p-5 flex-grow flex flex-col justify-between bg-[#0A0D1A] relative z-20 font-excon">
           {/* Floating Avatar */}
           <div className="absolute -top-10 right-4 z-30 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border-2 border-white/20 overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.8)] bg-black/80 group-hover:scale-110 group-hover:border-arc-cyan transition-all duration-300">
             <Image
@@ -196,17 +196,17 @@ function TiltCard({ item, idx }: { item: typeof featured[0]; idx: number }) {
             </div>
           </div>
 
-          <div className="pt-4 border-t border-white/10 flex items-center justify-between gap-2">
+          <div className="pt-3.5 border-t border-white/10 flex items-center justify-between gap-2">
             <Link
               href={item.link}
-              className="text-[11px] sm:text-xs font-bold text-arc-cyan hover:text-white transition-colors tracking-[0.12em] sm:tracking-[0.14em] uppercase flex items-center gap-1 font-excon-bold shrink-0"
+              className="text-[11px] sm:text-xs font-bold text-arc-cyan hover:text-white transition-colors tracking-wider uppercase flex items-center gap-1 font-excon-bold min-w-0"
             >
-              Mission Briefing
-              <RiArrowRightLine className="group-hover:translate-x-1 transition-transform" />
+              <span className="truncate">Mission Briefing</span>
+              <RiArrowRightLine className="group-hover:translate-x-1 transition-transform shrink-0" />
             </Link>
             <Link
               href="/signup"
-              className="text-[11px] sm:text-xs font-black text-white bg-marvel-red hover:bg-white hover:text-black px-3.5 sm:px-4 py-2 rounded-full transition-all uppercase tracking-[0.12em] sm:tracking-[0.15em] shadow-[0_0_12px_#ED1D24] font-excon-black shrink-0 text-center"
+              className="text-[10px] sm:text-[11px] font-black text-white bg-marvel-red hover:bg-white hover:text-black px-3.5 py-1.5 rounded-full transition-all uppercase tracking-wider shadow-[0_0_12px_#ED1D24] font-excon-black shrink-0 text-center whitespace-nowrap"
             >
               Join Mission
             </Link>
