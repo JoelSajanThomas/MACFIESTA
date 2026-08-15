@@ -29,8 +29,10 @@ export function CursorGlow() {
     const handleMouseMove = (e: MouseEvent) => {
       if (!rafId) {
         rafId = requestAnimationFrame(() => {
-          glow.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%) scale(${buttonState ? 1.4 : hoveredState ? 1.15 : 1})`;
-          core.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%) scale(${buttonState ? 1.3 : hoveredState ? 1.1 : 1})`;
+          glow.style.left = `${e.clientX}px`;
+          glow.style.top = `${e.clientY}px`;
+          core.style.left = `${e.clientX}px`;
+          core.style.top = `${e.clientY}px`;
           rafId = null;
         });
       }
@@ -63,15 +65,21 @@ export function CursorGlow() {
       {/* Outer Arc Reactor Aura */}
       <div
         ref={glowRef}
-        className="cursor-glow pointer-events-none fixed top-0 left-0 z-[9998] transition-transform duration-75 ease-out will-change-transform"
-        style={{ opacity: 0 }}
+        className="cursor-glow pointer-events-none fixed z-[9998] transition-transform duration-200 ease-out"
+        style={{
+          opacity: 0,
+          transform: `translate(-50%, -50%) scale(${isButton ? 1.4 : isHovered ? 1.15 : 1})`,
+        }}
       />
 
       {/* Mini Arc Reactor Core Cursor */}
       <div
         ref={coreRef}
-        className="pointer-events-none fixed top-0 left-0 z-[9999] hidden sm:flex items-center justify-center transition-transform duration-75 ease-out will-change-transform"
-        style={{ opacity: 0 }}
+        className="pointer-events-none fixed z-[9999] hidden sm:flex items-center justify-center transition-transform duration-100 ease-out"
+        style={{
+          opacity: 0,
+          transform: `translate(-50%, -50%) scale(${isButton ? 1.3 : isHovered ? 1.1 : 1})`,
+        }}
       >
         <div className={`relative flex items-center justify-center rounded-full transition-all duration-300 ${
           isButton ? "w-7 h-7 border-2 border-marvel-red bg-marvel-red/20 shadow-[0_0_20px_#ED1D24]" :

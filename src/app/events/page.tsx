@@ -19,6 +19,8 @@ const HERO_MAPPING: Record<string, { hero: string; level: string; power: string;
 
 import { getSocket } from "@/lib/socket";
 
+import { BackgroundVideo } from "@/components/ui/BackgroundVideo";
+
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [search, setSearch] = useState("");
@@ -30,11 +32,11 @@ export default function EventsPage() {
     async function fetchEvents() {
       try {
         const res = await api.get("/events");
-        if (res.data && res.data.success) {
+        if (res.data && res.data.success && Array.isArray(res.data.events)) {
           setEvents(res.data.events);
         }
       } catch (err) {
-        console.error("Failed to load events from DB", err);
+        console.error("Failed to load events from DB:", err);
       } finally {
         setLoading(false);
       }
@@ -42,44 +44,42 @@ export default function EventsPage() {
     fetchEvents();
 
     const socket = getSocket();
-    const handleEventsChange = () => {
-      fetchEvents();
-    };
-
-    socket.on("events-changed", handleEventsChange);
+    socket.on("event:created", (newEvent: Event) => {
+      setEvents((prev) => [newEvent, ...prev]);
+    });
+    socket.on("event:updated", (updatedEvent: Event) => {
+      setEvents((prev) => prev.map((e) => (e._id === updatedEvent._id ? updatedEvent : e)));
+    });
+    socket.on("event:deleted", (deletedId: string) => {
+      setEvents((prev) => prev.filter((e) => e._id !== deletedId));
+    });
 
     return () => {
-      socket.off("events-changed", handleEventsChange);
+      socket.off("event:created");
+      socket.off("event:updated");
+      socket.off("event:deleted");
     };
   }, []);
 
   const filteredEvents = useMemo(() => {
-    return events.filter((event) => {
-      const matchSearch =
-        event.title.toLowerCase().includes(search.toLowerCase()) ||
-        event.description.toLowerCase().includes(search.toLowerCase());
-      const matchCat = selectedCat === "all" || event.category === selectedCat;
-      const matchType = selectedType === "all" || event.type === selectedType;
+    return events.filter((e) => {
+      const matchSearch = e.title.toLowerCase().includes(search.toLowerCase()) ||
+        e.description.toLowerCase().includes(search.toLowerCase()) ||
+        e.category.toLowerCase().includes(search.toLowerCase());
+      const matchCat = selectedCat === "all" || e.category.toLowerCase() === selectedCat.toLowerCase();
+      const matchType = selectedType === "all" || e.type.toLowerCase() === selectedType.toLowerCase();
       return matchSearch && matchCat && matchType;
     });
   }, [events, search, selectedCat, selectedType]);
 
   return (
-    <div className="bg-[#05050A] min-h-screen pt-28 pb-16 text-white font-mono relative overflow-hidden">
-      {/* Background Marvel Video Loop (High Visibility) */}
-      <div className="absolute inset-0 z-0 overflow-hidden opacity-80 pointer-events-none">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="w-full h-full object-cover object-center filter brightness-110 contrast-115"
-
-        >
-          <source src="/MARVEL/Video Project 5.mp4" type="video/mp4" />
-        </video>
-        <div className="absolute inset-0 bg-gradient-to-b from-[#05050A]/40 via-[#05050A]/60 to-[#05050A]/90" />
-      </div>
+    <div className="bg-[#05050A] min-h-screen pt-28 pb-16 text-white font-excon relative overflow-hidden">
+      {/* Background Marvel Video Loop (Hardware Accelerated, Smooth Zero-Lag) */}
+      <BackgroundVideo
+        src="/MARVEL/Video Project 4.mp4"
+        fallbackSrc="/MARVEL/Video Project 5.mp4"
+        opacity="opacity-80"
+      />
 
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 relative z-10">
@@ -87,14 +87,15 @@ export default function EventsPage() {
 
         {/* Title Banner */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-arc-cyan/40 bg-arc-cyan/10 text-arc-cyan text-xs font-mono font-bold tracking-widest uppercase">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-arc-cyan/40 bg-arc-cyan/10 text-arc-cyan text-xs font-excon-bold font-bold tracking-[0.2em] uppercase shadow-[0_0_15px_rgba(0,212,255,0.25)]">
             <RiShieldFlashLine className="animate-pulse" />
             <span>S.H.I.E.L.D. MISSION DIRECTORY</span>
           </div>
-          <h1 className="text-4xl md:text-6xl font-black uppercase tracking-wider text-white" style={{ fontFamily: "var(--font-heading)" }}>
-            AVENGER <span className="gradient-text-gold neon-gold">MISSIONS</span>
+          <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tight text-white font-excon-black">
+            <span className="shimmer-text">AVENGER</span>{" "}
+            <span className="gradient-text-plasma">MISSIONS</span>
           </h1>
-          <p className="text-white/60 text-xs sm:text-sm leading-relaxed">
+          <p className="text-white/80 text-xs sm:text-sm leading-relaxed font-excon font-normal">
             Select your operational domain — solo, duo, squad or group challenges across 26 superhero technical & cultural contests.
           </p>
         </div>
@@ -215,7 +216,7 @@ export default function EventsPage() {
                       src={heroData.image || item.coverImage}
                       alt={item.title}
                       fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-85"
+                      className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-95"
                     />
 
                     <div className="absolute top-3 left-3 z-20 flex flex-col gap-1">
@@ -240,37 +241,37 @@ export default function EventsPage() {
                     </div>
 
                     <div className="space-y-3 pt-2">
-                      <div className="flex items-center justify-between text-[10px] text-white/50 pr-20">
-                        <span className="text-metallic-gold uppercase font-bold">{item.category}</span>
-                        <span className="text-arc-cyan font-bold">{heroData.level}</span>
+                      <div className="flex items-center justify-between text-[10px] text-white/60 pr-20">
+                        <span className="text-metallic-gold uppercase font-bold font-excon-bold tracking-wider">{item.category}</span>
+                        <span className="text-arc-cyan font-bold font-excon-bold tracking-wider">{heroData.level}</span>
                       </div>
 
-                      <h3 className="text-lg font-black text-white group-hover:text-metallic-gold transition-colors duration-300 truncate tracking-wide uppercase" style={{ fontFamily: "var(--font-heading)" }}>
+                      <h3 className="text-lg font-black text-white group-hover:text-metallic-gold transition-colors duration-300 truncate tracking-tight uppercase font-excon-black">
                         {item.title}
                       </h3>
 
-                      <div className="space-y-1.5 text-xs text-white/60">
+                      <div className="space-y-1.5 text-xs text-white/70 font-excon">
                         <div className="flex items-center gap-2">
                           <RiTrophyLine className="text-metallic-gold text-base" />
-                          <span>Prize Pool: <strong className="text-white">₹{item.prizePool.toLocaleString("en-IN")}</strong></span>
+                          <span>Prize Pool: <strong className="text-white font-black font-excon-black">₹{item.prizePool.toLocaleString("en-IN")}</strong></span>
                         </div>
                         <div className="flex items-center gap-2">
                           <RiMapPinLine className="text-arc-cyan text-base" />
-                          <span className="truncate">{item.venue}</span>
+                          <span className="truncate font-medium">{item.venue}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <RiTimeLine className="text-marvel-red text-base" />
-                          <span>{item.time}</span>
+                          <span className="font-medium">{item.time}</span>
                         </div>
                       </div>
                     </div>
 
                     <div className="pt-4 border-t border-white/10 flex items-center justify-between">
-                      <Link href={`/events/${item.slug}`} className="text-xs font-bold text-arc-cyan hover:text-white transition-colors tracking-widest uppercase flex items-center gap-1">
+                      <Link href={`/events/${item.slug}`} className="text-xs font-bold text-arc-cyan hover:text-white transition-colors tracking-[0.14em] uppercase flex items-center gap-1 font-excon-bold">
                         Rules & Briefing
                         <RiArrowRightLine />
                       </Link>
-                      <Link href={`/events/${item.slug}`} className="text-xs font-bold text-black bg-arc-cyan px-4 py-2 rounded-full hover:bg-white transition-all uppercase tracking-widest shadow-[0_0_10px_#00D4FF]">
+                      <Link href={`/events/${item.slug}`} className="text-xs font-black text-black bg-arc-cyan px-4 py-2 rounded-full hover:bg-white transition-all uppercase tracking-[0.15em] shadow-[0_0_12px_#00D4FF] font-excon-black">
                         Join Mission
                       </Link>
                     </div>

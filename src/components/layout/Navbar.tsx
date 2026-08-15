@@ -126,12 +126,11 @@ export function Navbar() {
               </div>
               <div className="flex flex-col">
                 <span
-                  className="text-white font-black tracking-widest text-base md:text-lg uppercase flex items-center gap-1 group-hover:text-arc-cyan transition-colors duration-300"
-                  style={{ fontFamily: "var(--font-syne, var(--font-heading))" }}
+                  className="text-white tracking-wide text-xl md:text-2xl uppercase flex items-center gap-1 group-hover:opacity-90 transition-opacity duration-300 font-anton"
                 >
-                  MAC<span className="gradient-text-gold neon-gold">FIESTA</span>
+                  <span className="shimmer-text">MACFIESTA</span>
                 </span>
-                <span className="text-[9px] font-bold tracking-[0.25em] text-marvel-red uppercase flex items-center gap-1 font-space">
+                <span className="text-[9px] font-bold tracking-[0.28em] text-arc-cyan uppercase flex items-center gap-1 font-space">
                   <RiShieldFlashLine className="animate-pulse" /> MARVELVERSE
                 </span>
               </div>
@@ -139,23 +138,23 @@ export function Navbar() {
           </div>
 
           {/* Desktop HUD Navigation */}
-          <div className="hidden xl:flex justify-center items-center gap-1 flex-initial bg-black/50 border border-white/10 rounded-full px-3 py-1.5 backdrop-blur-md shadow-[0_0_20px_rgba(0,212,255,0.05)]">
+          <div className="hidden xl:flex justify-center items-center gap-1.5 flex-initial bg-black/60 border border-white/15 rounded-full px-4 py-1.5 backdrop-blur-md shadow-[0_0_25px_rgba(0,212,255,0.08)] font-space">
             {mainNavItems.map((item) => {
               const isActive = pathname === item.href;
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`relative px-3.5 py-1.5 text-[11px] font-bold tracking-widest uppercase transition-all duration-300 rounded-full font-space ${isActive
-                      ? "bg-marvel-red text-white shadow-[0_0_15px_#ED1D24]"
-                      : "text-white/70 hover:text-arc-cyan hover:bg-white/5"
+                  className={`relative px-3.5 py-1.5 text-[11px] font-bold tracking-[0.16em] uppercase transition-all duration-300 rounded-full ${isActive
+                      ? "bg-marvel-red text-white shadow-[0_0_18px_#ED1D24]"
+                      : "text-white/75 hover:text-arc-cyan hover:bg-white/5"
                     }`}
                 >
                   {/* Active indicator dot */}
                   {isActive && (
                     <motion.span
                       layoutId="nav-active-dot"
-                      className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-arc-cyan"
+                      className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-arc-cyan shadow-[0_0_8px_#00D4FF]"
                     />
                   )}
                   {item.label}
@@ -168,20 +167,20 @@ export function Navbar() {
               <button
                 type="button"
                 suppressHydrationWarning={true}
-                className="px-3.5 py-1.5 text-[11px] font-bold text-white/70 hover:text-arc-cyan transition-colors tracking-widest uppercase flex items-center gap-1 cursor-default font-space"
+                className="px-3.5 py-1.5 text-[11px] font-bold text-white/75 hover:text-arc-cyan transition-colors tracking-[0.16em] uppercase flex items-center gap-1 cursor-default"
               >
                 <span>HQ Hub</span>
                 <span className="text-[8px] transition-transform duration-300 group-hover:rotate-180">▼</span>
               </button>
 
               <div
-                className="absolute top-full left-1/2 -translate-x-1/2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 glass-strong border border-arc-cyan/30 rounded-xl p-1.5 w-44 shadow-2xl z-50 flex flex-col gap-0.5"
+                className="absolute top-full left-1/2 -translate-x-1/2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 glass-strong border border-arc-cyan/30 rounded-xl p-1.5 w-44 shadow-2xl z-50 flex flex-col gap-0.5 font-space"
               >
                 {dropdownNavItems.map((subItem) => (
                   <Link
                     key={subItem.href}
                     href={subItem.href}
-                    className="px-4 py-2.5 text-[10px] font-bold text-white/70 hover:text-arc-cyan hover:bg-arc-cyan/10 rounded-lg transition-colors uppercase tracking-widest text-center font-space"
+                    className="px-4 py-2.5 text-[10px] font-bold text-white/75 hover:text-arc-cyan hover:bg-arc-cyan/10 rounded-lg transition-colors uppercase tracking-[0.14em] text-center"
                   >
                     {subItem.label}
                   </Link>
@@ -191,43 +190,50 @@ export function Navbar() {
           </div>
 
           {/* Right Header Actions */}
-          <div className="hidden xl:flex justify-end items-center gap-3 flex-1">
-            <a
+          <div className="hidden xl:flex justify-end items-center gap-3 flex-1 font-space">
+            <motion.a
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
               href={settings.socialInstagram || SOCIAL_LINKS[0].url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-arc-cyan/30 bg-arc-cyan/10 text-arc-cyan hover:bg-arc-cyan hover:text-black text-[10px] font-bold tracking-widest uppercase transition-all duration-300 shadow-[0_0_10px_rgba(0,212,255,0.2)] font-space"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-arc-cyan/30 bg-arc-cyan/10 text-arc-cyan hover:bg-arc-cyan hover:text-black text-[10px] font-bold tracking-[0.15em] uppercase transition-all duration-300 shadow-[0_0_12px_rgba(0,212,255,0.25)] hover:shadow-[0_0_20px_rgba(0,212,255,0.6)]"
             >
               <RiFlashlightLine />
               <span>S.H.I.E.L.D. Link</span>
-            </a>
+            </motion.a>
 
             {user ? (
               <div className="flex items-center gap-2">
-                <Link
-                  href={user.role === "admin" ? "/admin" : "/dashboard"}
-                  className="px-4 py-1.5 text-[11px] font-bold bg-marvel-red text-white rounded-full hover:bg-white hover:text-black transition-all duration-300 tracking-widest uppercase shadow-[0_0_15px_#ED1D24] font-space"
-                >
-                  {user.role === "admin" ? "Command Console" : "Agent HUD"}
-                </Link>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Link
+                    href={user.role === "admin" ? "/admin" : "/dashboard"}
+                    className="px-4 py-1.5 text-[11px] font-bold bg-marvel-red text-white rounded-full hover:bg-white hover:text-black transition-all duration-300 tracking-[0.15em] uppercase shadow-[0_0_18px_#ED1D24] block"
+                  >
+                    {user.role === "admin" ? "Command Console" : "Agent HUD"}
+                  </Link>
+                </motion.div>
                 {!isAdminPage && (
                   <button
                     type="button"
                     suppressHydrationWarning={true}
                     onClick={logout}
-                    className="px-3 py-1.5 text-[10px] font-bold text-white/50 hover:text-marvel-red transition-colors tracking-widest uppercase cursor-pointer font-space"
+                    className="px-3 py-1.5 text-[10px] font-bold text-white/50 hover:text-marvel-red transition-colors tracking-widest uppercase cursor-pointer"
                   >
                     Abort
                   </button>
                 )}
               </div>
             ) : (
-              <Link
-                href="/signin"
-                className="px-4 py-1.5 text-[11px] font-bold text-black bg-metallic-gold border border-metallic-gold rounded-full hover:bg-white hover:border-white transition-all duration-300 tracking-widest uppercase shadow-[0_0_15px_rgba(212,175,55,0.4)] font-space"
-              >
-                Agent Login
-              </Link>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Link
+                  href="/signin"
+                  className="px-4 py-1.5 text-[11px] font-black text-black bg-metallic-gold border border-metallic-gold rounded-full hover:bg-white hover:border-white transition-all duration-300 tracking-[0.16em] uppercase shadow-[0_0_18px_rgba(212,175,55,0.5)] hover:shadow-[0_0_25px_rgba(212,175,55,0.8)] block"
+                >
+                  Agent Login
+                </Link>
+              </motion.div>
             )}
           </div>
 

@@ -23,13 +23,19 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
     }
 
     const lenis = new Lenis({
-      duration: 0.8,
+      duration: 1.2,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      touchMultiplier: 1.5,
-      wheelMultiplier: 1.0,
+      touchMultiplier: 2,
+      smoothWheel: true,
     });
 
     lenisRef.current = lenis;
+
+    // Synchronize Lenis scroll updates with Framer Motion and window
+    const handleScroll = () => {
+      // Ensure any scroll observers and framer motion listeners are refreshed
+    };
+    lenis.on("scroll", handleScroll);
 
     let rafId: number;
     function raf(time: number) {

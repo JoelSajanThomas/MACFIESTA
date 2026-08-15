@@ -285,15 +285,14 @@ export function LoadingScreen() {
                 className="flex flex-col items-center gap-2"
               >
                 <span
-                  className="text-2xl sm:text-4xl font-black tracking-[0.18em] uppercase"
+                  className="text-2xl sm:text-4xl font-black tracking-[0.2em] uppercase font-excon-black"
                   style={{
-                    fontFamily: "var(--font-orbitron, 'Orbitron', sans-serif)",
                     background:
                       "linear-gradient(135deg, #F5D76E 0%, #D4AF37 45%, #FFE680 70%, #C8960C 100%)",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                     backgroundClip: "text",
-                    filter: "drop-shadow(0 0 14px rgba(212,175,55,0.5))",
+                    filter: "drop-shadow(0 0 16px rgba(212,175,55,0.6))",
                   }}
                 >
                   MACFIESTA 2K26
@@ -312,8 +311,7 @@ export function LoadingScreen() {
                 />
 
                 <span
-                  className="text-[10px] sm:text-xs tracking-[0.4em] uppercase text-white/45"
-                  style={{ fontFamily: "var(--font-orbitron, 'Orbitron', sans-serif)" }}
+                  className="text-[10px] sm:text-xs tracking-[0.42em] uppercase text-white/60 font-excon-bold"
                 >
                   UNITED TO EXCEL
                 </span>

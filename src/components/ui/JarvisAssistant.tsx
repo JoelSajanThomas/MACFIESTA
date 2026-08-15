@@ -126,10 +126,10 @@ export function JarvisAssistant() {
                   <RiRobot2Line className="text-lg" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-white tracking-widest uppercase flex items-center gap-2" style={{ fontFamily: "var(--font-heading)" }}>
-                    J.A.R.V.I.S. <span className="text-[10px] px-2 py-0.5 rounded bg-arc-cyan/20 text-arc-cyan border border-arc-cyan/30 font-mono">v4.8 ONLINE</span>
+                  <h3 className="text-sm font-bold text-white tracking-widest uppercase flex items-center gap-2 font-excon-bold">
+                    J.A.R.V.I.S. <span className="text-[10px] px-2 py-0.5 rounded bg-arc-cyan/20 text-arc-cyan border border-arc-cyan/30 font-mono font-bold">v4.8 ONLINE</span>
                   </h3>
-                  <p className="text-[10px] text-white/50">Stark Industries AI Command</p>
+                  <p className="text-[10px] text-white/50 font-excon font-medium">Stark Industries AI Command</p>
                 </div>
               </div>
 
@@ -152,8 +152,7 @@ export function JarvisAssistant() {
                   type="button"
                   suppressHydrationWarning={true}
                   onClick={() => handleSend(q.query)}
-                  className="px-3 py-1 text-[10px] font-bold tracking-wider text-white/70 hover:text-arc-cyan bg-white/5 hover:bg-arc-cyan/10 border border-white/10 hover:border-arc-cyan/30 rounded-full whitespace-nowrap transition-all"
-                  style={{ fontFamily: "var(--font-heading)" }}
+                  className="px-3 py-1 text-[10px] font-bold tracking-wider text-white/75 hover:text-arc-cyan bg-white/5 hover:bg-arc-cyan/10 border border-white/10 hover:border-arc-cyan/30 rounded-full whitespace-nowrap transition-all font-excon-bold"
                 >
                   {q.label}
                 </button>

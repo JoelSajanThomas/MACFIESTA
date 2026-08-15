@@ -15,30 +15,57 @@ import {
 } from "react-icons/ri";
 import { useFestivalControl } from "@/lib/festivalStore";
 
-/* ─── Stagger container ─── */
-const containerVariants = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.12, delayChildren: 0.1 },
-  },
-};
+/* ─── Reference Design Framer Motion Animation Variants ─── */
+const customEase: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
-const wordVariants = {
-  hidden: { opacity: 0, y: 60, rotateX: 30 },
+const heroTitleVariants = {
+  hidden: { opacity: 0, y: 40 },
   visible: {
     opacity: 1,
     y: 0,
-    rotateX: 0,
-    transition: { duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] },
+    transition: {
+      duration: 0.8,
+      ease: customEase,
+    },
   },
 };
 
-const fadeUp = {
+const heroSubtextVariants = {
   hidden: { opacity: 0, y: 30 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.7, ease: "easeOut" as const },
+    transition: {
+      duration: 0.8,
+      delay: 0.15,
+      ease: customEase,
+    },
+  },
+};
+
+const heroCtaVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.8,
+      delay: 0.3,
+      ease: customEase,
+    },
+  },
+};
+
+const heroYearSlideVariants = {
+  hidden: { opacity: 0, x: 60 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: 0.8,
+      delay: 0.6,
+      ease: customEase,
+    },
   },
 };
 
@@ -52,11 +79,17 @@ export function HeroSection() {
   const scrollPausedRef = useRef(false);
 
   /* ─── Parallax ─── */
-  const { scrollY } = useScroll();
-  const bgY = useTransform(scrollY, [0, 600], ["0%", "25%"]);
-  const bgScale = useTransform(scrollY, [0, 600], [1.02, 1.08]);
-  const contentOpacity = useTransform(scrollY, [0, 300], [1, 0]);
-  const contentY = useTransform(scrollY, [0, 300], [0, -40]);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  });
+
+  // Background layer moves at 30% scroll speed (y: 0% -> 30%)
+  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+
+  // Title/text layer moves at 60% scroll speed (y: 0% -> 60%) and fades out (opacity 1 -> 0) by 80% scroll progress
+  const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "60%"]);
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   const setPlayState = (val: boolean) => {
     setIsPlaying(val);
@@ -151,29 +184,16 @@ export function HeroSection() {
       ref={sectionRef}
       className="relative w-full min-h-screen flex flex-col justify-between overflow-hidden bg-transparent pt-24 md:pt-32"
     >
-      {/* ─── Ambient Glow Accents (Translucent for 3D Canvas) ─── */}
-      <div className="absolute inset-0 z-[1] pointer-events-none">
-        <div className="absolute top-1/4 left-10 w-96 h-96 rounded-full bg-marvel-red/10 blur-[140px]" />
-        <div className="absolute top-1/3 right-10 w-96 h-96 rounded-full bg-arc-cyan/10 blur-[140px]" />
-      </div>
+      {/* ─── Parallax Ambient Energy Glows ─── */}
+      <motion.div
+        style={{ y: bgY }}
+        className="absolute inset-0 z-[1] pointer-events-none"
+      >
+        <div className="absolute top-1/4 left-10 w-96 h-96 rounded-full bg-marvel-red/15 blur-[140px]" />
+        <div className="absolute top-1/3 right-10 w-96 h-96 rounded-full bg-arc-cyan/15 blur-[140px]" />
+      </motion.div>
 
-      {/* Floating Iron Man */}
-      <div className="absolute top-10 right-8 opacity-35 hidden xl:block pointer-events-none z-[3]">
-        <motion.div
-          animate={{ y: [-8, 8, -8] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <Image
-            src="/MARVEL/ironman.png"
-            alt="Iron Man"
-            width={360}
-            height={360}
-            className="object-contain drop-shadow-[0_0_30px_rgba(237,29,36,0.7)]"
-          />
-        </motion.div>
-      </div>
-
-      {/* ─── Main Content ─── */}
+      {/* ─── Main Content / Text Layer (moves at 60% scroll speed: 0% -> 60% and fades out by 80%) ─── */}
       <motion.div
         className="relative z-10 flex-grow flex flex-col justify-center max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 md:py-16"
         style={{ opacity: contentOpacity, y: contentY }}
@@ -181,90 +201,130 @@ export function HeroSection() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
 
           {/* Hero Text */}
-          <div className="lg:col-span-8 space-y-6 text-center lg:text-left flex flex-col items-center lg:items-start">
+          <div className="lg:col-span-8 space-y-6 text-center lg:text-left flex flex-col items-center lg:items-start relative">
 
             {/* Badge */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-marvel-red/40 bg-marvel-red/10 text-marvel-red text-xs font-bold tracking-widest uppercase shadow-[0_0_15px_rgba(237,29,36,0.3)] font-space"
+              transition={{ duration: 0.8, ease: customEase }}
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-marvel-red/40 bg-marvel-red/10 text-marvel-red text-xs font-bold tracking-[0.2em] uppercase shadow-[0_0_18px_rgba(237,29,36,0.35)] font-space"
             >
               <RiShieldFlashLine className="animate-pulse text-sm" />
               <span>AVENGERS HEADQUARTERS DIRECTIVE • {settings.edition}</span>
             </motion.div>
 
-            {/* Main Title — Staggered words */}
-            <motion.div
-              className="space-y-1.5 w-full perspective-[1000px] overflow-hidden"
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              <motion.div variants={wordVariants}>
-                <span
-                  className="block text-white text-xl sm:text-2xl lg:text-3xl font-black uppercase tracking-widest text-arc-cyan glow-text-cyan"
-                  style={{ fontFamily: "var(--font-orbitron)" }}
-                >
+            {/* Main Title Block — Headline: 'Anton', uppercase, tight tracking (-0.02em), line-height 0.85, clamp(3rem, 12vw, 9rem) */}
+            <div className="space-y-2 w-full">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, ease: customEase }}
+              >
+                <span className="block text-arc-cyan text-sm sm:text-lg lg:text-xl font-bold uppercase tracking-[0.25em] font-space">
                   WELCOME TO
                 </span>
               </motion.div>
 
-              <motion.div variants={wordVariants}>
-                <span
-                  className="block marvel-bang-comic-gradient uppercase tracking-normal break-words max-w-full font-black drop-shadow-[0_4px_25px_rgba(237,29,36,0.7)]"
+              {/* Title fades up + in (y: 40 -> 0, opacity: 0 -> 1, 0.8s, ease [0.16,1,0.3,1]) with Large 2K26 slide-in from right (x: 60 -> 0, 0.6s delay) */}
+              <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6">
+                <motion.h1
+                  variants={heroTitleVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="headline-hero shimmer-text break-words max-w-full font-normal m-0"
                   style={{
-                    fontFamily: "var(--font-syne)",
-                    fontSize: "clamp(1.8rem, 5.2vw, 4.2rem)",
-                    fontWeight: 900,
-                    lineHeight: 1.0,
+                    fontFamily: "var(--font-anton), 'Anton', sans-serif",
+                    letterSpacing: "-0.02em",
+                    lineHeight: 0.85,
+                    fontSize: "clamp(3rem, 12vw, 9rem)",
+                    textTransform: "uppercase",
                   }}
                 >
                   {settings.name.toUpperCase()}
-                </span>
-              </motion.div>
+                </motion.h1>
 
-              <motion.div variants={wordVariants}>
-                <span
-                  className="block text-marvel-red text-lg sm:text-2xl lg:text-3xl font-black uppercase tracking-[0.2em] mt-1 glow-text-red"
-                  style={{ fontFamily: "var(--font-orbitron)" }}
+                {/* Large "2K26" text slides in from right (x: 60 -> 0, 0.6s delay) */}
+                <motion.div
+                  variants={heroYearSlideVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="flex items-center self-center sm:self-auto"
                 >
+                  <span
+                    className="gradient-text-plasma font-normal select-none"
+                    style={{
+                      fontFamily: "var(--font-anton), 'Anton', sans-serif",
+                      letterSpacing: "-0.02em",
+                      lineHeight: 0.85,
+                      fontSize: "clamp(2.5rem, 8vw, 6.5rem)",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {settings.edition ? settings.edition.toUpperCase() : "2K26"}
+                  </span>
+                </motion.div>
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.2, ease: customEase }}
+              >
+                <span className="block text-marvel-red text-xl sm:text-3xl lg:text-4xl font-normal uppercase tracking-[0.18em] mt-1" style={{ fontFamily: "var(--font-anton), 'Anton', sans-serif" }}>
                   MARVELVERSE
                 </span>
               </motion.div>
-            </motion.div>
+            </div>
 
-            {/* Subtitle */}
+            {/* Subtext — follows with 0.15s stagger delay */}
             <motion.p
-              variants={fadeUp}
+              variants={heroSubtextVariants}
               initial="hidden"
               animate="visible"
-              transition={{ delay: 0.5 }}
-              className="text-white/80 max-w-xl mx-auto lg:mx-0 font-space text-base leading-relaxed"
+              className="text-white/85 max-w-xl mx-auto lg:mx-0 font-space text-base md:text-lg leading-relaxed font-normal"
             >
-              &ldquo;Every Hero Has A Mission.&rdquo; — Earth&apos;s premier college festival at MACFAST.
+              &ldquo;Every Hero Has A Mission.&rdquo; — Earth&apos;s premier national collegiate festival at MACFAST.
               Prepare your suit, verify your squad, and assemble for victory across{" "}
-              <span className="text-arc-cyan font-semibold">26 high-level missions</span>.
+              <span className="text-arc-cyan font-bold">26 high-level missions</span>.
             </motion.p>
 
-            {/* CTAs */}
+            {/* CTA buttons — follow with 0.15s stagger delay & scale hover/tap effects */}
             <motion.div
-              variants={fadeUp}
+              variants={heroCtaVariants}
               initial="hidden"
               animate="visible"
-              transition={{ delay: 0.65 }}
-              className="flex flex-wrap justify-center lg:justify-start gap-4 pt-4 w-full"
+              className="flex flex-wrap justify-center lg:justify-start gap-4 pt-2 w-full"
             >
-              <Link href="/signup" className="btn-urgency group">
-                <span className="relative z-10">
-                  {settings.registrationOpen ? "Register Now" : "Registration Closed"}
-                </span>
-                <RiPlayLine className="group-hover:translate-x-1 transition-transform relative z-10" />
-              </Link>
-              <Link href="/events" className="btn-outline border-arc-cyan text-white hover:bg-arc-cyan/20">
-                <RiCompass3Line className="text-arc-cyan" />
-                <span>View Events</span>
-              </Link>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+              >
+                <Link
+                  href="/signup"
+                  className="btn-urgency group font-space flex items-center gap-2 px-8 py-3.5 rounded-full shadow-[0_0_25px_rgba(237,29,36,0.5)] hover:shadow-[0_0_40px_rgba(237,29,36,0.8)] transition-shadow duration-300"
+                >
+                  <span className="relative z-10 font-bold tracking-[0.16em] uppercase">
+                    {settings.registrationOpen ? "Register Now" : "Registration Closed"}
+                  </span>
+                  <RiPlayLine className="group-hover:translate-x-1 transition-transform relative z-10" />
+                </Link>
+              </motion.div>
+
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+              >
+                <Link
+                  href="/events"
+                  className="btn-outline border-arc-cyan text-white hover:bg-arc-cyan/20 font-space flex items-center gap-2 px-7 py-3.5 rounded-full shadow-[0_0_20px_rgba(0,212,255,0.25)] hover:shadow-[0_0_35px_rgba(0,212,255,0.6)] transition-shadow duration-300"
+                >
+                  <RiCompass3Line className="text-arc-cyan text-lg" />
+                  <span className="font-bold tracking-[0.16em] uppercase">View Events</span>
+                </Link>
+              </motion.div>
             </motion.div>
           </div>
 

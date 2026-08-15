@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
 import { RiCalendarEventLine, RiFlashlightLine, RiShieldFlashLine, RiTrophyLine } from "react-icons/ri";
+import { Reveal } from "@/components/ui/Reveal";
 
 const TIMELINE_STEPS = [
   {
@@ -60,45 +61,40 @@ export function MarvelTimeline() {
   const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
 
   return (
-    <section ref={sectionRef} className="relative bg-[#05050A]/60 backdrop-blur-md section-padding border-t border-arc-cyan/20 overflow-hidden min-h-[600px]">
-      {/* Parallax Background */}
-      <motion.div className="absolute inset-0 z-0 pointer-events-none overflow-hidden" style={{ y: bgY }}>
+    <section ref={sectionRef} className="relative bg-transparent section-padding border-t border-arc-cyan/20 overflow-hidden min-h-[600px]">
+      {/* Parallax Background (Soft Watermark) */}
+      <motion.div className="absolute inset-0 z-0 opacity-20 pointer-events-none overflow-hidden" style={{ y: bgY }}>
         <Image
           src="/MARVEL/The Spider….jpg"
           alt="Spider-Man Mission Timeline Background"
           fill
-          priority
           className="object-cover object-center filter brightness-105 contrast-125 saturate-135 scale-[1.15]"
         />
       </motion.div>
-      <div className="absolute inset-0 z-[1] pointer-events-none bg-gradient-to-t from-[#05050A] via-[#05050A]/50 to-[#05050A]/60" />
-      <div className="absolute inset-0 z-[1] bg-[radial-gradient(circle_at_center,transparent_40%,rgba(5,5,10,0.9)_90%)] pointer-events-none" />
+      <div className="absolute inset-0 z-[1] pointer-events-none bg-gradient-to-t from-[#05050A]/80 via-transparent to-[#05050A]/70" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] rounded-full bg-marvel-red/15 blur-[140px] z-[1] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto relative z-10 space-y-14">
 
         {/* Header */}
-        <motion.div
-          className="text-center space-y-3 max-w-2xl mx-auto"
-          initial={{ opacity: 0, y: 40, scale: 0.95 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-        >
-          <div className="glass-aurora border border-white/15 p-6 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.8),0_0_20px_rgba(0,212,255,0.08)]">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-arc-cyan/40 bg-arc-cyan/15 text-arc-cyan text-xs font-bold tracking-widest uppercase shadow-[0_0_15px_rgba(0,212,255,0.3)] font-space mb-3">
-              <RiFlashlightLine className="animate-pulse" />
-              <span>S.H.I.E.L.D. TACTICAL CHRONOLOGY</span>
-            </div>
+        <Reveal y={60} duration={0.7} margin="-100px">
+          <div className="text-center space-y-3 max-w-2xl mx-auto">
+            <div className="glass-aurora border border-white/15 p-6 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.8),0_0_20px_rgba(0,212,255,0.08)]">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-arc-cyan/40 bg-arc-cyan/15 text-arc-cyan text-xs font-bold tracking-[0.2em] uppercase shadow-[0_0_15px_rgba(0,212,255,0.3)] font-space mb-3">
+                <RiFlashlightLine className="animate-pulse" />
+                <span>S.H.I.E.L.D. TACTICAL CHRONOLOGY</span>
+              </div>
 
-            <h2 className="section-title text-white uppercase" style={{ fontFamily: "var(--font-syne)" }}>
-              Marvel <span className="marvel-bang-comic-gradient font-black">Mission Timeline</span>
-            </h2>
-            <p className="text-sm text-white/70 font-space mt-2 leading-relaxed">
-              Chronological roadmap of all MACFIESTA festival phases from initialization to the finale.
-            </p>
+              <h2 className="section-title text-white uppercase font-anton">
+                Marvel <span className="shimmer-text">Mission</span>{" "}
+                <span className="gradient-text-plasma">Timeline</span>
+              </h2>
+              <p className="text-sm text-white/85 font-space mt-2 leading-relaxed font-normal">
+                Chronological roadmap of all MACFIESTA festival phases from initialization to the finale.
+              </p>
+            </div>
           </div>
-        </motion.div>
+        </Reveal>
 
         {/* 3D Timeline Items */}
         <div className="relative ml-4 md:ml-32">
@@ -155,13 +151,13 @@ export function MarvelTimeline() {
 
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <span
-                        className={`text-[10px] font-extrabold tracking-widest uppercase font-space ${step.color}`}
+                        className={`text-[10px] font-bold tracking-[0.18em] uppercase font-excon-bold ${step.color}`}
                         style={{ transform: "translateZ(5px)" }}
                       >
                         {step.phase}
                       </span>
                       <span
-                        className="text-[10px] font-bold text-arc-cyan bg-arc-cyan/15 px-2.5 py-0.5 rounded border border-arc-cyan/30 font-space"
+                        className="text-[10px] font-bold text-arc-cyan bg-arc-cyan/15 px-2.5 py-0.5 rounded border border-arc-cyan/30 font-excon-bold tracking-wider"
                         style={{ transform: "translateZ(5px)" }}
                       >
                         {step.date}
@@ -169,13 +165,13 @@ export function MarvelTimeline() {
                     </div>
 
                     <h3
-                      className="text-lg font-black text-white uppercase tracking-wide group-hover:text-metallic-gold transition-colors duration-300"
-                      style={{ fontFamily: "var(--font-syne)", transform: "translateZ(8px)" }}
+                      className="text-lg font-black text-white uppercase tracking-tight group-hover:text-metallic-gold transition-colors duration-300 font-excon-black"
+                      style={{ transform: "translateZ(8px)" }}
                     >
                       {step.title}
                     </h3>
 
-                    <p className="text-xs text-white/75 font-space leading-relaxed" style={{ transform: "translateZ(4px)" }}>
+                    <p className="text-xs text-white/80 font-excon leading-relaxed font-normal" style={{ transform: "translateZ(4px)" }}>
                       {step.desc}
                     </p>
                   </motion.div>

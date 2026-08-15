@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { motion, useInView, useMotionValue, useTransform, useSpring } from "framer-motion";
 import { RiShieldFlashLine, RiFlashlightLine, RiStarFill } from "react-icons/ri";
+import { Reveal, RevealGroup, RevealItem } from "@/components/ui/Reveal";
 
 const partners = [
   { name: "Stark Industries", tier: "platinum", logo: "🛡️", tagline: "Technology Partner" },
@@ -158,12 +159,11 @@ function SponsorCard({ partner, index }: { partner: typeof partners[0]; index: n
         {/* Name & Tagline */}
         <div className="text-center space-y-1" style={{ transform: "translateZ(10px)" }}>
           <span
-            className="block text-sm font-black text-white uppercase tracking-wide leading-tight"
-            style={{ fontFamily: "var(--font-syne)" }}
+            className="block text-sm font-black text-white uppercase tracking-tight leading-tight font-excon-black"
           >
             {partner.name}
           </span>
-          <span className={`block text-[9px] uppercase tracking-widest font-space ${cfg.labelColor}`}>
+          <span className={`block text-[9px] uppercase tracking-wider font-excon-bold ${cfg.labelColor}`}>
             {partner.tagline}
           </span>
         </div>
@@ -181,8 +181,8 @@ function SponsorCard({ partner, index }: { partner: typeof partners[0]; index: n
         <motion.div
           className="absolute inset-0 rounded-2xl pointer-events-none"
           initial={{ boxShadow: "none" }}
-          whileHover={{ boxShadow: `${cfg.glow}` }}
-          transition={{ duration: 0.4 }}
+          whileHover={{ boxShadow: `0 0 35px rgba(${cfg.accentRgb},0.35)` }}
+          transition={{ duration: 0.3 }}
         />
       </motion.div>
     </motion.div>
@@ -191,42 +191,19 @@ function SponsorCard({ partner, index }: { partner: typeof partners[0]; index: n
 
 export function SponsorsSection() {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true });
 
   return (
-    <section className="relative bg-[#03030A]/60 backdrop-blur-md py-24 border-t border-white/8 overflow-hidden">
+    <section className="relative bg-transparent section-padding border-t border-arc-cyan/20 overflow-hidden">
+      {/* Background glow effects */}
+      <div className="absolute top-1/3 left-1/4 w-[500px] h-[300px] rounded-full bg-arc-cyan/5 blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-1/3 right-1/4 w-[500px] h-[300px] rounded-full bg-metallic-gold/5 blur-[140px] pointer-events-none" />
 
-      {/* ─── Background atmosphere ─── */}
-      <div className="absolute inset-0 pointer-events-none">
-        {/* Slow drifting glows */}
+      {/* Cyber grid lines */}
+      <div className="absolute inset-0 z-0 opacity-10 pointer-events-none overflow-hidden">
+        <div className="h-full w-full bg-[linear-gradient(to_right,#00d4ff10_1px,transparent_1px),linear-gradient(to_bottom,#00d4ff10_1px,transparent_1px)] bg-[size:4rem_4rem]" />
+        {/* Animated scan beam */}
         <motion.div
-          className="absolute top-0 left-1/4 w-[600px] h-[300px] rounded-full bg-arc-cyan/6 blur-[150px]"
-          animate={{ x: [0, 40, 0], y: [0, -30, 0], scale: [1, 1.1, 1] }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute bottom-0 right-1/4 w-[600px] h-[300px] rounded-full bg-metallic-gold/6 blur-[150px]"
-          animate={{ x: [0, -40, 0], y: [0, 30, 0], scale: [1, 1.1, 1] }}
-          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut", delay: 4 }}
-        />
-        <motion.div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[200px] rounded-full bg-vibranium-purple/4 blur-[120px]"
-          animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0.8, 0.4] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-        />
-
-        {/* Dot grid */}
-        <div
-          className="absolute inset-0 opacity-[0.025]"
-          style={{
-            backgroundImage: "radial-gradient(rgba(0,212,255,0.8) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-          }}
-        />
-
-        {/* Diagonal scan line */}
-        <motion.div
-          className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-arc-cyan/30 to-transparent"
+          className="absolute inset-x-0 h-32 bg-gradient-to-b from-transparent via-arc-cyan/20 to-transparent"
           animate={{ y: ["0vh", "100vh"] }}
           transition={{ duration: 6, repeat: Infinity, ease: "linear", repeatDelay: 4 }}
         />
@@ -235,51 +212,36 @@ export function SponsorsSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
         {/* ─── Section Header ─── */}
-        <div className="text-center space-y-5 mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: -20, scale: 0.9 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-arc-cyan/30 bg-arc-cyan/10 text-arc-cyan text-xs font-bold tracking-widest uppercase shadow-[0_0_20px_rgba(0,212,255,0.25)] font-space"
-          >
-            <RiShieldFlashLine className="animate-pulse" />
-            <span>Valued Alliances &amp; Strategic Partners</span>
-          </motion.div>
+        <Reveal y={60} duration={0.7} margin="-100px">
+          <div className="text-center space-y-5 mb-16">
+            <div
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-arc-cyan/30 bg-arc-cyan/10 text-arc-cyan text-xs font-bold tracking-[0.2em] uppercase shadow-[0_0_20px_rgba(0,212,255,0.25)] font-space"
+            >
+              <RiShieldFlashLine className="animate-pulse" />
+              <span>Valued Alliances &amp; Strategic Partners</span>
+            </div>
 
-          <motion.h2
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.15, duration: 0.7 }}
-            className="text-3xl md:text-5xl font-black text-white uppercase tracking-wide"
-            style={{ fontFamily: "var(--font-syne)" }}
-          >
-            Our{" "}
-            <span className="shimmer-text">Sponsors</span>
-            {" "}&amp;{" "}
-            <span className="gradient-text-plasma">Partners</span>
-          </motion.h2>
+            <h2
+              className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight font-anton"
+            >
+              Our{" "}
+              <span className="shimmer-text">Sponsors</span>
+              {" "}&amp;{" "}
+              <span className="gradient-text-plasma">Partners</span>
+            </h2>
 
-          {/* Animated expanding divider */}
-          <motion.div
-            initial={{ scaleX: 0, opacity: 0 }}
-            whileInView={{ scaleX: 1, opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.35, duration: 0.8 }}
-            className="h-px w-32 mx-auto bg-gradient-to-r from-transparent via-arc-cyan to-metallic-gold to-transparent origin-center"
-          />
+            {/* Animated expanding divider */}
+            <div
+              className="h-px w-32 mx-auto bg-gradient-to-r from-transparent via-arc-cyan to-metallic-gold to-transparent origin-center"
+            />
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.5 }}
-            className="text-white/45 text-sm font-space max-w-md mx-auto leading-relaxed"
-          >
-            Powering Earth&apos;s mightiest college festival alongside our incredible partners
-          </motion.p>
-        </div>
+            <p
+              className="text-white/60 text-sm font-space max-w-md mx-auto leading-relaxed font-normal"
+            >
+              Powering Earth&apos;s mightiest college festival alongside our incredible partners
+            </p>
+          </div>
+        </Reveal>
 
         {/* ─── Tier filter badges ─── */}
         <motion.div
@@ -309,42 +271,14 @@ export function SponsorsSection() {
           })}
         </motion.div>
 
-        {/* ─── 3D Cards Grid ─── */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5 mb-16">
+        {/* ─── 3D Cards Grid with Staggered Scroll Reveal ─── */}
+        <RevealGroup stagger={0.1} margin="-80px" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5 mb-16">
           {partners.map((partner, idx) => (
-            <SponsorCard key={partner.name} partner={partner} index={idx} />
+            <RevealItem key={partner.name}>
+              <SponsorCard partner={partner} index={idx} />
+            </RevealItem>
           ))}
-        </div>
-
-        {/* ─── Scrolling ticker strip ─── */}
-        <motion.div
-          className="relative overflow-hidden rounded-2xl border border-white/8 bg-black/50 backdrop-blur-md py-4"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-        >
-          {/* Fade masks */}
-          <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-black/90 to-transparent z-10 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-black/90 to-transparent z-10 pointer-events-none" />
-
-          {/* Top accent */}
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-arc-cyan/50 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-metallic-gold/50 to-transparent" />
-
-          <div className="flex animate-ticker whitespace-nowrap gap-12">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="flex gap-12 items-center shrink-0">
-                <span className="text-arc-cyan text-[11px] font-bold tracking-[0.25em] uppercase font-space">🛡️ Stark Industries</span>
-                <span className="text-metallic-gold text-[11px] font-bold tracking-[0.25em] uppercase font-space">💠 Wakanda Vibranium</span>
-                <span className="text-white/50 text-[11px] font-bold tracking-[0.25em] uppercase font-space">⚡ AIM Corporation</span>
-                <span className="text-metallic-gold text-[11px] font-bold tracking-[0.25em] uppercase font-space">🏆 S.H.I.E.L.D. Corp</span>
-                <span className="text-arc-cyan text-[11px] font-bold tracking-[0.25em] uppercase font-space">🌐 Quantum Realm</span>
-                <span className="text-white/50 text-[11px] font-bold tracking-[0.25em] uppercase font-space">🚀 Nova Prime</span>
-              </div>
-            ))}
-          </div>
-        </motion.div>
+        </RevealGroup>
 
         {/* ─── Become a sponsor CTA ─── */}
         <motion.div

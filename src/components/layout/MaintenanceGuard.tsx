@@ -32,7 +32,11 @@ export function MaintenanceGuard({ children }: { children: React.ReactNode }) {
             loop
             muted
             playsInline
-            className="w-full h-full object-cover object-center filter brightness-105 contrast-125 saturate-135 scale-105"
+            preload="auto"
+            disablePictureInPicture
+            disableRemotePlayback
+            className="w-full h-full object-cover object-center"
+            style={{ transform: "translate3d(0,0,0)", willChange: "transform" }}
           >
             <source src={encodeURI("/MARVEL/Video Project 4.mp4")} type="video/mp4" />
           </video>

@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 
 interface ScrollRevealProps {
   children: React.ReactNode;
@@ -21,27 +22,64 @@ export function ScrollRevealWrapper({
   children,
   id,
   className = "",
+  enable3DTilt = true,
   laserColor = "cyan",
 }: ScrollRevealProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Track scroll position of this section relative to viewport
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"],
+  });
+
+  const springConfig = { stiffness: 140, damping: 22, restDelta: 0.001 };
+
+  // Scroll-driven smooth entrance transforms (anchored at 100% full width/height without detachment gaps)
+  const rawRotateX = useTransform(scrollYProgress, [0, 0.25], [4, 0]);
+  const rawScale = useTransform(scrollYProgress, [0, 0.25], [0.98, 1]);
+  const rawOpacity = useTransform(scrollYProgress, [0, 0.2], [0.6, 1]);
+  const rawY = useTransform(scrollYProgress, [0, 0.25], [30, 0]);
+
+  // Laser beam fill line progress (0 -> 1 when section enters viewport)
+  const laserProgress = useTransform(scrollYProgress, [0, 0.3], [0, 1]);
+
+  const rotateX = useSpring(rawRotateX, springConfig);
+  const scale = useSpring(rawScale, springConfig);
+  const opacity = useSpring(rawOpacity, springConfig);
+  const y = useSpring(rawY, springConfig);
+
   const laserGradient = LASER_GRADIENTS[laserColor] || LASER_GRADIENTS.cyan;
 
   return (
-    <div id={id} className={`relative w-full ${className}`}>
-      {/* ─── Scroll Energy Tracer Line ─── */}
-      <div className="absolute top-0 left-0 right-0 h-[2px] z-30 pointer-events-none overflow-hidden opacity-60">
-        <div className={`h-full w-full bg-gradient-to-r ${laserGradient}`} />
+    <div ref={containerRef} id={id} className={`relative w-full ${className}`}>
+      {/* ─── Scroll-Driven Laser Energy Tracer Line ─── */}
+      <div className="absolute top-0 left-0 right-0 h-[2px] z-30 pointer-events-none overflow-hidden">
+        <motion.div
+          className={`h-full w-full bg-gradient-to-r ${laserGradient}`}
+          style={{ scaleX: laserProgress, transformOrigin: "center" }}
+        />
       </div>
 
-      {/* ─── Lightweight GPU-Accelerated Viewport Reveal ─── */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-60px" }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        style={{ willChange: "transform, opacity" }}
-      >
-        {children}
-      </motion.div>
+      {/* ─── 3D Perspective Section Container ─── */}
+      <div style={{ perspective: "1400px" }}>
+        <motion.div
+          style={
+            enable3DTilt
+              ? {
+                  rotateX,
+                  scale,
+                  opacity,
+                  y,
+                  transformStyle: "preserve-3d",
+                  willChange: "transform, opacity",
+                }
+              : { opacity }
+          }
+        >
+          {children}
+        </motion.div>
+      </div>
     </div>
   );
 }

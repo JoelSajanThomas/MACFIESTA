@@ -24,11 +24,13 @@ api.interceptors.request.use(
   }
 );
 
-// Interceptor to handle authentication expiration redirects
+// Interceptor to handle authentication expiration redirects & rate limit warnings
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+    if (error.response?.status === 429) {
+      console.warn("API Rate Limit (429): Request threshold reached. Please wait a moment before retrying.");
+    } else if (error.response && (error.response.status === 401 || error.response.status === 403)) {
       if (typeof window !== "undefined") {
         sessionStorage.removeItem("macfiesta_token");
         sessionStorage.removeItem("macfiesta_user");

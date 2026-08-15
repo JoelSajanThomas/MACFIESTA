@@ -23,6 +23,7 @@ import {
 } from "react-icons/ri";
 import { api } from "@/lib/api";
 import { useAuthStore } from "@/lib/authStore";
+import { BackgroundVideo } from "@/components/ui/BackgroundVideo";
 import { useFestivalControl } from "@/lib/festivalStore";
 import { Event } from "@/types";
 import { downloadEventTicketPDF } from "@/lib/ticketGenerator";
@@ -233,20 +234,12 @@ export default function EventDetailClient({ slug }: { slug: string }) {
 
   return (
     <div className="bg-[#05050A] min-h-screen pt-28 pb-16 text-white font-mono relative overflow-hidden">
-      {/* Background Marvel Video Loop (High Visibility) */}
-      <div className="absolute inset-0 z-0 overflow-hidden opacity-75 pointer-events-none">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="w-full h-full object-cover object-center filter brightness-110 contrast-115"
-
-        >
-          <source src="/MARVEL/Video Project 5.mp4" type="video/mp4" />
-        </video>
-        <div className="absolute inset-0 bg-gradient-to-b from-[#05050A]/40 via-[#05050A]/60 to-[#05050A]/90" />
-      </div>
+      {/* Background Marvel Video Loop (Hardware-Accelerated, Smooth Zero-Lag) */}
+      <BackgroundVideo
+        src="/MARVEL/Video Project 4.mp4"
+        fallbackSrc="/MARVEL/Video Project 5.mp4"
+        opacity="opacity-75"
+      />
 
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 relative z-10">
@@ -260,7 +253,7 @@ export default function EventDetailClient({ slug }: { slug: string }) {
               src={event.coverImage}
               alt={event.title}
               fill
-              className="object-cover opacity-80"
+              className="object-cover opacity-95 filter brightness-105 contrast-110"
               priority
             />
           )}

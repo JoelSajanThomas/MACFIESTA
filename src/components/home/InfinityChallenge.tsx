@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { RiShieldFlashLine, RiSparklingLine } from "react-icons/ri";
+import { Reveal } from "@/components/ui/Reveal";
 
 const INFINITY_STONES = [
   {
@@ -54,9 +55,9 @@ export function InfinityChallenge() {
   const [activeStone, setActiveStone] = useState(INFINITY_STONES[0]);
 
   return (
-    <section className="relative bg-[#05050A]/60 backdrop-blur-md py-20 md:py-24 border-t border-arc-cyan/20 overflow-hidden min-h-[580px]">
+    <section className="relative bg-transparent py-20 md:py-24 border-t border-arc-cyan/20 overflow-hidden min-h-[580px]">
       {/* Background Infinity Gauntlet Marvel Image */}
-      <div className="absolute inset-0 z-0 opacity-90 pointer-events-none">
+      <div className="absolute inset-0 z-0 opacity-85 pointer-events-none">
         <Image
           src="/MARVEL/4081455907815375.png"
           alt="Infinity Gauntlet Background"
@@ -64,8 +65,8 @@ export function InfinityChallenge() {
           priority
           className="object-cover object-top filter brightness-110 contrast-125 saturate-135"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#05050A] via-transparent to-[#05050A] z-[1]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_55%,rgba(5,5,10,0.85)_95%)] z-[1]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#05050A]/60 via-transparent to-[#05050A]/70 z-[1]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_50%,rgba(5,5,10,0.7)_95%)] z-[1]" />
       </div>
 
       {/* Background ambient glow matching active stone */}
@@ -76,25 +77,22 @@ export function InfinityChallenge() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 relative z-10">
         {/* Section Header Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-          className="text-center space-y-3 max-w-2xl mx-auto glass-aurora border border-white/15 p-6 sm:p-8 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.8)]"
-        >
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-metallic-gold/40 bg-metallic-gold/15 text-metallic-gold text-xs font-bold tracking-widest uppercase shadow-[0_0_15px_rgba(255,215,0,0.3)] font-space">
-            <RiSparklingLine className="animate-spin-slow" />
-            <span>THE SIX DOMAINS OF VICTORY</span>
-          </div>
+        <Reveal y={60} duration={0.7} margin="-100px">
+          <div className="text-center space-y-3 max-w-2xl mx-auto glass-aurora border border-white/15 p-6 sm:p-8 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-metallic-gold/40 bg-metallic-gold/15 text-metallic-gold text-xs font-bold tracking-[0.2em] uppercase shadow-[0_0_15px_rgba(255,215,0,0.3)] font-space">
+              <RiSparklingLine className="animate-spin-slow" />
+              <span>THE SIX DOMAINS OF VICTORY</span>
+            </div>
 
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white uppercase tracking-wide" style={{ fontFamily: "var(--font-syne)" }}>
-            Infinity <span className="marvel-bang-comic-gradient font-black">Gauntlet Challenge</span>
-          </h2>
-          <p className="text-xs sm:text-sm text-white/80 font-space max-w-lg mx-auto leading-relaxed">
-            Harness the power of all 6 Infinity Stones by competing across diverse mission categories at MACFIESTA.
-          </p>
-        </motion.div>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white uppercase tracking-tight font-anton">
+              <span className="shimmer-text">Infinity Gauntlet</span>{" "}
+              <span className="gradient-text-plasma">Challenge</span>
+            </h2>
+            <p className="text-xs sm:text-sm text-white/85 font-space max-w-lg mx-auto leading-relaxed font-normal">
+              Harness the power of all 6 Infinity Stones by competing across diverse mission categories at MACFIESTA.
+            </p>
+          </div>
+        </Reveal>
 
         {/* Stone Selectors Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
@@ -120,9 +118,9 @@ export function InfinityChallenge() {
                     }`}
                   style={{ background: stone.color, boxShadow: `0 0 18px ${stone.color}` }}
                 >
-                  <span className="text-[11px] font-black text-black font-space">★</span>
+                  <span className="text-[11px] font-black text-black font-excon-black">★</span>
                 </div>
-                <span className="text-xs font-bold font-space tracking-wider uppercase text-center">
+                <span className="text-xs font-bold font-excon-bold tracking-wider uppercase text-center">
                   {stone.name}
                 </span>
               </motion.button>
@@ -147,13 +145,13 @@ export function InfinityChallenge() {
           </div>
 
           <div className="space-y-2 text-center md:text-left">
-            <div className="text-xs font-extrabold uppercase tracking-widest font-space" style={{ color: activeStone.color }}>
+            <div className="text-xs font-bold uppercase tracking-[0.16em] font-excon-bold" style={{ color: activeStone.color }}>
               {activeStone.name} • {activeStone.domain}
             </div>
-            <h3 className="text-xl sm:text-2xl font-black text-white uppercase tracking-wide" style={{ fontFamily: "var(--font-syne)" }}>
+            <h3 className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight font-excon-black">
               {activeStone.domain}
             </h3>
-            <p className="text-xs sm:text-sm text-white/80 font-space leading-relaxed">
+            <p className="text-xs sm:text-sm text-white/85 font-excon leading-relaxed font-normal">
               {activeStone.desc}
             </p>
           </div>

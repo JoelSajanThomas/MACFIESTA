@@ -79,11 +79,16 @@ app.use(express.json());
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 mins
-  max: 200, // Limit IP calls
-  message: "Rate limit threshold reached. Please retry in 15 mins."
+  max: process.env.NODE_ENV === "production" ? 3000 : 15000, // High throughput for live fest and local dev
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.method === "OPTIONS" || req.path === "/health" || req.path === "/api/health",
+  message: {
+    success: false,
+    message: "Rate limit threshold reached. Please retry in a few moments."
+  }
 });
-app.use("/api/", limiter);
-app.use("/", limiter); // Also rate-limit root-prefix calls
+app.use("/api", limiter);
 
 // Shared configurations, database collections, and auth middlewares
 import { adminRouter } from "./admin";

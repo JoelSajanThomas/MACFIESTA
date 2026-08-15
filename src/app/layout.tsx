@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Inter, Orbitron, Bebas_Neue, Rajdhani, Space_Grotesk, Syne } from "next/font/google";
+import localFont from "next/font/local";
+import { Anton, Space_Grotesk, Inter, Orbitron, Bebas_Neue, Rajdhani, Syne } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -11,6 +12,57 @@ import { ParticleBackground } from "@/components/ui/ParticleBackground";
 import { JarvisAssistant } from "@/components/ui/JarvisAssistant";
 import { LoadingProvider } from "@/providers/LoadingProvider";
 import { PageGate } from "@/components/layout/PageGate";
+
+const anton = Anton({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-anton",
+  display: "swap",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
+});
+
+const excon = localFont({
+  src: [
+    {
+      path: "../../public/Fonts/WEB/fonts/Excon-Thin.woff2",
+      weight: "100",
+      style: "normal",
+    },
+    {
+      path: "../../public/Fonts/WEB/fonts/Excon-Light.woff2",
+      weight: "300",
+      style: "normal",
+    },
+    {
+      path: "../../public/Fonts/WEB/fonts/Excon-Regular.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/Fonts/WEB/fonts/Excon-Medium.woff2",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../../public/Fonts/WEB/fonts/Excon-Bold.woff2",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "../../public/Fonts/WEB/fonts/Excon-Black.woff2",
+      weight: "900",
+      style: "normal",
+    },
+  ],
+  variable: "--font-excon",
+  display: "swap",
+});
 
 const inter = Inter({
   subsets: ["latin"],
@@ -35,13 +87,6 @@ const bebasNeue = Bebas_Neue({
 const rajdhani = Rajdhani({
   subsets: ["latin"],
   variable: "--font-rajdhani",
-  display: "swap",
-  weight: ["300", "400", "500", "600", "700"],
-});
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-space-grotesk",
   display: "swap",
   weight: ["300", "400", "500", "600", "700"],
 });
@@ -116,7 +161,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" suppressHydrationWarning={true}>
       <body
-        className={`${inter.variable} ${orbitron.variable} ${bebasNeue.variable} ${rajdhani.variable} ${spaceGrotesk.variable} ${syne.variable} antialiased noise-overlay`}
+        className={`${anton.variable} ${spaceGrotesk.variable} ${excon.variable} ${inter.variable} ${orbitron.variable} ${bebasNeue.variable} ${rajdhani.variable} ${syne.variable} antialiased noise-overlay font-space text-white`}
         suppressHydrationWarning={true}
       >
         <LoadingProvider>

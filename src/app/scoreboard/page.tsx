@@ -6,6 +6,7 @@ import { io } from "socket.io-client";
 import { RiBaseStationLine, RiTrophyLine, RiShieldFlashLine, RiFlashlightLine } from "react-icons/ri";
 import { api } from "@/lib/api";
 import { SOCKET_URL } from "@/lib/constants";
+import { BackgroundVideo } from "@/components/ui/BackgroundVideo";
 
 export default function ScoreboardPage() {
   const [scores, setScores] = useState<any[]>([]);
@@ -29,26 +30,8 @@ export default function ScoreboardPage() {
 
     const socket = io(SOCKET_URL);
     
-    socket.on("connect", () => {
-      console.log("WebSocket connected to S.H.I.E.L.D. channel:", socket.id);
-    });
-
-    socket.on("score-live", (updatedScore: any) => {
-      setScores((prev) => {
-        const targetId = typeof updatedScore.eventId === "object" ? updatedScore.eventId._id : updatedScore.eventId;
-        const index = prev.findIndex((s) => {
-          const currentId = typeof s.eventId === "object" ? s.eventId._id : s.eventId;
-          return currentId === targetId;
-        });
-
-        if (index !== -1) {
-          const updated = [...prev];
-          updated[index] = updatedScore;
-          return updated;
-        } else {
-          return [...prev, updatedScore];
-        }
-      });
+    socket.on("score-updated", () => {
+      loadScores();
     });
 
     return () => {
@@ -60,23 +43,12 @@ export default function ScoreboardPage() {
 
   return (
     <div className="bg-[#05050A] min-h-screen pt-28 pb-16 text-white font-mono relative overflow-hidden">
-      {/* Background Marvel Video Project 6.mp4 Loop (High Visibility) */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-80">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="auto"
-          onPause={(e) => e.currentTarget.play()}
-          onEnded={(e) => e.currentTarget.play()}
-          className="w-full h-full object-cover object-center filter brightness-110 contrast-115"
-
-        >
-          <source src="/MARVEL/Video Project 6.mp4" type="video/mp4" />
-        </video>
-        <div className="absolute inset-0 bg-gradient-to-b from-[#05050A]/40 via-[#05050A]/60 to-[#05050A]/90" />
-      </div>
+      {/* Background Marvel Video Loop (Hardware Accelerated, Smooth Zero-Lag) */}
+      <BackgroundVideo
+        src="/MARVEL/Video Project 6.mp4"
+        fallbackSrc="/MARVEL/Video Project 4.mp4"
+        opacity="opacity-80"
+      />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 relative z-10">
 
@@ -84,28 +56,29 @@ export default function ScoreboardPage() {
         {/* Header */}
         <div className="text-center space-y-3">
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="inline-flex items-center gap-2 px-3.5 py-1 bg-arc-cyan/10 border border-arc-cyan/30 text-arc-cyan text-xs font-bold rounded-full uppercase tracking-wider"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-marvel-red/40 bg-marvel-red/10 text-marvel-red text-xs font-excon-bold font-bold tracking-[0.2em] uppercase shadow-[0_0_18px_rgba(237,29,36,0.3)]"
           >
             <RiBaseStationLine className="animate-pulse text-sm text-marvel-red" />
             <span>S.H.I.E.L.D. LIVE RADAR SCOREBOARD</span>
           </motion.div>
           
-          <h1 className="text-4xl md:text-6xl font-black uppercase tracking-wider text-white" style={{ fontFamily: "var(--font-heading)" }}>
-            LIVE <span className="gradient-text-gold neon-gold">SCOREBOARD</span>
+          <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tight text-white font-excon-black">
+            <span className="shimmer-text">LIVE</span>{" "}
+            <span className="gradient-text-plasma">SCOREBOARD</span>
           </h1>
-          <p className="text-white/60 text-xs sm:text-sm">
+          <p className="text-white/80 text-xs sm:text-sm font-excon font-normal">
             Real-time power levels, leaderboard rankings, and arena scores updated live.
           </p>
         </div>
 
         {loading ? (
-          <div className="text-center text-arc-cyan uppercase font-bold text-xs tracking-widest py-10 animate-pulse">
+          <div className="text-center text-arc-cyan uppercase font-bold text-xs tracking-[0.2em] py-10 animate-pulse font-excon-bold">
             Connecting to S.H.I.E.L.D. Satellite Feed...
           </div>
         ) : scores.length === 0 ? (
-          <div className="marvel-card p-12 rounded-3xl border border-white/10 text-center text-white/40 text-sm">
+          <div className="marvel-card p-12 rounded-3xl border border-white/10 text-center text-white/50 text-sm font-excon">
             No active mission scoreboards broadcast currently.
           </div>
         ) : (
@@ -118,12 +91,11 @@ export default function ScoreboardPage() {
                   <button
                     key={score._id}
                     onClick={() => setActiveScoreIdx(idx)}
-                    className={`px-5 py-2.5 rounded-full border text-xs font-bold uppercase tracking-widest transition-all cursor-pointer ${
+                    className={`px-5 py-2.5 rounded-full border text-xs font-black uppercase tracking-[0.16em] transition-all cursor-pointer font-excon-bold ${
                       activeScoreIdx === idx
-                        ? "bg-marvel-red text-white border-marvel-red shadow-[0_0_15px_#ED1D24]"
-                        : "bg-white/5 text-white/60 border-white/10 hover:text-white"
+                        ? "bg-marvel-red text-white border-marvel-red shadow-[0_0_18px_#ED1D24]"
+                        : "bg-white/5 text-white/70 border-white/10 hover:text-white"
                     }`}
-                    style={{ fontFamily: "var(--font-heading)" }}
                   >
                     <span>{event.title || "Arena Mission"}</span>
                   </button>

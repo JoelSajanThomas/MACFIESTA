@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
+import Image from "next/image";
 import { RiAwardLine, RiGroupLine, RiFlashlightLine, RiShieldFlashLine } from "react-icons/ri";
 import { useFestivalControl } from "@/lib/festivalStore";
 
@@ -52,9 +53,9 @@ function StatCard({
     <motion.div
       initial={{ opacity: 0, scale: 0.85, y: 30 }}
       whileInView={{ opacity: 1, scale: 1, y: 0 }}
-      whileHover={{ scale: 1.06, y: -6 }}
+      whileHover={{ scale: 1.04, y: -8 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.5, delay: index * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
       className="glass-aurora p-6 md:p-8 rounded-2xl border border-white/10 text-center flex flex-col items-center justify-center space-y-4 shadow-2xl cursor-default hover:border-arc-cyan/40 transition-colors duration-300"
     >
       <div
@@ -64,13 +65,12 @@ function StatCard({
       </div>
       <div className="space-y-1">
         <span
-          className="block text-3xl md:text-4xl font-black text-white uppercase"
-          style={{ fontFamily: "var(--font-syne)" }}
+          className="block text-3xl md:text-5xl font-black text-white uppercase font-anton tracking-tight"
         >
           {count}
           {suffix}
         </span>
-        <span className="block text-xs text-arc-cyan font-extrabold uppercase tracking-wider font-space">
+        <span className="block text-xs text-arc-cyan font-bold uppercase tracking-[0.16em] font-space">
           {label}
         </span>
       </div>
@@ -91,18 +91,23 @@ export function AboutFestival() {
   const inView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section className="relative bg-[#05050A]/65 backdrop-blur-md section-padding border-t border-white/10 overflow-hidden">
-      {/* Background Marvel energy glows — animate on scroll */}
-      <motion.div
-        className="absolute top-1/4 left-1/10 w-96 h-96 rounded-full bg-marvel-red/10 blur-[130px] pointer-events-none"
-        animate={{ x: [0, 20, 0], y: [0, -15, 0] }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute bottom-1/4 right-1/10 w-96 h-96 rounded-full bg-arc-cyan/10 blur-[130px] pointer-events-none"
-        animate={{ x: [0, -20, 0], y: [0, 15, 0] }}
-        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-      />
+    <section className="relative bg-transparent section-padding border-t border-marvel-red/20 overflow-hidden min-h-[580px]">
+      {/* Background Marvel Artwork Accent */}
+      <div className="absolute inset-0 z-0 opacity-85 pointer-events-none overflow-hidden">
+        <Image
+          src="/MARVEL/In a city that never sleeps, I find my….png"
+          alt="About Festival Marvel Background"
+          fill
+          priority
+          className="object-cover object-center filter brightness-105 contrast-125 saturate-135"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#05050A]/70 via-transparent to-[#05050A]/70 z-[1]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_45%,rgba(5,5,10,0.65)_90%)] z-[1]" />
+      </div>
+
+      {/* Background glow accents */}
+      <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-marvel-red/10 blur-[140px] pointer-events-none" />
+      <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-arc-cyan/10 blur-[140px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
@@ -112,29 +117,28 @@ export function AboutFestival() {
             className="lg:col-span-6 space-y-6"
             initial={{ opacity: 0, x: -60 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           >
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-arc-cyan/30 bg-arc-cyan/10 text-arc-cyan text-xs font-bold tracking-widest uppercase font-space">
+            <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full border border-arc-cyan/30 bg-arc-cyan/10 text-arc-cyan text-xs font-bold tracking-[0.2em] uppercase font-space shadow-[0_0_15px_rgba(0,212,255,0.2)]">
               <RiShieldFlashLine className="animate-pulse" />
               <span>STARK INDUSTRIES &amp; WAKANDA TECH BRIEFING</span>
             </div>
 
             <h2
-              className="section-title text-white uppercase"
-              style={{ fontFamily: "var(--font-syne)" }}
+              className="section-title text-white uppercase font-anton"
             >
               Where Heroes <br />
-              <span className="marvel-bang-comic-gradient font-black">Assemble &amp; Dominate</span>
+              <span className="shimmer-text">Assemble</span> &amp; <span className="gradient-text-plasma">Dominate</span>
             </h2>
 
-            <p className="text-white/80 leading-relaxed font-space text-base">
+            <p className="text-white/85 leading-relaxed font-space text-base">
               {settings.aboutText}
             </p>
 
-            <p className="text-white/70 leading-relaxed font-space text-sm">
+            <p className="text-white/75 leading-relaxed font-space text-sm">
               Over 2 action-packed days, the country&apos;s elite delegates gather inside{" "}
-              <span className="text-arc-cyan font-semibold">{settings.name}</span> Avengers
+              <span className="text-arc-cyan font-bold">{settings.name}</span> Avengers
               Headquarters to compete for glory, honor, S.H.I.E.L.D. trophies, and massive bounty
               pools.
             </p>

@@ -1,8 +1,92 @@
 @import "tailwindcss";
 
 /* ============================================
+   Excon Webfont Declarations (public/Fonts/WEB/fonts/)
+   Ultra-Bold Futuristic Geometric Type System
+   ============================================ */
+@font-face {
+  font-family: 'Excon';
+  src: url('/Fonts/WEB/fonts/Excon-Thin.woff2') format('woff2'),
+       url('/Fonts/WEB/fonts/Excon-Thin.woff') format('woff'),
+       url('/Fonts/WEB/fonts/Excon-Thin.ttf') format('truetype');
+  font-weight: 100;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Excon';
+  src: url('/Fonts/WEB/fonts/Excon-Light.woff2') format('woff2'),
+       url('/Fonts/WEB/fonts/Excon-Light.woff') format('woff'),
+       url('/Fonts/WEB/fonts/Excon-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Excon';
+  src: url('/Fonts/WEB/fonts/Excon-Regular.woff2') format('woff2'),
+       url('/Fonts/WEB/fonts/Excon-Regular.woff') format('woff'),
+       url('/Fonts/WEB/fonts/Excon-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Excon';
+  src: url('/Fonts/WEB/fonts/Excon-Medium.woff2') format('woff2'),
+       url('/Fonts/WEB/fonts/Excon-Medium.woff') format('woff'),
+       url('/Fonts/WEB/fonts/Excon-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Excon';
+  src: url('/Fonts/WEB/fonts/Excon-Bold.woff2') format('woff2'),
+       url('/Fonts/WEB/fonts/Excon-Bold.woff') format('woff'),
+       url('/Fonts/WEB/fonts/Excon-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Excon';
+  src: url('/Fonts/WEB/fonts/Excon-Black.woff2') format('woff2'),
+       url('/Fonts/WEB/fonts/Excon-Black.woff') format('woff'),
+       url('/Fonts/WEB/fonts/Excon-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Excon-Bold';
+  src: url('/Fonts/WEB/fonts/Excon-Bold.woff2') format('woff2'),
+       url('/Fonts/WEB/fonts/Excon-Bold.woff') format('woff'),
+       url('/Fonts/WEB/fonts/Excon-Bold.ttf') format('truetype');
+  font-weight: 700 900;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Excon-Black';
+  src: url('/Fonts/WEB/fonts/Excon-Black.woff2') format('woff2'),
+       url('/Fonts/WEB/fonts/Excon-Black.woff') format('woff'),
+       url('/Fonts/WEB/fonts/Excon-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-display: swap;
+  font-style: normal;
+}
+
+/* ============================================
    MacFiesta PRO 2K26 — Marvel Cinematic Command Center UI/UX
-   COMPLETE OVERHAUL v2.0 — Scroll Transitions + Premium Fonts
+   EXCON BOLD OVERHAUL — Blockbuster Superhero Typography
    ============================================ */
 
 /* --- Marvel Cinematic Theme Tokens --- */
@@ -37,15 +121,18 @@
   --color-festival-dark-border: rgba(237, 29, 36, 0.30);
   --color-festival-surface: rgba(17, 17, 24, 0.85);
 
-  /* ============== NEW FONT SYSTEM ============== */
-  /* Primary Display — Syne (bold, dramatic) */
-  --font-display: 'Syne', 'Bebas Neue', 'Orbitron', sans-serif;
-  /* Body — Space Grotesk (modern, geometric) */
-  --font-body: 'Space Grotesk', 'Rajdhani', 'Inter', system-ui, sans-serif;
-  /* Heading — Orbitron (techy HUD) */
-  --font-heading: 'Orbitron', 'Rajdhani', 'Bebas Neue', sans-serif;
-  /* Mono — still used for HUD labels */
-  --font-mono: 'Space Grotesk', 'Rajdhani', ui-monospace, monospace;
+  /* ============== BOLD EXCON FONT SYSTEM ============== */
+  /* Primary Headline / Display — Anton (Google Fonts) with tight tracking */
+  --font-headline: var(--font-anton), 'Anton', 'Excon-Black', sans-serif;
+  --font-display: var(--font-anton), 'Anton', var(--font-excon), 'Excon-Black', sans-serif;
+  --font-heading: var(--font-anton), 'Anton', var(--font-excon), 'Excon-Bold', sans-serif;
+  /* Primary Body — Space Grotesk (Google Fonts) */
+  --font-body: var(--font-space-grotesk), 'Space Grotesk', var(--font-excon), sans-serif;
+  --font-space: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
+  --font-anton: var(--font-anton), 'Anton', sans-serif;
+  --font-syne: var(--font-anton), 'Anton', 'Syne', sans-serif;
+  /* Mono for HUD telemetry */
+  --font-mono: var(--font-space-grotesk), 'Space Grotesk', 'Rajdhani', ui-monospace, monospace;
 
   /* Animations */
   --animate-float: float 6s ease-in-out infinite;
@@ -1170,7 +1257,6 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(3px 4px 0px #000000) drop-shadow(0 0 20px rgba(255, 102, 0, 0.5));
 }
 
 /* ============================================
@@ -2178,12 +2264,146 @@ body {
 }
 
 .section-title {
-  font-family: var(--font-syne), var(--font-heading), sans-serif;
-  font-size: clamp(1.4rem, 2.8vw, 2.5rem);
+  font-family: var(--font-excon, 'Excon-Black', 'Excon-Bold', 'Syne', sans-serif);
+  font-size: clamp(1.6rem, 3.2vw, 2.8rem);
   font-weight: 900;
-  line-height: 1.15;
-  letter-spacing: -0.01em;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   overflow-wrap: break-word;
   word-break: break-word;
+}
+
+/* ============================================
+   EXCON BOLD & MARVEL GRAPHIC TYPOGRAPHY SYSTEM
+   ============================================ */
+.font-excon {
+  font-family: var(--font-excon, 'Excon', sans-serif);
+}
+
+.font-excon-black {
+  font-family: var(--font-excon, 'Excon-Black', 'Excon', sans-serif);
+  font-weight: 900;
+}
+
+.font-excon-bold {
+  font-family: var(--font-excon, 'Excon-Bold', 'Excon', sans-serif);
+  font-weight: 700;
+}
+
+.font-excon-medium {
+  font-family: var(--font-excon, 'Excon-Medium', 'Excon', sans-serif);
+  font-weight: 500;
+}
+
+.font-anton {
+  font-family: var(--font-anton), 'Anton', 'Excon-Black', sans-serif;
+}
+
+.font-headline {
+  font-family: var(--font-anton), 'Anton', 'Excon-Black', sans-serif;
+}
+
+.font-space {
+  font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
+}
+
+/* Reference Design Headline Hero: uppercase, tight tracking, line-height 0.85, clamp(3rem, 12vw, 9rem) */
+.headline-hero {
+  font-family: var(--font-anton), 'Anton', 'Excon-Black', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: 0.85;
+  font-size: clamp(3rem, 12vw, 9rem);
+}
+
+.font-syne {
+  font-family: var(--font-anton), 'Anton', 'Syne', sans-serif;
+}
+
+.font-orbitron {
+  font-family: var(--font-orbitron), 'Orbitron', 'Excon-Bold', sans-serif;
+}
+
+.font-bebas {
+  font-family: var(--font-anton), 'Anton', 'Bebas Neue', sans-serif;
+}
+
+/* Marvel Cinematic Color Grading Tokens */
+.shimmer-text {
+  background: linear-gradient(90deg,
+      #FFF5C0 0%,
+      #FFD700 20%,
+      #FFFFFF 45%,
+      #FFA726 65%,
+      #ED1D24 85%,
+      #FFF5C0 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: text-shimmer 3.2s linear infinite;
+  display: inline-block;
+  text-shadow: 0 0 30px rgba(255, 215, 0, 0.25);
+}
+
+.gradient-text-plasma {
+  background: linear-gradient(135deg, 
+      #E0F7FF 0%, 
+      #00D4FF 30%, 
+      #FFFFFF 55%, 
+      #00E5FF 75%, 
+      #0099FF 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: text-shimmer 3.2s linear infinite;
+  display: inline-block;
+  text-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+}
+
+.marvel-bang-comic-gradient {
+  background: linear-gradient(90deg,
+      #FFF5C0 0%,
+      #FFD700 25%,
+      #FFFFFF 50%,
+      #FF6B00 75%,
+      #ED1D24 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: text-shimmer 3.2s linear infinite;
+  display: inline-block;
+}
+
+.gradient-text-gold {
+  background: linear-gradient(90deg,
+      #FFF8DC 0%,
+      #FDE047 25%,
+      #FFFFFF 50%,
+      #EAB308 75%,
+      #FFF8DC 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: text-shimmer 3.2s linear infinite;
+  display: inline-block;
+}
+
+.glow-text-red {
+  color: #FF3B47;
+  text-shadow: 0 0 25px rgba(237, 29, 36, 0.65), 0 0 50px rgba(237, 29, 36, 0.35);
+}
+
+.glow-text-cyan {
+  color: #00D4FF;
+  text-shadow: 0 0 25px rgba(0, 212, 255, 0.65), 0 0 50px rgba(0, 212, 255, 0.35);
+}
+
+.glow-text-gold {
+  color: #FFD700;
+  text-shadow: 0 0 25px rgba(255, 215, 0, 0.65), 0 0 50px rgba(255, 215, 0, 0.35);
 }

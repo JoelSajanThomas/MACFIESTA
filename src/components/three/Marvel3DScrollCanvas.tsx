@@ -31,7 +31,6 @@ export function Marvel3DScrollCanvas({
   const imagesRef = useRef<HTMLImageElement[]>([]);
   const currentFrameRef = useRef(1);
   const targetFrameRef = useRef(1);
-  const lastDrawnFrameRef = useRef(0);
   const rafRef = useRef<number | null>(null);
 
   // Generate frame path
@@ -40,7 +39,7 @@ export function Marvel3DScrollCanvas({
     return `/MARVEL/${seq}/frame_${padded}.jpg`;
   }, []);
 
-  // Preload frames in chunks to keep main thread and network responsive
+  // Preload frames
   useEffect(() => {
     let isCancelled = false;
     imagesRef.current = new Array(TOTAL_FRAMES + 1);
@@ -61,15 +60,9 @@ export function Marvel3DScrollCanvas({
       drawFrame(1);
     };
 
-    // Load remaining frames in batches of 12
-    let currentBatchStart = 2;
-    const CHUNK_SIZE = 12;
-
-    const loadNextBatch = () => {
-      if (isCancelled || currentBatchStart > TOTAL_FRAMES) return;
-
-      const end = Math.min(TOTAL_FRAMES, currentBatchStart + CHUNK_SIZE);
-      for (let i = currentBatchStart; i <= end; i++) {
+    // Load remaining frames in batches
+    const loadRemaining = () => {
+      for (let i = 2; i <= TOTAL_FRAMES; i++) {
         const img = new Image();
         img.src = getFramePath(sequence, i);
         img.onload = () => {
@@ -84,13 +77,10 @@ export function Marvel3DScrollCanvas({
           setLoadedCount(count);
         };
       }
-      currentBatchStart = end + 1;
-      if (currentBatchStart <= TOTAL_FRAMES) {
-        setTimeout(loadNextBatch, 30);
-      }
     };
 
-    const timer = setTimeout(loadNextBatch, 100);
+    // Trigger after a tiny tick to prioritize first frame
+    const timer = setTimeout(loadRemaining, 50);
 
     return () => {
       isCancelled = true;
@@ -98,16 +88,17 @@ export function Marvel3DScrollCanvas({
     };
   }, [sequence, getFramePath]);
 
-  // Draw frame to canvas with object-fit: cover
+  // Draw frame to canvas with object-fit: cover and high clarity
   const drawFrame = useCallback((frameIdx: number) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) return;
 
-    // Fallback search if current frame isn't loaded yet
+    // Fallback search if current frame isn't loaded yet: search nearest loaded frame
     let imgToDraw = imagesRef.current[frameIdx];
     if (!imgToDraw || !imgToDraw.complete || imgToDraw.naturalWidth === 0) {
+      // Find nearest loaded frame
       for (let offset = 1; offset < TOTAL_FRAMES; offset++) {
         const prev = imagesRef.current[frameIdx - offset];
         if (prev && prev.complete && prev.naturalWidth > 0) {
@@ -126,6 +117,11 @@ export function Marvel3DScrollCanvas({
 
     const width = canvas.width;
     const height = canvas.height;
+
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+
+    // Calculate aspect ratio cover
     const imgWidth = imgToDraw.naturalWidth;
     const imgHeight = imgToDraw.naturalHeight;
     const imgAspect = imgWidth / imgHeight;
@@ -137,28 +133,29 @@ export function Marvel3DScrollCanvas({
     let offsetY = 0;
 
     if (canvasAspect > imgAspect) {
+      // Canvas is wider than image
       renderHeight = width / imgAspect;
       offsetY = (height - renderHeight) / 2;
     } else {
+      // Canvas is taller than image
       renderWidth = height * imgAspect;
       offsetX = (width - renderWidth) / 2;
     }
 
     ctx.drawImage(imgToDraw, offsetX, offsetY, renderWidth, renderHeight);
-    lastDrawnFrameRef.current = frameIdx;
   }, []);
 
-  // Resize handler — capped DPR for peak GPU performance
+  // Resize handler
   useEffect(() => {
     const handleResize = () => {
       const canvas = canvasRef.current;
       if (!canvas) return;
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.25);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const w = window.innerWidth;
       const h = window.innerHeight;
 
-      canvas.width = Math.round(w * dpr);
-      canvas.height = Math.round(h * dpr);
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
       canvas.style.width = `${w}px`;
       canvas.style.height = `${h}px`;
 
@@ -170,20 +167,13 @@ export function Marvel3DScrollCanvas({
     return () => window.removeEventListener("resize", handleResize);
   }, [drawFrame]);
 
-  // Mouse move tilt handler (debounced)
+  // Mouse move tilt handler
   useEffect(() => {
-    let ticking = false;
     const handleMouseMove = (e: MouseEvent) => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          const nx = (e.clientX / window.innerWidth - 0.5) * 2;
-          const ny = (e.clientY / window.innerHeight - 0.5) * 2;
-          mouseTiltRef.current.targetX = nx * 3; // max 3deg subtle tilt
-          mouseTiltRef.current.targetY = ny * -3;
-          ticking = false;
-        });
-        ticking = true;
-      }
+      const nx = (e.clientX / window.innerWidth - 0.5) * 2;
+      const ny = (e.clientY / window.innerHeight - 0.5) * 2;
+      mouseTiltRef.current.targetX = nx * 3;
+      mouseTiltRef.current.targetY = ny * -3;
     };
 
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
@@ -197,7 +187,9 @@ export function Marvel3DScrollCanvas({
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
       const progress = docHeight > 0 ? Math.min(1, Math.max(0, scrollY / docHeight)) : 0;
 
-      // Map progress [0, 1] to frame index [1, TOTAL_FRAMES]
+      setScrollProgress(progress);
+
+      // Map progress [0, 1] across all 169 frames
       const targetIdx = Math.max(1, Math.min(TOTAL_FRAMES, Math.floor(progress * (TOTAL_FRAMES - 1)) + 1));
       targetFrameRef.current = targetIdx;
     };
@@ -205,28 +197,27 @@ export function Marvel3DScrollCanvas({
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
 
-    // Smooth RAF render loop (Lerp interpolation)
+    // Smooth RAF render loop (fluid responsiveness)
     let isRunning = true;
     const renderLoop = () => {
       if (!isRunning) return;
 
-      // Smooth frame scrubbing
+      // Smooth frame scrubbing (responsive tracking)
       const diff = targetFrameRef.current - currentFrameRef.current;
-      if (Math.abs(diff) > 0.05) {
-        currentFrameRef.current += diff * 0.18; // Responsive lerp
+      if (Math.abs(diff) > 0.005) {
+        currentFrameRef.current += diff * 0.22;
         const frameToDraw = Math.max(1, Math.min(TOTAL_FRAMES, Math.round(currentFrameRef.current)));
-        if (frameToDraw !== lastDrawnFrameRef.current) {
-          drawFrame(frameToDraw);
-        }
+        setCurrentFrameIndex(frameToDraw);
+        drawFrame(frameToDraw);
       }
 
       // Smooth mouse tilt
       const tilt = mouseTiltRef.current;
-      tilt.x += (tilt.targetX - tilt.x) * 0.06;
-      tilt.y += (tilt.targetY - tilt.y) * 0.06;
+      tilt.x += (tilt.targetX - tilt.x) * 0.05;
+      tilt.y += (tilt.targetY - tilt.y) * 0.05;
 
       if (containerRef.current) {
-        containerRef.current.style.transform = `perspective(1000px) rotateX(${tilt.y.toFixed(2)}deg) rotateY(${tilt.x.toFixed(2)}deg)`;
+        containerRef.current.style.transform = `perspective(1200px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg) scale(1.01)`;
       }
 
       rafRef.current = requestAnimationFrame(renderLoop);
@@ -254,19 +245,17 @@ export function Marvel3DScrollCanvas({
         {/* Animated Perspective Wrapper */}
         <div
           ref={containerRef}
-          className="relative w-full h-full transition-transform duration-75 ease-out will-change-transform"
+          className="relative w-full h-full will-change-transform"
         >
           <canvas
             ref={canvasRef}
-            className="w-full h-full block object-cover filter brightness-[1.03] contrast-[1.08]"
+            className="w-full h-full block object-cover filter brightness-105 contrast-110 saturate-110"
           />
 
-          {/* Cinematic Vignette & Ambient Hologram Gradients */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#05050A] via-transparent to-[#05050A]/70 pointer-events-none" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(5,5,10,0.85)_100%)] pointer-events-none" />
-          <div className="absolute inset-0 bg-marvel-red/5 mix-blend-color-dodge pointer-events-none" />
-          <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-[#05050A]/90 to-transparent pointer-events-none" />
-          <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#05050A] to-transparent pointer-events-none" />
+          {/* Clean Subtle Lighting Vignette — Subject in Center is 100% Bright and Clear */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_55%,rgba(5,5,10,0.6)_100%)] pointer-events-none" />
+          <div className="absolute top-0 left-0 right-0 h-28 bg-gradient-to-b from-[#05050A]/70 via-[#05050A]/20 to-transparent pointer-events-none" />
+          <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-[#05050A]/70 via-[#05050A]/20 to-transparent pointer-events-none" />
         </div>
       </div>
 

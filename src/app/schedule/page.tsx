@@ -20,6 +20,8 @@ const timelineEvents = {
   ]
 };
 
+import { BackgroundVideo } from "@/components/ui/BackgroundVideo";
+
 export default function SchedulePage() {
   const [activeDay, setActiveDay] = useState<"day1" | "day2">("day1");
   const [stageFilter, setStageFilter] = useState("all");
@@ -30,23 +32,11 @@ export default function SchedulePage() {
 
   return (
     <div className="bg-[#05050A] min-h-screen pt-28 pb-16 text-white font-mono relative overflow-hidden">
-      {/* Background Marvel Video Project 4.mp4 Loop (High Visibility) */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-80">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="auto"
-          onPause={(e) => e.currentTarget.play()}
-          onEnded={(e) => e.currentTarget.play()}
-          className="w-full h-full object-cover object-center filter brightness-110 contrast-115"
-
-        >
-          <source src="/MARVEL/Video Project 4.mp4" type="video/mp4" />
-        </video>
-        <div className="absolute inset-0 bg-gradient-to-b from-[#05050A]/40 via-[#05050A]/60 to-[#05050A]/90" />
-      </div>
+      {/* Background Marvel Video Loop (Hardware Accelerated, Smooth Zero-Lag) */}
+      <BackgroundVideo
+        src="/MARVEL/Video Project 4.mp4"
+        opacity="opacity-80"
+      />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 relative z-10">
 
@@ -58,10 +48,11 @@ export default function SchedulePage() {
             <span>S.H.I.E.L.D. TACTICAL MISSION RADAR</span>
           </div>
 
-          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-wider text-white" style={{ fontFamily: "var(--font-heading)" }}>
-            MISSION <span className="gradient-text-gold neon-gold">TIMELINE</span>
+          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tight text-white font-excon-black">
+            <span className="shimmer-text">MISSION</span>{" "}
+            <span className="gradient-text-plasma">TIMELINE</span>
           </h1>
-          <p className="text-white/60 text-xs sm:text-sm">
+          <p className="text-white/80 text-xs sm:text-sm font-excon font-normal">
             Track real-time parallel operations across Avengers Command venues.
           </p>
         </div>
