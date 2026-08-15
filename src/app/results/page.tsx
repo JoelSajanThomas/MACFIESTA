@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { RiAwardLine, RiSearchLine, RiDownloadLine, RiCheckDoubleLine, RiTrophyLine, RiSparklingLine, RiShieldFlashLine } from "react-icons/ri";
+import { RiAwardLine, RiSearchLine, RiDownloadLine, RiCheckDoubleLine, RiSparklingLine, RiShieldFlashLine } from "react-icons/ri";
 import { api } from "@/lib/api";
 import { getSocket } from "@/lib/socket";
 
@@ -18,18 +18,19 @@ export function HallOfHeroesPodium({ topTeams }: { topTeams?: Array<{ name: stri
   const third = topTeams?.[2]?.name || "Syntax Team";
 
   return (
-    <div className="marvel-card p-8 rounded-3xl border border-metallic-gold/40 text-center space-y-6 relative overflow-hidden bg-gradient-to-b from-[#0F0D05] to-[#05050A]">
-      <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-metallic-gold/40 bg-metallic-gold/10 text-metallic-gold text-xs font-mono font-bold tracking-widest uppercase">
+    <div className="marvel-card p-8 rounded-3xl border border-metallic-gold/40 text-center space-y-6 relative overflow-hidden bg-gradient-to-b from-[#0F0D05] to-[#05050A] font-excon">
+      <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-metallic-gold/40 bg-metallic-gold/10 text-metallic-gold text-xs font-excon-bold font-bold tracking-[0.2em] uppercase">
         <RiSparklingLine className="animate-spin-slow" />
         <span>AVENGERS HALL OF HEROES PODIUM</span>
       </div>
 
-      <h3 className="text-2xl font-black text-white uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
-        CONGRATULATIONS TO THE <span className="gradient-text-gold neon-gold">VICTORS</span>
+      <h3 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tight font-excon-black">
+        <span className="shimmer-text">CONGRATULATIONS TO THE</span>{" "}
+        <span className="gradient-text-plasma">VICTORS</span>
       </h3>
 
       {/* Holographic 3D Podium Display — Scroll-Triggered Rising Pillars */}
-      <div className="flex justify-center items-end gap-4 pt-6 pb-2 font-mono">
+      <div className="flex justify-center items-end gap-4 pt-6 pb-2">
         {/* 2nd Place */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
@@ -42,8 +43,8 @@ export function HallOfHeroesPodium({ topTeams }: { topTeams?: Array<{ name: stri
             🥈
           </div>
           <div className="w-24 sm:w-32 h-28 bg-white/5 border border-white/20 rounded-t-2xl flex flex-col justify-center p-2 text-center">
-            <span className="text-[10px] text-white/50 uppercase font-bold">2ND PLACE</span>
-            <span className="text-xs font-bold text-white truncate">{runner}</span>
+            <span className="text-[10px] text-white/50 uppercase font-bold font-excon-bold">2ND PLACE</span>
+            <span className="text-xs font-black text-white truncate font-excon-black">{runner}</span>
           </div>
         </motion.div>
 
@@ -59,8 +60,8 @@ export function HallOfHeroesPodium({ topTeams }: { topTeams?: Array<{ name: stri
             🏆
           </div>
           <div className="w-28 sm:w-36 h-36 bg-metallic-gold/10 border-2 border-metallic-gold/50 rounded-t-2xl flex flex-col justify-center p-2 text-center shadow-[0_0_30px_rgba(255,215,0,0.2)]">
-            <span className="text-[10px] text-metallic-gold uppercase font-black tracking-widest">GRAND CHAMPION</span>
-            <span className="text-sm font-black text-white truncate">{champion}</span>
+            <span className="text-[10px] text-metallic-gold uppercase font-black tracking-widest font-excon-bold">GRAND CHAMPION</span>
+            <span className="text-sm font-black text-white truncate font-excon-black">{champion}</span>
           </div>
         </motion.div>
 
@@ -76,8 +77,8 @@ export function HallOfHeroesPodium({ topTeams }: { topTeams?: Array<{ name: stri
             🥉
           </div>
           <div className="w-24 sm:w-32 h-20 bg-marvel-red/5 border border-marvel-red/20 rounded-t-2xl flex flex-col justify-center p-2 text-center">
-            <span className="text-[10px] text-marvel-red uppercase font-bold">3RD PLACE</span>
-            <span className="text-xs font-bold text-white truncate">{third}</span>
+            <span className="text-[10px] text-marvel-red uppercase font-bold font-excon-bold">3RD PLACE</span>
+            <span className="text-xs font-black text-white truncate font-excon-black">{third}</span>
           </div>
         </motion.div>
       </div>
@@ -145,27 +146,28 @@ export default function ResultsPage() {
 
   const allTeams = scores.flatMap((s) => (Array.isArray(s.teams) ? s.teams : [])).sort((a: any, b: any) => b.score - a.score);
 
-
   return (
-    <div className="bg-[#05050A] min-h-screen pt-28 pb-16 text-white font-mono relative overflow-hidden">
+    <div className="bg-[#05050A] min-h-screen pt-28 pb-16 text-white font-excon relative overflow-hidden">
       {/* Background Marvel Neon Ambient Color Blending */}
-      <div className="absolute top-1/4 left-1/4 w-[600px] h-[400px] bg-metallic-gold/15 rounded-full blur-[140px] pointer-events-none z-0" />
-      <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[400px] bg-arc-cyan/15 rounded-full blur-[140px] pointer-events-none z-0" />
+      <div className="absolute top-1/4 left-1/4 w-[600px] h-[400px] bg-arc-cyan/15 rounded-full blur-[140px] pointer-events-none z-0" />
+      <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[400px] bg-metallic-gold/15 rounded-full blur-[140px] pointer-events-none z-0" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_45%,rgba(5,5,10,0.85)_95%)] pointer-events-none z-0" />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 relative z-10">
 
-        
         {/* Header */}
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-metallic-gold/40 bg-metallic-gold/10 text-metallic-gold text-xs font-mono font-bold tracking-widest uppercase">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-arc-cyan/40 bg-arc-cyan/10 text-arc-cyan text-xs font-excon-bold font-bold tracking-[0.2em] uppercase shadow-[0_0_15px_rgba(0,212,255,0.25)]">
             <RiShieldFlashLine className="animate-pulse" />
             <span>S.H.I.E.L.D. VERIFIED VICTORY RECORDS</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-wider text-white" style={{ fontFamily: "var(--font-heading)" }}>
-            HALL OF <span className="gradient-text-gold neon-gold">HEROES</span>
+
+          <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tight text-white font-excon-black">
+            <span className="shimmer-text">HALL OF</span>{" "}
+            <span className="gradient-text-plasma">HEROES</span>
           </h1>
-          <p className="text-white/60 text-xs sm:text-sm">
+
+          <p className="text-white/80 text-xs sm:text-sm leading-relaxed font-excon font-normal">
             Inspect official tournament winners, hero achievements, and download verified certificates.
           </p>
         </div>
@@ -174,14 +176,14 @@ export default function ResultsPage() {
         <HallOfHeroesPodium topTeams={allTeams} />
 
         {/* Search */}
-        <div className="glass p-4 rounded-xl border border-arc-cyan/20 relative">
+        <div className="glass p-4 rounded-2xl border border-arc-cyan/20 relative">
           <RiSearchLine className="absolute left-7 top-1/2 -translate-y-1/2 text-arc-cyan text-lg" />
           <input
             type="text"
             placeholder="Search hall of heroes by mission name..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:border-arc-cyan focus:outline-none text-white text-xs"
+            className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-arc-cyan focus:outline-none text-white text-xs placeholder:text-white/30 transition-all font-excon"
           />
         </div>
 
@@ -192,26 +194,26 @@ export default function ResultsPage() {
               key={idx}
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              className="marvel-card p-6 rounded-2xl border border-white/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:border-metallic-gold/50 transition-all shadow-xl"
+              className="marvel-card p-6 rounded-2xl border border-arc-cyan/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:border-arc-cyan transition-all shadow-xl"
             >
               <div className="space-y-4 flex-grow">
-                <div className="flex items-center gap-2 text-metallic-gold text-xs font-bold uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
+                <div className="flex items-center gap-2 text-metallic-gold text-xs font-bold uppercase tracking-wider font-excon-bold">
                   <RiAwardLine />
                   <span>{row.event}</span>
-                  <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-arc-cyan/10 border border-arc-cyan/30 text-arc-cyan text-[9px] tracking-widest ml-2">
+                  <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-arc-cyan/10 border border-arc-cyan/30 text-arc-cyan text-[9px] font-excon-bold tracking-widest ml-2">
                     <RiCheckDoubleLine />
                     VERIFIED
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
-                  <div className="p-3.5 bg-black/60 rounded-xl border border-metallic-gold/30">
-                    <span className="block text-[10px] uppercase font-black text-metallic-gold tracking-wider">🏆 GRAND CHAMPION</span>
-                    <span className="block font-bold text-white text-sm mt-1">{row.winner}</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-excon">
+                  <div className="p-3.5 bg-black/60 rounded-xl border border-arc-cyan/30">
+                    <span className="block text-[10px] uppercase font-bold text-metallic-gold tracking-wider font-excon-bold">🏆 GRAND CHAMPION</span>
+                    <span className="block font-black text-white text-sm mt-1 font-excon-black">{row.winner}</span>
                   </div>
                   <div className="p-3.5 bg-black/60 rounded-xl border border-white/10">
-                    <span className="block text-[10px] uppercase font-black text-white/40 tracking-wider">🥈 RUNNER UP AGENT</span>
-                    <span className="block font-bold text-white/80 text-sm mt-1">{row.runner}</span>
+                    <span className="block text-[10px] uppercase font-bold text-white/50 tracking-wider font-excon-bold">🥈 RUNNER UP AGENT</span>
+                    <span className="block font-bold text-white/80 text-sm mt-1 font-excon">{row.runner}</span>
                   </div>
                 </div>
               </div>
@@ -219,7 +221,7 @@ export default function ResultsPage() {
               {/* Certificate Download button */}
               <button
                 onClick={() => alert(`Downloading official S.H.I.E.L.D. Victory Certificate PDF for ${row.event}...`)}
-                className="btn-outline border-metallic-gold text-metallic-gold hover:bg-metallic-gold hover:text-black text-xs px-5 py-3 flex items-center gap-2 uppercase tracking-widest self-stretch md:self-center justify-center font-mono"
+                className="text-xs font-black text-black bg-arc-cyan hover:bg-white px-5 py-3 rounded-xl transition-all uppercase tracking-[0.15em] shadow-[0_0_12px_#00D4FF] font-excon-black flex items-center gap-2 justify-center shrink-0 self-stretch md:self-center cursor-pointer"
               >
                 <RiDownloadLine />
                 <span>Certificate PDF</span>

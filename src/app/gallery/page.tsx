@@ -14,6 +14,7 @@ import {
   RiArrowRightSLine,
   RiFullscreenLine,
   RiFullscreenExitLine,
+  RiShieldFlashLine
 } from "react-icons/ri";
 import { useGalleryItems, GalleryItem } from "@/lib/galleryStore";
 
@@ -48,7 +49,6 @@ export default function GalleryPage() {
   const toggleNativeFullscreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(() => {});
-      setIsNativeFullscreen(true);
     } else {
       if (document.exitFullscreen) {
         document.exitFullscreen().catch(() => {});
@@ -71,31 +71,34 @@ export default function GalleryPage() {
   }, [selectedIndex, handleNext, handlePrev]);
 
   return (
-    <div className="bg-[#05050A] min-h-screen pt-28 pb-16 text-white font-mono relative overflow-hidden select-none">
+    <div className="bg-[#05050A] min-h-screen pt-28 pb-16 text-white font-excon relative overflow-hidden select-none">
       {/* Background Marvel Neon Ambient Color Blending */}
-      <div className="absolute top-1/4 left-1/4 w-[600px] h-[400px] bg-vibranium-purple/15 rounded-full blur-[140px] pointer-events-none z-0" />
-      <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[400px] bg-arc-cyan/15 rounded-full blur-[140px] pointer-events-none z-0" />
+      <div className="absolute top-1/4 left-1/4 w-[600px] h-[400px] bg-arc-cyan/15 rounded-full blur-[140px] pointer-events-none z-0" />
+      <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[400px] bg-metallic-gold/15 rounded-full blur-[140px] pointer-events-none z-0" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_45%,rgba(5,5,10,0.85)_95%)] pointer-events-none z-0" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 relative z-10">
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-arc-cyan/10 border border-arc-cyan/30 text-arc-cyan text-xs font-mono font-bold tracking-widest uppercase">
-            <RiSparklingLine className="animate-spin-slow" />
+        <div className="text-center max-w-3xl mx-auto space-y-3">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-arc-cyan/40 bg-arc-cyan/10 text-arc-cyan text-xs font-excon-bold font-bold tracking-[0.2em] uppercase shadow-[0_0_15px_rgba(0,212,255,0.25)]">
+            <RiShieldFlashLine className="animate-pulse" />
             <span>OFFICIAL MACFIESTA MEDIA VAULT</span>
           </div>
-          <h1 className="text-4xl md:text-6xl font-black uppercase tracking-wider text-white" style={{ fontFamily: "var(--font-heading)" }}>
-            Media <span className="marvel-bang-comic-gradient font-black">Gallery</span>
+
+          <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tight text-white font-excon-black">
+            <span className="shimmer-text">MEDIA</span>{" "}
+            <span className="gradient-text-plasma">GALLERY</span>
           </h1>
-          <p className="text-white/60 text-sm md:text-base">
+
+          <p className="text-white/80 text-xs sm:text-sm leading-relaxed font-excon font-normal">
             Glimpses of high-octane esports, cultural stage nights, tech sprint hackathons & pro show highlights. Click any photo or video for 100% full-screen playback.
           </p>
         </div>
 
         {/* MEDIA TYPE & CATEGORY FILTER BARS */}
-        <div className="space-y-4 w-full">
+        <div className="glass p-6 rounded-2xl border border-arc-cyan/20 space-y-6">
           {/* 1. Photos vs Videos Selector */}
-          <div className="flex flex-wrap justify-center gap-2 px-2">
+          <div className="flex flex-wrap justify-center gap-2">
             {[
               { id: "all" as const, label: `All Assets (${items.length})`, icon: RiGalleryLine },
               { id: "image" as const, label: `📷 Photos (${imagesCount})`, icon: RiImageAddLine },
@@ -107,12 +110,11 @@ export default function GalleryPage() {
                   setFilterType(tab.id);
                   setSelectedIndex(null);
                 }}
-                className={`px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-2xl text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all cursor-pointer border ${
+                className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer font-excon-bold border ${
                   filterType === tab.id
-                    ? "bg-marvel-red text-white border-marvel-red shadow-[0_0_20px_#ED1D24]"
-                    : "bg-black/60 text-white/60 hover:text-white border-white/10 hover:bg-white/5"
+                    ? "bg-arc-cyan text-black border-arc-cyan shadow-[0_0_15px_#00D4FF]"
+                    : "bg-white/5 text-white/60 hover:text-white border-white/10 hover:bg-white/10"
                 }`}
-                style={{ fontFamily: "var(--font-heading)" }}
               >
                 {tab.label}
               </button>
@@ -120,7 +122,7 @@ export default function GalleryPage() {
           </div>
 
           {/* 2. Category Filters */}
-          <div className="flex gap-2 justify-start sm:justify-center overflow-x-auto pb-2 scrollbar-none select-scrollbar px-4 sm:px-0 w-full">
+          <div className="flex gap-2 justify-start sm:justify-center overflow-x-auto pb-2 border-t border-white/10 pt-4 scrollbar-none select-scrollbar w-full">
             {["all", "cultural", "gaming", "technical", "pro-show", "general"].map((cat) => (
               <button
                 key={cat}
@@ -128,12 +130,11 @@ export default function GalleryPage() {
                   setFilterCategory(cat);
                   setSelectedIndex(null);
                 }}
-                className={`px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-[10px] sm:text-[11px] font-bold uppercase tracking-widest whitespace-nowrap transition-all cursor-pointer shrink-0 ${
+                className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-all cursor-pointer shrink-0 font-excon-bold ${
                   filterCategory === cat
-                    ? "bg-metallic-gold text-black font-extrabold shadow-[0_0_15px_#FFD700]"
+                    ? "bg-metallic-gold text-black font-black shadow-[0_0_15px_#FFD700]"
                     : "bg-white/5 text-white/60 hover:text-white border border-white/10"
                 }`}
-                style={{ fontFamily: "var(--font-heading)" }}
               >
                 {cat}
               </button>
@@ -142,7 +143,7 @@ export default function GalleryPage() {
         </div>
 
         {/* Media Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
           <AnimatePresence>
             {filteredMedia.map((item, idx) => (
               <motion.div
@@ -152,7 +153,7 @@ export default function GalleryPage() {
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.3 }}
                 onClick={() => setSelectedIndex(idx)}
-                className="relative aspect-video overflow-hidden rounded-3xl border border-white/10 group shadow-2xl cursor-pointer bg-black/80"
+                className="marvel-card relative aspect-video overflow-hidden rounded-2xl border border-arc-cyan/20 hover:border-arc-cyan group shadow-xl cursor-pointer bg-black/80"
               >
                 <img
                   src={encodeURI(item.type === "image" ? item.url : item.thumbnailUrl || item.url)}
@@ -163,7 +164,7 @@ export default function GalleryPage() {
                 {/* Media Badges */}
                 <div className="absolute top-3 left-3 z-10 flex gap-2">
                   <span
-                    className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase border ${
+                    className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase border font-excon-bold ${
                       item.type === "image"
                         ? "bg-arc-cyan/20 border-arc-cyan/40 text-arc-cyan"
                         : "bg-marvel-red/20 border-marvel-red/40 text-marvel-red"
@@ -173,17 +174,14 @@ export default function GalleryPage() {
                   </span>
                 </div>
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0A0D1A] via-black/30 to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
 
                 <div className="absolute inset-0 p-5 flex flex-col justify-end">
                   <div className="space-y-1 transform group-hover:-translate-y-1 transition-transform">
-                    <span className="text-[10px] text-metallic-gold font-bold uppercase tracking-widest block">
+                    <span className="text-[10px] text-metallic-gold font-bold uppercase tracking-wider font-excon-bold block">
                       {item.category}
                     </span>
-                    <h3
-                      className="text-white text-sm font-extrabold uppercase tracking-wider block"
-                      style={{ fontFamily: "var(--font-heading)" }}
-                    >
+                    <h3 className="text-white text-base font-black uppercase tracking-tight font-excon-black block group-hover:text-metallic-gold transition-colors">
                       {item.title}
                     </h3>
                   </div>
@@ -191,7 +189,7 @@ export default function GalleryPage() {
 
                 {/* Hover Play / Zoom Icon */}
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span className="p-4 bg-marvel-red text-white rounded-full text-xl shadow-[0_0_20px_#ED1D24] transform scale-75 group-hover:scale-100 transition-transform">
+                  <span className="p-4 bg-arc-cyan text-black rounded-full text-xl shadow-[0_0_20px_#00D4FF] transform scale-75 group-hover:scale-100 transition-transform">
                     {item.type === "video" ? <RiPlayLine /> : <RiZoomInLine />}
                   </span>
                 </div>
@@ -201,7 +199,7 @@ export default function GalleryPage() {
         </div>
 
         {filteredMedia.length === 0 && (
-          <div className="text-center py-12 text-white/40 font-mono text-xs">
+          <div className="text-center py-12 text-white/50 font-excon text-xs uppercase tracking-wider">
             No media assets found in this category.
           </div>
         )}
@@ -215,12 +213,12 @@ export default function GalleryPage() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.98 }}
             transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-2xl w-screen h-screen flex items-center justify-center overflow-hidden"
+            className="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-2xl w-screen h-screen flex items-center justify-center overflow-hidden font-excon"
           >
             {/* FLOATING CLOSE BUTTON */}
             <button
               onClick={() => setSelectedIndex(null)}
-              className="fixed top-6 right-6 z-[10000] px-4 py-2.5 rounded-2xl bg-black/80 border border-white/20 text-white hover:bg-marvel-red hover:border-marvel-red transition-all cursor-pointer font-bold text-xs uppercase backdrop-blur-md shadow-[0_0_20px_rgba(237,29,36,0.6)] flex items-center gap-2"
+              className="fixed top-6 right-6 z-[10000] px-4 py-2.5 rounded-xl bg-black/80 border border-white/20 text-white hover:bg-marvel-red hover:border-marvel-red transition-all cursor-pointer font-black text-xs uppercase backdrop-blur-md shadow-[0_0_20px_rgba(237,29,36,0.6)] flex items-center gap-2 font-excon-black"
               title="Close Full Screen (Esc)"
             >
               <RiCloseLine size={20} />
@@ -281,10 +279,10 @@ export default function GalleryPage() {
             </div>
 
             {/* FLOATING MARVEL HUD BOTTOM CONTROL BAR */}
-            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[10000] max-w-3xl w-[92vw] px-6 py-3 rounded-2xl bg-black/80 border border-white/20 backdrop-blur-xl flex items-center justify-between shadow-[0_10px_40px_rgba(0,0,0,0.8)] font-mono text-xs">
+            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[10000] max-w-3xl w-[92vw] px-6 py-3 rounded-2xl bg-black/80 border border-arc-cyan/30 backdrop-blur-xl flex items-center justify-between shadow-[0_10px_40px_rgba(0,0,0,0.8)] font-excon text-xs">
               <div className="flex items-center gap-3 truncate pr-4">
                 <span
-                  className={`px-3 py-0.5 rounded-full text-[10px] font-black uppercase shrink-0 ${
+                  className={`px-3 py-0.5 rounded-full text-[10px] font-black uppercase shrink-0 font-excon-bold ${
                     activeItem.type === "image"
                       ? "bg-arc-cyan/20 border border-arc-cyan/40 text-arc-cyan"
                       : "bg-marvel-red/20 border border-marvel-red/40 text-marvel-red"
@@ -292,13 +290,13 @@ export default function GalleryPage() {
                 >
                   {activeItem.type.toUpperCase()} · {activeItem.category}
                 </span>
-                <h3 className="text-white font-extrabold uppercase truncate text-sm">
+                <h3 className="text-white font-black uppercase truncate text-sm font-excon-black">
                   {activeItem.title}
                 </h3>
               </div>
 
               <div className="flex items-center gap-3 shrink-0">
-                <span className="text-metallic-gold font-bold">
+                <span className="text-metallic-gold font-bold font-excon-bold">
                   {selectedIndex + 1} / {filteredMedia.length}
                 </span>
 
