@@ -76,7 +76,8 @@ export function HeroSection() {
   const sectionRef = useRef<HTMLElement | null>(null);
 
   const isPlayingRef = useRef(false);
-  const scrollPausedRef = useRef(false);
+  const userMutedRef = useRef(false);
+  const maxVolume = 0.4;
 
   /* ─── Parallax ─── */
   const { scrollYProgress } = useScroll({
@@ -99,16 +100,54 @@ export function HeroSection() {
   useEffect(() => {
     const audio = new Audio(encodeURI("/ULTRA NATÉ - Movin To The Sun.mp3"));
     audio.loop = true;
-    audio.volume = 0.4;
+    audio.volume = maxVolume;
     audioRef.current = audio;
 
-    const startPlayback = () => {
-      audio.play().then(() => {
-        setPlayState(true);
-      }).catch(() => {
-        const handleInteraction = () => {
+    let fadeRaf: number;
+
+    const updateVolumeOnScroll = () => {
+      if (!audioRef.current || userMutedRef.current) return;
+
+      const fadeDistance = Math.max(320, window.innerHeight * 0.65);
+      const scrollY = window.scrollY;
+      const factor = Math.max(0, Math.min(1, 1 - scrollY / fadeDistance));
+      const targetVol = maxVolume * factor;
+
+      audio.volume = Math.max(0, Math.min(maxVolume, targetVol));
+
+      if (factor <= 0.02) {
+        if (!audio.paused) {
+          audio.pause();
+          setPlayState(false);
+        }
+      } else {
+        if (audio.paused && !userMutedRef.current) {
           audio.play().then(() => {
             setPlayState(true);
+          }).catch(() => {});
+        } else if (!audio.paused && !isPlayingRef.current) {
+          setPlayState(true);
+        }
+      }
+    };
+
+    const handleScroll = () => {
+      cancelAnimationFrame(fadeRaf);
+      fadeRaf = requestAnimationFrame(updateVolumeOnScroll);
+    };
+
+    const startPlayback = () => {
+      if (userMutedRef.current) return;
+
+      audio.play().then(() => {
+        setPlayState(true);
+        updateVolumeOnScroll();
+      }).catch(() => {
+        const handleInteraction = () => {
+          if (userMutedRef.current) return;
+          audio.play().then(() => {
+            setPlayState(true);
+            updateVolumeOnScroll();
           }).catch(e => console.log("Playback still blocked:", e));
 
           window.removeEventListener("click", handleInteraction);
@@ -122,24 +161,6 @@ export function HeroSection() {
       });
     };
 
-    const handleScroll = () => {
-      const scrollThreshold = 100;
-      if (window.scrollY > scrollThreshold) {
-        if (isPlayingRef.current) {
-          audio.pause();
-          setPlayState(false);
-          scrollPausedRef.current = true;
-        }
-      } else {
-        if (scrollPausedRef.current && !isPlayingRef.current) {
-          audio.play().then(() => {
-            setPlayState(true);
-            scrollPausedRef.current = false;
-          }).catch(err => console.log("Scroll resume blocked:", err));
-        }
-      }
-    };
-
     const mountDelay = setTimeout(() => {
       startPlayback();
     }, 100);
@@ -148,6 +169,7 @@ export function HeroSection() {
 
     return () => {
       clearTimeout(mountDelay);
+      cancelAnimationFrame(fadeRaf);
       window.removeEventListener("scroll", handleScroll);
       if (audioRef.current) {
         audioRef.current.pause();
@@ -159,16 +181,18 @@ export function HeroSection() {
     if (!audioRef.current) return;
 
     const audio = audioRef.current;
-    audio.volume = 0.4;
 
     if (isPlaying) {
       audio.pause();
       setPlayState(false);
-      scrollPausedRef.current = false;
+      userMutedRef.current = true;
     } else {
+      userMutedRef.current = false;
+      const fadeDistance = Math.max(320, window.innerHeight * 0.65);
+      const factor = Math.max(0, Math.min(1, 1 - window.scrollY / fadeDistance));
+      audio.volume = maxVolume * Math.max(0.1, factor);
       audio.play().then(() => {
         setPlayState(true);
-        scrollPausedRef.current = false;
       }).catch(err => {
         console.error("Audio playback blocked:", err);
       });
