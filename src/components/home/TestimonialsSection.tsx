@@ -79,7 +79,7 @@ export function TestimonialsSection() {
         </Reveal>
 
         {/* Testimonials Grid — alternating directions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
           {testimonials.map((t, idx) => (
             <motion.div
               key={idx}
@@ -89,7 +89,7 @@ export function TestimonialsSection() {
               viewport={{ once: true, margin: "-60px" }}
               whileHover={{ scale: 1.03, y: -4 }}
               transition={{ duration: 0.3 }}
-              className="glass-aurora p-6 sm:p-8 rounded-2xl border border-white/15 flex flex-col justify-between relative shadow-2xl h-full min-h-[260px] group hover:border-metallic-gold/50 transition-colors duration-300"
+              className="glass-aurora p-5 sm:p-8 rounded-2xl border border-white/15 flex flex-col justify-between relative shadow-2xl h-full min-h-[220px] sm:min-h-[260px] group hover:border-metallic-gold/50 transition-colors duration-300"
             >
               {/* Quote mark */}
               <div className="absolute top-6 right-8 text-white/10 text-5xl pointer-events-none group-hover:text-metallic-gold/25 transition-colors duration-500">

@@ -232,16 +232,34 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Mobile menu toggle */}
-          <button
-            type="button"
-            suppressHydrationWarning={true}
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="xl:hidden p-2 text-white/80 hover:text-arc-cyan transition-colors cursor-pointer"
-            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-          >
-            {mobileMenuOpen ? <RiCloseLine size={28} /> : <RiMenuLine size={28} />}
-          </button>
+          {/* Mobile Right Quick Action & Menu toggle */}
+          <div className="flex items-center gap-2 xl:hidden">
+            {!user ? (
+              <Link
+                href="/signin"
+                className="px-3 py-1 text-[10px] font-black text-black bg-metallic-gold rounded-full tracking-wider uppercase shadow-[0_0_12px_rgba(212,175,55,0.4)]"
+              >
+                Login
+              </Link>
+            ) : (
+              <Link
+                href={user.role === "admin" ? "/admin" : "/dashboard"}
+                className="px-3 py-1 text-[10px] font-bold bg-marvel-red text-white rounded-full tracking-wider uppercase shadow-[0_0_12px_#ED1D24]"
+              >
+                {user.role === "admin" ? "Console" : "HUD"}
+              </Link>
+            )}
+
+            <button
+              type="button"
+              suppressHydrationWarning={true}
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-1.5 rounded-xl bg-white/5 border border-white/10 text-white/80 hover:text-arc-cyan hover:border-arc-cyan/40 transition-all cursor-pointer"
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+            >
+              {mobileMenuOpen ? <RiCloseLine size={24} /> : <RiMenuLine size={24} />}
+            </button>
+          </div>
         </nav>
       </motion.header>
 
@@ -249,11 +267,11 @@ export function Navbar() {
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            className="fixed inset-0 z-[99] bg-[#05050A]/98 backdrop-blur-2xl flex flex-col justify-between p-4 sm:p-6 xl:hidden overflow-hidden w-full max-w-full"
+            className="fixed inset-0 z-[99] bg-[#05050A]/95 backdrop-blur-2xl flex flex-col justify-between p-4 sm:p-6 xl:hidden overflow-hidden w-full max-w-full"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+            transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
           >
             {/* Ambient Lighting */}
             <div className="absolute -top-20 -left-20 w-72 h-72 rounded-full bg-marvel-red/15 blur-[100px] pointer-events-none" />

@@ -40,19 +40,19 @@ export function GalleryPreview() {
 
       <div className="max-w-7xl mx-auto relative z-10">
         <Reveal y={60} duration={0.7} margin="-100px">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
-            <div className="space-y-3">
-              <div className="text-arc-cyan text-xs font-bold tracking-[0.2em] uppercase flex items-center gap-1.5 font-space">
-                <RiFlashlightLine className="animate-pulse" /> S.H.I.E.L.D. VISUAL ARCHIVES
+          <div className="flex flex-row items-end justify-between gap-3 sm:gap-6 mb-8 sm:mb-14">
+            <div className="space-y-2 sm:space-y-3 min-w-0">
+              <div className="text-arc-cyan text-[10px] sm:text-xs font-bold tracking-[0.16em] sm:tracking-[0.2em] uppercase flex items-center gap-1.5 font-space truncate">
+                <RiFlashlightLine className="animate-pulse shrink-0" /> <span className="truncate">S.H.I.E.L.D. VISUAL ARCHIVES</span>
               </div>
               <h2 className="section-title text-white uppercase font-anton">
                 <span className="shimmer-text">Festival</span>{" "}
                 <span className="gradient-text-plasma">Gallery</span>
               </h2>
-              <div className="h-0.5 w-20 bg-gradient-to-r from-vibranium-purple to-arc-cyan origin-left" />
+              <div className="h-0.5 w-16 sm:w-20 bg-gradient-to-r from-vibranium-purple to-arc-cyan origin-left" />
             </div>
 
-            <div>
+            <div className="shrink-0">
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -60,10 +60,10 @@ export function GalleryPreview() {
               >
                 <Link
                   href="/gallery"
-                  className="btn-outline text-xs px-6 py-3 flex items-center gap-2 tracking-[0.16em] uppercase font-space text-white border-arc-cyan/40 shadow-[0_0_15px_rgba(0,212,255,0.2)] hover:shadow-[0_0_30px_rgba(0,212,255,0.5)] transition-shadow duration-300"
+                  className="btn-outline text-[10px] sm:text-xs px-3.5 sm:px-6 py-2 sm:py-3 flex items-center gap-1.5 sm:gap-2 tracking-wider sm:tracking-[0.16em] uppercase font-space text-white border-arc-cyan/40 shadow-[0_0_15px_rgba(0,212,255,0.2)] hover:shadow-[0_0_30px_rgba(0,212,255,0.5)] transition-shadow duration-300 whitespace-nowrap"
                 >
-                  Explore Full Gallery
-                  <RiArrowRightLine />
+                  <span className="truncate">Full Gallery</span>
+                  <RiArrowRightLine className="shrink-0" />
                 </Link>
               </motion.div>
             </div>

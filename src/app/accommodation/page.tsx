@@ -228,18 +228,15 @@ export default function AccommodationPage() {
           </div>
         </div>
 
-        {/* Accommodation Hostel Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Hostels Grid Display */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
           {filteredHostels.map((hostel) => (
             <div
               key={hostel.id}
-              className={`marvel-card group rounded-2xl border transition-all duration-300 flex flex-col justify-between overflow-hidden shadow-xl ${hostel.gender === "male"
-                ? "hover:border-arc-cyan border-arc-cyan/20"
-                : "hover:border-marvel-red border-marvel-red/20"
-                }`}
+              className="marvel-card rounded-2xl border border-white/10 overflow-hidden flex flex-col justify-between group hover:border-arc-cyan/50 transition-all duration-300 shadow-xl"
             >
               {/* Top Card Banner Header */}
-              <div className="p-6 space-y-4 border-b border-white/5 relative">
+              <div className="p-4 sm:p-6 space-y-3 sm:space-y-4 border-b border-white/5 relative">
 
                 {/* Gender Indicator Badge */}
                 <div className="flex justify-between items-center">
@@ -266,7 +263,7 @@ export default function AccommodationPage() {
                 </div>
 
                 <div>
-                  <h3 className="text-xl font-black text-white group-hover:text-metallic-gold transition-colors duration-300 uppercase tracking-tight font-excon-black">
+                  <h3 className="text-lg sm:text-xl font-black text-white group-hover:text-metallic-gold transition-colors duration-300 uppercase tracking-tight font-excon-black">
                     {hostel.name}
                   </h3>
                   <p className="text-xs text-metallic-gold font-bold uppercase tracking-wider mt-0.5 font-excon-bold">
@@ -281,15 +278,15 @@ export default function AccommodationPage() {
               </div>
 
               {/* Card Body & Amenities */}
-              <div className="p-6 space-y-5 flex-1 font-excon">
+              <div className="p-4 sm:p-6 space-y-4 sm:space-y-5 flex-1 font-excon">
                 <p className="text-xs text-white/70 leading-relaxed">
                   {hostel.description}
                 </p>
 
                 {/* Tariff Pill */}
-                <div className="bg-white/5 border border-white/10 p-3.5 rounded-xl flex items-center justify-between">
+                <div className="bg-white/5 border border-white/10 p-3 sm:p-3.5 rounded-xl flex items-center justify-between">
                   <span className="text-[10px] uppercase font-bold text-white/50 tracking-wider font-excon-bold">Tariff Rate</span>
-                  <span className="text-sm font-black text-metallic-gold tracking-wide font-excon-black">{hostel.tariff}</span>
+                  <span className="text-xs sm:text-sm font-black text-metallic-gold tracking-wide font-excon-black">{hostel.tariff}</span>
                 </div>
 
                 {/* Room Types */}
@@ -336,12 +333,12 @@ export default function AccommodationPage() {
               </div>
 
               {/* Action Button */}
-              <div className="p-6 pt-0">
+              <div className="p-4 sm:p-6 pt-0">
                 <button
                   type="button"
                   suppressHydrationWarning={true}
                   onClick={() => handleOpenBooking(hostel)}
-                  className={`w-full py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all duration-300 cursor-pointer shadow-lg flex items-center justify-center gap-2 font-excon-black ${hostel.gender === "male"
+                  className={`w-full py-2.5 sm:py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all duration-300 cursor-pointer shadow-lg flex items-center justify-center gap-2 font-excon-black ${hostel.gender === "male"
                     ? "bg-arc-cyan hover:bg-white text-black shadow-[0_0_12px_#00D4FF]"
                     : "bg-marvel-red hover:bg-white hover:text-black text-white shadow-[0_0_12px_#ED1D24]"
                     }`}
@@ -355,7 +352,7 @@ export default function AccommodationPage() {
         </div>
 
         {/* Emergency Contacts & Helpline Section */}
-        <div className="glass p-8 rounded-2xl border border-arc-cyan/20 space-y-6">
+        <div className="glass p-4 sm:p-8 rounded-2xl border border-arc-cyan/20 space-y-4 sm:space-y-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-4">
             <div>
               <h2 className="text-xl font-black uppercase text-white font-excon-black">

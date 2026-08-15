@@ -96,9 +96,9 @@ export default function GalleryPage() {
         </div>
 
         {/* MEDIA TYPE & CATEGORY FILTER BARS */}
-        <div className="glass p-6 rounded-2xl border border-arc-cyan/20 space-y-6">
+        <div className="glass p-3.5 sm:p-6 rounded-2xl border border-arc-cyan/20 space-y-3.5 sm:space-y-6">
           {/* 1. Photos vs Videos Selector */}
-          <div className="flex flex-wrap justify-center gap-2">
+          <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2">
             {[
               { id: "all" as const, label: `All Assets (${items.length})`, icon: RiGalleryLine },
               { id: "image" as const, label: `📷 Photos (${imagesCount})`, icon: RiImageAddLine },
@@ -110,7 +110,7 @@ export default function GalleryPage() {
                   setFilterType(tab.id);
                   setSelectedIndex(null);
                 }}
-                className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer font-excon-bold border ${
+                className={`px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-xl text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all cursor-pointer font-excon-bold border ${
                   filterType === tab.id
                     ? "bg-arc-cyan text-black border-arc-cyan shadow-[0_0_15px_#00D4FF]"
                     : "bg-white/5 text-white/60 hover:text-white border-white/10 hover:bg-white/10"
@@ -122,7 +122,7 @@ export default function GalleryPage() {
           </div>
 
           {/* 2. Category Filters */}
-          <div className="flex gap-2 justify-start sm:justify-center overflow-x-auto pb-2 border-t border-white/10 pt-4 scrollbar-none select-scrollbar w-full">
+          <div className="flex gap-1.5 sm:gap-2 justify-start sm:justify-center overflow-x-auto pb-2 border-t border-white/10 pt-3 sm:pt-4 scrollbar-none select-scrollbar w-full">
             {["all", "cultural", "gaming", "technical", "pro-show", "general"].map((cat) => (
               <button
                 key={cat}
@@ -130,7 +130,7 @@ export default function GalleryPage() {
                   setFilterCategory(cat);
                   setSelectedIndex(null);
                 }}
-                className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-all cursor-pointer shrink-0 font-excon-bold ${
+                className={`px-3.5 sm:px-5 py-1.5 sm:py-2.5 rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-all cursor-pointer shrink-0 font-excon-bold ${
                   filterCategory === cat
                     ? "bg-metallic-gold text-black font-black shadow-[0_0_15px_#FFD700]"
                     : "bg-white/5 text-white/60 hover:text-white border border-white/10"
@@ -143,7 +143,7 @@ export default function GalleryPage() {
         </div>
 
         {/* Media Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
           <AnimatePresence>
             {filteredMedia.map((item, idx) => (
               <motion.div

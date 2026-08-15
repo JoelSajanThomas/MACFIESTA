@@ -101,30 +101,29 @@ export default function EventsPage() {
         </div>
 
         {/* Filter Controls */}
-        <div className="glass p-6 rounded-2xl border border-arc-cyan/20 space-y-6">
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+        <div className="glass p-4 sm:p-6 rounded-2xl border border-arc-cyan/20 space-y-4 sm:space-y-6">
+          <div className="flex flex-col md:flex-row gap-3 sm:gap-4 items-center justify-between">
             {/* Search */}
             <div className="relative w-full md:max-w-md">
-              <RiSearchLine className="absolute left-4 top-1/2 -translate-y-1/2 text-arc-cyan text-lg" />
+              <RiSearchLine className="absolute left-4 top-1/2 -translate-y-1/2 text-arc-cyan text-base sm:text-lg" />
               <input
                 type="text"
                 suppressHydrationWarning={true}
                 placeholder="Search missions by hero or title..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-arc-cyan focus:outline-none text-white text-xs transition-all placeholder:text-white/30"
+                className="w-full pl-11 sm:pl-12 pr-4 py-2.5 sm:py-3 bg-white/5 border border-white/10 rounded-xl focus:border-arc-cyan focus:outline-none text-white text-xs transition-all placeholder:text-white/30 font-excon"
               />
             </div>
 
             {/* Type selector */}
-            <div className="flex gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 scrollbar-none select-scrollbar">
+            <div className="flex gap-1.5 sm:gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 scrollbar-none select-scrollbar">
               <button
                 type="button"
                 suppressHydrationWarning={true}
                 onClick={() => setSelectedType("all")}
-                className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider whitespace-nowrap ${selectedType === "all" ? "bg-arc-cyan text-black" : "text-white/60 hover:text-white"
+                className={`px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-xs font-bold uppercase tracking-wider whitespace-nowrap font-excon-bold ${selectedType === "all" ? "bg-arc-cyan text-black" : "text-white/60 hover:text-white"
                   }`}
-                style={{ fontFamily: "var(--font-heading)" }}
               >
                 All Squads
               </button>
@@ -134,9 +133,8 @@ export default function EventsPage() {
                   type="button"
                   suppressHydrationWarning={true}
                   onClick={() => setSelectedType(t.id)}
-                  className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider whitespace-nowrap ${selectedType === t.id ? "bg-marvel-red text-white" : "text-white/60 hover:text-white"
+                  className={`px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-xs font-bold uppercase tracking-wider whitespace-nowrap font-excon-bold ${selectedType === t.id ? "bg-marvel-red text-white" : "text-white/60 hover:text-white"
                     }`}
-                  style={{ fontFamily: "var(--font-heading)" }}
                 >
                   {t.label}
                 </button>
@@ -145,16 +143,15 @@ export default function EventsPage() {
           </div>
 
           {/* Category Tabs */}
-          <div className="flex gap-2 overflow-x-auto pb-2 border-t border-white/10 pt-4 scrollbar-none select-scrollbar">
+          <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-2 border-t border-white/10 pt-3 sm:pt-4 scrollbar-none select-scrollbar">
             <button
               type="button"
               suppressHydrationWarning={true}
               onClick={() => setSelectedCat("all")}
-              className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-all ${selectedCat === "all"
+              className={`px-3.5 sm:px-5 py-1.5 sm:py-2.5 rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-all font-excon-bold ${selectedCat === "all"
                   ? "bg-metallic-gold text-black shadow-[0_0_15px_#FFD700]"
                   : "bg-white/5 text-white/60 hover:text-white border border-white/10"
                 }`}
-              style={{ fontFamily: "var(--font-heading)" }}
             >
               All Domains
             </button>
@@ -164,11 +161,10 @@ export default function EventsPage() {
                 type="button"
                 suppressHydrationWarning={true}
                 onClick={() => setSelectedCat(cat.id)}
-                className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-all ${selectedCat === cat.id
+                className={`px-3.5 sm:px-5 py-1.5 sm:py-2.5 rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-all font-excon-bold ${selectedCat === cat.id
                     ? "bg-metallic-gold text-black shadow-[0_0_15px_#FFD700]"
                     : "bg-white/5 text-white/60 hover:text-white border border-white/10"
                   }`}
-                style={{ fontFamily: "var(--font-heading)" }}
               >
                 {cat.label}
               </button>
@@ -177,21 +173,21 @@ export default function EventsPage() {
         </div>
 
         {/* Results Info */}
-        <div className="text-xs text-white/50 font-bold uppercase tracking-wider flex items-center gap-2">
+        <div className="text-xs text-white/50 font-bold uppercase tracking-wider flex items-center gap-2 font-excon-bold">
           <RiFlashlightLine className="text-arc-cyan" />
           {loading ? "Scanning S.H.I.E.L.D. mission database..." : `Verified ${filteredEvents.length} Active Missions`}
         </div>
 
         {/* Loading skeleton */}
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {[1, 2, 3].map((n) => (
               <div key={n} className="glass rounded-2xl h-[460px] animate-pulse bg-white/5 border border-white/5" />
             ))}
           </div>
         ) : (
           /* Mission Cards Grid */
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {filteredEvents.map((item, idx) => {
               const heroData = HERO_MAPPING[item.slug] || {
                 hero: "Avenger Hero",

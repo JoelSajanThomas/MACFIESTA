@@ -82,7 +82,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 pb-6 border-b border-white/10 items-start">
 
           {/* Brand & Socials (4 cols) */}
-          <div className="md:col-span-4 space-y-3 text-center md:text-left flex flex-col items-center md:items-start">
+          <div className="md:col-span-4 space-y-3 text-left flex flex-col items-start">
             <Link
               href="/"
               className="flex items-center gap-2.5 group focus:outline-none"
@@ -102,7 +102,7 @@ export function Footer() {
                   <span className="shimmer-text">{settings.name.toUpperCase()}</span>
                 </h3>
                 <p className="text-[8px] text-arc-cyan tracking-[0.25em] uppercase font-bold font-space mt-0.5">
-                  MARVELVERSE • {settings.edition}
+                  {settings.edition}
                 </p>
               </div>
             </Link>
@@ -136,9 +136,9 @@ export function Footer() {
           </div>
 
           {/* Links: Portals & Resources (5 cols) */}
-          <div className="md:col-span-5 grid grid-cols-2 gap-4 text-center md:text-left">
+          <div className="md:col-span-5 grid grid-cols-2 gap-4 text-left">
             <div className="space-y-2">
-              <h4 className="text-[11px] font-bold text-arc-cyan uppercase tracking-[0.18em] font-space flex items-center justify-center md:justify-start gap-1.5">
+              <h4 className="text-[11px] font-bold text-arc-cyan uppercase tracking-[0.18em] font-space flex items-center justify-start gap-1.5">
                 <RiFlashlightLine className="text-xs shrink-0" /> Portals
               </h4>
               <ul className="space-y-1.5">

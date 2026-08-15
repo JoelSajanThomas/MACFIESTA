@@ -18,33 +18,33 @@ export function HallOfHeroesPodium({ topTeams }: { topTeams?: Array<{ name: stri
   const third = topTeams?.[2]?.name || "Syntax Team";
 
   return (
-    <div className="marvel-card p-8 rounded-3xl border border-metallic-gold/40 text-center space-y-6 relative overflow-hidden bg-gradient-to-b from-[#0F0D05] to-[#05050A] font-excon">
+    <div className="marvel-card p-4 sm:p-8 rounded-2xl sm:rounded-3xl border border-metallic-gold/40 text-center space-y-4 sm:space-y-6 relative overflow-hidden bg-gradient-to-b from-[#0F0D05] to-[#05050A] font-excon">
       <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-metallic-gold/40 bg-metallic-gold/10 text-metallic-gold text-xs font-excon-bold font-bold tracking-[0.2em] uppercase">
         <RiSparklingLine className="animate-spin-slow" />
         <span>AVENGERS HALL OF HEROES PODIUM</span>
       </div>
 
-      <h3 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tight font-excon-black">
+      <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-white uppercase tracking-tight font-excon-black">
         <span className="shimmer-text">CONGRATULATIONS TO THE</span>{" "}
         <span className="gradient-text-plasma">VICTORS</span>
       </h3>
 
       {/* Holographic 3D Podium Display — Scroll-Triggered Rising Pillars */}
-      <div className="flex justify-center items-end gap-4 pt-6 pb-2">
+      <div className="flex justify-center items-end gap-2 sm:gap-4 pt-4 sm:pt-6 pb-2">
         {/* 2nd Place */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-40px" }}
           transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col items-center space-y-2"
+          className="flex flex-col items-center space-y-1.5 sm:space-y-2"
         >
-          <div className="w-12 h-12 rounded-full bg-white/10 border border-white/30 flex items-center justify-center text-white text-lg font-bold shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 border border-white/30 flex items-center justify-center text-white text-base sm:text-lg font-bold shadow-[0_0_15px_rgba(255,255,255,0.2)]">
             🥈
           </div>
-          <div className="w-24 sm:w-32 h-28 bg-white/5 border border-white/20 rounded-t-2xl flex flex-col justify-center p-2 text-center">
-            <span className="text-[10px] text-white/50 uppercase font-bold font-excon-bold">2ND PLACE</span>
-            <span className="text-xs font-black text-white truncate font-excon-black">{runner}</span>
+          <div className="w-20 sm:w-32 h-24 sm:h-28 bg-white/5 border border-white/20 rounded-t-2xl flex flex-col justify-center p-1.5 sm:p-2 text-center">
+            <span className="text-[9px] sm:text-[10px] text-white/50 uppercase font-bold font-excon-bold">2ND PLACE</span>
+            <span className="text-[11px] sm:text-xs font-black text-white truncate font-excon-black">{runner}</span>
           </div>
         </motion.div>
 
@@ -54,14 +54,14 @@ export function HallOfHeroesPodium({ topTeams }: { topTeams?: Array<{ name: stri
           whileInView={{ opacity: 1, y: -16 }}
           viewport={{ once: true, margin: "-40px" }}
           transition={{ duration: 0.7, delay: 0.28, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col items-center space-y-2"
+          className="flex flex-col items-center space-y-1.5 sm:space-y-2"
         >
-          <div className="w-16 h-16 rounded-full bg-metallic-gold/20 border-2 border-metallic-gold flex items-center justify-center text-metallic-gold text-2xl font-bold shadow-[0_0_25px_#FFD700]">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-metallic-gold/20 border-2 border-metallic-gold flex items-center justify-center text-metallic-gold text-xl sm:text-2xl font-bold shadow-[0_0_25px_#FFD700]">
             🏆
           </div>
-          <div className="w-28 sm:w-36 h-36 bg-metallic-gold/10 border-2 border-metallic-gold/50 rounded-t-2xl flex flex-col justify-center p-2 text-center shadow-[0_0_30px_rgba(255,215,0,0.2)]">
-            <span className="text-[10px] text-metallic-gold uppercase font-black tracking-widest font-excon-bold">GRAND CHAMPION</span>
-            <span className="text-sm font-black text-white truncate font-excon-black">{champion}</span>
+          <div className="w-24 sm:w-36 h-32 sm:h-36 bg-metallic-gold/10 border-2 border-metallic-gold/50 rounded-t-2xl flex flex-col justify-center p-1.5 sm:p-2 text-center shadow-[0_0_30px_rgba(255,215,0,0.2)]">
+            <span className="text-[9px] sm:text-[10px] text-metallic-gold uppercase font-black tracking-widest font-excon-bold truncate">CHAMPION</span>
+            <span className="text-xs sm:text-sm font-black text-white truncate font-excon-black">{champion}</span>
           </div>
         </motion.div>
 
@@ -71,14 +71,14 @@ export function HallOfHeroesPodium({ topTeams }: { topTeams?: Array<{ name: stri
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-40px" }}
           transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col items-center space-y-2"
+          className="flex flex-col items-center space-y-1.5 sm:space-y-2"
         >
-          <div className="w-12 h-12 rounded-full bg-marvel-red/20 border border-marvel-red/40 flex items-center justify-center text-marvel-red text-lg font-bold shadow-[0_0_15px_rgba(237,29,36,0.3)]">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-marvel-red/20 border border-marvel-red/40 flex items-center justify-center text-marvel-red text-base sm:text-lg font-bold shadow-[0_0_15px_rgba(237,29,36,0.3)]">
             🥉
           </div>
-          <div className="w-24 sm:w-32 h-20 bg-marvel-red/5 border border-marvel-red/20 rounded-t-2xl flex flex-col justify-center p-2 text-center">
-            <span className="text-[10px] text-marvel-red uppercase font-bold font-excon-bold">3RD PLACE</span>
-            <span className="text-xs font-black text-white truncate font-excon-black">{third}</span>
+          <div className="w-20 sm:w-32 h-18 sm:h-20 bg-marvel-red/5 border border-marvel-red/20 rounded-t-2xl flex flex-col justify-center p-1.5 sm:p-2 text-center">
+            <span className="text-[9px] sm:text-[10px] text-marvel-red uppercase font-bold font-excon-bold">3RD PLACE</span>
+            <span className="text-[11px] sm:text-xs font-black text-white truncate font-excon-black">{third}</span>
           </div>
         </motion.div>
       </div>
@@ -188,32 +188,32 @@ export default function ResultsPage() {
         </div>
 
         {/* Results grid */}
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {filtered.map((row, idx) => (
             <motion.div
               key={idx}
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              className="marvel-card p-6 rounded-2xl border border-arc-cyan/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:border-arc-cyan transition-all shadow-xl"
+              className="marvel-card p-4 sm:p-6 rounded-2xl border border-arc-cyan/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6 hover:border-arc-cyan transition-all shadow-xl"
             >
-              <div className="space-y-4 flex-grow">
-                <div className="flex items-center gap-2 text-metallic-gold text-xs font-bold uppercase tracking-wider font-excon-bold">
-                  <RiAwardLine />
+              <div className="space-y-3 sm:space-y-4 flex-grow w-full md:w-auto">
+                <div className="flex items-center gap-2 text-metallic-gold text-xs font-bold uppercase tracking-wider font-excon-bold flex-wrap">
+                  <RiAwardLine className="shrink-0" />
                   <span>{row.event}</span>
-                  <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-arc-cyan/10 border border-arc-cyan/30 text-arc-cyan text-[9px] font-excon-bold tracking-widest ml-2">
+                  <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-arc-cyan/10 border border-arc-cyan/30 text-arc-cyan text-[9px] font-excon-bold tracking-widest ml-auto sm:ml-2">
                     <RiCheckDoubleLine />
                     VERIFIED
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-excon">
-                  <div className="p-3.5 bg-black/60 rounded-xl border border-arc-cyan/30">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-4 text-xs font-excon">
+                  <div className="p-3 sm:p-3.5 bg-black/60 rounded-xl border border-arc-cyan/30">
                     <span className="block text-[10px] uppercase font-bold text-metallic-gold tracking-wider font-excon-bold">🏆 GRAND CHAMPION</span>
-                    <span className="block font-black text-white text-sm mt-1 font-excon-black">{row.winner}</span>
+                    <span className="block font-black text-white text-xs sm:text-sm mt-1 font-excon-black truncate">{row.winner}</span>
                   </div>
-                  <div className="p-3.5 bg-black/60 rounded-xl border border-white/10">
+                  <div className="p-3 sm:p-3.5 bg-black/60 rounded-xl border border-white/10">
                     <span className="block text-[10px] uppercase font-bold text-white/50 tracking-wider font-excon-bold">🥈 RUNNER UP AGENT</span>
-                    <span className="block font-bold text-white/80 text-sm mt-1 font-excon">{row.runner}</span>
+                    <span className="block font-bold text-white/80 text-xs sm:text-sm mt-1 font-excon truncate">{row.runner}</span>
                   </div>
                 </div>
               </div>
@@ -221,7 +221,7 @@ export default function ResultsPage() {
               {/* Certificate Download button */}
               <button
                 onClick={() => alert(`Downloading official S.H.I.E.L.D. Victory Certificate PDF for ${row.event}...`)}
-                className="text-xs font-black text-black bg-arc-cyan hover:bg-white px-5 py-3 rounded-xl transition-all uppercase tracking-[0.15em] shadow-[0_0_12px_#00D4FF] font-excon-black flex items-center gap-2 justify-center shrink-0 self-stretch md:self-center cursor-pointer"
+                className="text-xs font-black text-black bg-arc-cyan hover:bg-white px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl transition-all uppercase tracking-[0.14em] shadow-[0_0_12px_#00D4FF] font-excon-black flex items-center gap-2 justify-center shrink-0 w-full md:w-auto cursor-pointer"
               >
                 <RiDownloadLine />
                 <span>Certificate PDF</span>

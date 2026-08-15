@@ -2,7 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { RiRobot2Line, RiCloseLine, RiSendPlaneLine } from "react-icons/ri";
+import {
+  RiRobot2Line,
+  RiCloseLine,
+  RiSendPlaneLine,
+  RiDragMove2Line,
+  RiFlashlightLine,
+} from "react-icons/ri";
 
 interface Message {
   id: string;
@@ -41,6 +47,9 @@ export function JarvisAssistant() {
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  
+  const isDraggingRef = useRef(false);
+  const constraintsRef = useRef<HTMLDivElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -96,52 +105,103 @@ export function JarvisAssistant() {
 
   return (
     <>
-      {/* Floating Arc Reactor Button */}
-      <motion.button
-        onClick={() => setIsOpen(!isOpen)}
-        suppressHydrationWarning={true}
-        className="fixed bottom-6 right-6 z-[9990] w-14 h-14 rounded-full bg-festival-dark border-2 border-arc-cyan flex items-center justify-center text-arc-cyan shadow-[0_0_25px_rgba(0,212,255,0.4)] hover:shadow-[0_0_40px_rgba(0,212,255,0.7)] hover:scale-110 transition-all duration-300 cursor-pointer group"
-        whileTap={{ scale: 0.95 }}
-        aria-label="Toggle J.A.R.V.I.S. AI Assistant"
-      >
-        <div className="absolute inset-0 rounded-full border border-marvel-red/40 animate-spin-slow" />
-        <RiRobot2Line className="text-2xl group-hover:rotate-12 transition-transform duration-300" />
-        <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-arc-cyan animate-pulse shadow-[0_0_10px_#00D4FF]" />
-      </motion.button>
+      {/* Global Boundary Constraint for Full-Screen Dragging */}
+      <div
+        ref={constraintsRef}
+        className="fixed inset-0 pointer-events-none z-[9990] overflow-hidden"
+        aria-hidden="true"
+      />
 
-      {/* J.A.R.V.I.S. HUD Panel */}
+      {/* Floating Draggable Arc Reactor Bot Button */}
+      <motion.div
+        drag
+        dragConstraints={constraintsRef}
+        dragElastic={0.1}
+        dragMomentum={false}
+        onDragStart={() => {
+          isDraggingRef.current = true;
+        }}
+        onDragEnd={() => {
+          setTimeout(() => {
+            isDraggingRef.current = false;
+          }, 120);
+        }}
+        whileDrag={{ scale: 1.15, cursor: "grabbing" }}
+        className="fixed bottom-6 right-6 z-[9992] pointer-events-auto touch-none select-none cursor-grab active:cursor-grabbing"
+      >
+        <button
+          onClick={() => {
+            if (!isDraggingRef.current) {
+              setIsOpen((prev) => !prev);
+            }
+          }}
+          suppressHydrationWarning={true}
+          className="relative w-14 h-14 rounded-full bg-[#05050A] border-2 border-arc-cyan flex items-center justify-center text-arc-cyan shadow-[0_0_25px_rgba(0,212,255,0.45),0_0_10px_rgba(237,29,36,0.3)] hover:shadow-[0_0_40px_rgba(0,212,255,0.8)] transition-all duration-300 group"
+          aria-label="Toggle and Move J.A.R.V.I.S. AI Assistant"
+        >
+          {/* Animated Spinning Arc Ring */}
+          <div className="absolute inset-0 rounded-full border border-marvel-red/50 animate-spin-slow pointer-events-none" />
+          
+          {/* Inner Robot Icon */}
+          <RiRobot2Line className="text-2xl group-hover:rotate-12 transition-transform duration-300 drop-shadow-[0_0_8px_#00D4FF]" />
+          
+          {/* Pulse Status Beacon */}
+          <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-arc-cyan animate-pulse shadow-[0_0_10px_#00D4FF]" />
+
+          {/* Drag Handle Tooltip Badge on Hover */}
+          <div className="absolute -top-7 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none bg-black/80 border border-arc-cyan/40 px-2 py-0.5 rounded text-[8px] font-bold text-arc-cyan uppercase tracking-widest whitespace-nowrap shadow-lg">
+            Drag Anywhere
+          </div>
+        </button>
+      </motion.div>
+
+      {/* Draggable J.A.R.V.I.S. Tactical HUD Panel */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
+            drag
+            dragConstraints={constraintsRef}
+            dragElastic={0.08}
+            dragMomentum={false}
             initial={{ opacity: 0, y: 30, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="fixed bottom-24 right-4 sm:right-8 z-[9995] w-[92vw] sm:w-[420px] max-h-[620px] h-[78vh] glass-strong rounded-2xl border border-arc-cyan/30 shadow-[0_0_50px_rgba(0,0,0,0.8),0_0_20px_rgba(0,212,255,0.15)] flex flex-col overflow-hidden"
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="fixed bottom-24 right-4 sm:right-8 z-[9995] w-[92vw] sm:w-[420px] max-h-[620px] h-[78vh] glass-strong rounded-2xl border border-arc-cyan/40 shadow-[0_0_50px_rgba(0,0,0,0.9),0_0_30px_rgba(0,212,255,0.25)] flex flex-col overflow-hidden pointer-events-auto"
           >
-            {/* HUD Header */}
-            <div className="p-4 border-b border-arc-cyan/20 bg-black/40 flex items-center justify-between">
+            {/* Draggable Stark HUD Header */}
+            <div className="p-3.5 sm:p-4 border-b border-arc-cyan/25 bg-black/60 flex items-center justify-between cursor-grab active:cursor-grabbing select-none">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-arc-cyan/10 border border-arc-cyan/40 flex items-center justify-center text-arc-cyan shadow-[0_0_15px_rgba(0,212,255,0.3)]">
+                <div className="w-9 h-9 rounded-full bg-arc-cyan/15 border border-arc-cyan/50 flex items-center justify-center text-arc-cyan shadow-[0_0_15px_rgba(0,212,255,0.35)] shrink-0">
                   <RiRobot2Line className="text-lg" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-white tracking-widest uppercase flex items-center gap-2 font-excon-bold">
-                    J.A.R.V.I.S. <span className="text-[10px] px-2 py-0.5 rounded bg-arc-cyan/20 text-arc-cyan border border-arc-cyan/30 font-mono font-bold">v4.8 ONLINE</span>
+                  <h3 className="text-xs sm:text-sm font-bold text-white tracking-widest uppercase flex items-center gap-2 font-excon-bold">
+                    J.A.R.V.I.S. <span className="text-[9px] px-1.5 py-0.5 rounded bg-arc-cyan/20 text-arc-cyan border border-arc-cyan/40 font-mono font-bold">ONLINE</span>
                   </h3>
-                  <p className="text-[10px] text-white/50 font-excon font-medium">Stark Industries AI Command</p>
+                  <p className="text-[9px] sm:text-[10px] text-white/50 font-excon flex items-center gap-1">
+                    <RiFlashlightLine className="text-arc-cyan text-xs" /> Stark Industries AI Command
+                  </p>
                 </div>
               </div>
 
-              <button
-                type="button"
-                suppressHydrationWarning={true}
-                onClick={() => setIsOpen(false)}
-                className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors"
-                aria-label="Close J.A.R.V.I.S."
-              >
-                <RiCloseLine className="text-xl" />
-              </button>
+              <div className="flex items-center gap-2">
+                {/* Drag Grip Indicator */}
+                <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded bg-white/5 border border-white/10 text-arc-cyan/70 text-[9px] font-bold tracking-wider uppercase">
+                  <RiDragMove2Line className="text-xs" />
+                  <span>Move</span>
+                </div>
+
+                <button
+                  type="button"
+                  suppressHydrationWarning={true}
+                  onClick={() => setIsOpen(false)}
+                  className="p-1.5 sm:p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                  aria-label="Close J.A.R.V.I.S."
+                >
+                  <RiCloseLine className="text-xl" />
+                </button>
+              </div>
             </div>
 
             {/* Quick Queries Bar */}
@@ -152,7 +212,7 @@ export function JarvisAssistant() {
                   type="button"
                   suppressHydrationWarning={true}
                   onClick={() => handleSend(q.query)}
-                  className="px-3 py-1 text-[10px] font-bold tracking-wider text-white/75 hover:text-arc-cyan bg-white/5 hover:bg-arc-cyan/10 border border-white/10 hover:border-arc-cyan/30 rounded-full whitespace-nowrap transition-all font-excon-bold"
+                  className="px-3 py-1 text-[10px] font-bold tracking-wider text-white/75 hover:text-arc-cyan bg-white/5 hover:bg-arc-cyan/10 border border-white/10 hover:border-arc-cyan/30 rounded-full whitespace-nowrap transition-all font-excon-bold cursor-pointer"
                 >
                   {q.label}
                 </button>
@@ -160,7 +220,7 @@ export function JarvisAssistant() {
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 p-4 overflow-y-auto space-y-3 font-mono text-xs select-scrollbar">
+            <div className="flex-1 p-3.5 sm:p-4 overflow-y-auto space-y-3 font-mono text-xs select-scrollbar">
               {messages.map((msg) => (
                 <motion.div
                   key={msg.id}
@@ -171,8 +231,8 @@ export function JarvisAssistant() {
                   <div
                     className={`max-w-[85%] p-3 rounded-xl whitespace-pre-wrap leading-relaxed ${
                       msg.sender === "user"
-                        ? "bg-marvel-red/20 border border-marvel-red/40 text-white rounded-br-none"
-                        : "bg-arc-cyan/10 border border-arc-cyan/30 text-arc-cyan/90 rounded-bl-none shadow-[0_0_15px_rgba(0,212,255,0.05)]"
+                        ? "bg-marvel-red/25 border border-marvel-red/50 text-white rounded-br-none shadow-[0_0_15px_rgba(237,29,36,0.15)]"
+                        : "bg-arc-cyan/10 border border-arc-cyan/30 text-arc-cyan/95 rounded-bl-none shadow-[0_0_15px_rgba(0,212,255,0.1)]"
                     }`}
                   >
                     {msg.text}
@@ -186,14 +246,14 @@ export function JarvisAssistant() {
                   <span className="w-1.5 h-1.5 rounded-full bg-arc-cyan animate-bounce" />
                   <span className="w-1.5 h-1.5 rounded-full bg-arc-cyan animate-bounce [animation-delay:0.2s]" />
                   <span className="w-1.5 h-1.5 rounded-full bg-arc-cyan animate-bounce [animation-delay:0.4s]" />
-                  <span className="ml-2 text-[10px] tracking-widest uppercase">Jarvis analyzing...</span>
+                  <span className="ml-2 text-[10px] tracking-widest uppercase font-excon-bold">Jarvis analyzing...</span>
                 </div>
               )}
               <div ref={chatEndRef} />
             </div>
 
             {/* Input Footer */}
-            <div className="p-3 border-t border-white/10 bg-black/50 flex gap-2 items-center">
+            <div className="p-3 border-t border-white/10 bg-black/60 flex gap-2 items-center">
               <input
                 type="text"
                 suppressHydrationWarning={true}
@@ -201,13 +261,13 @@ export function JarvisAssistant() {
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
                 placeholder="Ask Jarvis anything about MacFiesta..."
-                className="flex-1 px-4 py-2.5 bg-white/5 border border-arc-cyan/20 rounded-xl text-white text-xs focus:outline-none focus:border-arc-cyan transition-all placeholder:text-white/30"
+                className="flex-1 px-3.5 sm:px-4 py-2.5 bg-white/5 border border-arc-cyan/25 rounded-xl text-white text-xs focus:outline-none focus:border-arc-cyan transition-all placeholder:text-white/30 font-excon"
               />
               <button
                 type="button"
                 suppressHydrationWarning={true}
                 onClick={() => handleSend()}
-                className="p-2.5 rounded-xl bg-arc-cyan text-festival-dark hover:bg-white font-bold transition-all shadow-[0_0_15px_rgba(0,212,255,0.4)] cursor-pointer"
+                className="p-2.5 rounded-xl bg-arc-cyan text-black hover:bg-white font-bold transition-all shadow-[0_0_15px_rgba(0,212,255,0.4)] cursor-pointer shrink-0"
                 aria-label="Send Message"
               >
                 <RiSendPlaneLine className="text-base" />

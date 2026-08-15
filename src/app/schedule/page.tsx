@@ -31,24 +31,24 @@ export default function SchedulePage() {
   });
 
   return (
-    <div className="bg-[#05050A] min-h-screen pt-28 pb-16 text-white font-mono relative overflow-hidden">
+    <div className="bg-[#05050A] min-h-screen pt-28 pb-16 text-white font-excon relative overflow-hidden">
       {/* Background Marvel Video Loop (Hardware Accelerated, Smooth Zero-Lag) */}
       <BackgroundVideo
         src="/MARVEL/Video Project 4.mp4"
         opacity="opacity-80"
       />
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 relative z-10">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-12 relative z-10">
 
         
         {/* Header */}
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-arc-cyan/40 bg-arc-cyan/10 text-arc-cyan text-xs font-mono font-bold tracking-widest uppercase">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-arc-cyan/40 bg-arc-cyan/10 text-arc-cyan text-xs font-excon-bold font-bold tracking-widest uppercase">
             <RiRadarLine className="animate-spin-slow text-sm" />
             <span>S.H.I.E.L.D. TACTICAL MISSION RADAR</span>
           </div>
 
-          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tight text-white font-excon-black">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tight text-white font-excon-black">
             <span className="shimmer-text">MISSION</span>{" "}
             <span className="gradient-text-plasma">TIMELINE</span>
           </h1>
@@ -58,29 +58,27 @@ export default function SchedulePage() {
         </div>
 
         {/* Tab & Filter Panel */}
-        <div className="glass p-6 rounded-2xl border border-arc-cyan/20 space-y-6">
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+        <div className="glass p-3.5 sm:p-6 rounded-2xl border border-arc-cyan/20 space-y-4 sm:space-y-6">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center justify-between">
             {/* Day Selector */}
-            <div className="flex gap-2">
+            <div className="flex flex-row gap-2 w-full sm:w-auto">
               <button
                 onClick={() => setActiveDay("day1")}
-                className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+                className={`flex-1 sm:flex-initial px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider sm:tracking-widest transition-all font-excon-bold text-center truncate ${
                   activeDay === "day1"
                     ? "bg-marvel-red text-white shadow-[0_0_15px_#ED1D24]"
                     : "bg-white/5 text-white/60 hover:text-white border border-white/10"
                 }`}
-                style={{ fontFamily: "var(--font-heading)" }}
               >
                 Phase 01 — 24 Sep
               </button>
               <button
                 onClick={() => setActiveDay("day2")}
-                className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
+                className={`flex-1 sm:flex-initial px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider sm:tracking-widest transition-all font-excon-bold text-center truncate ${
                   activeDay === "day2"
                     ? "bg-marvel-red text-white shadow-[0_0_15px_#ED1D24]"
                     : "bg-white/5 text-white/60 hover:text-white border border-white/10"
                 }`}
-                style={{ fontFamily: "var(--font-heading)" }}
               >
                 Phase 02 — 25 Sep
               </button>
@@ -90,8 +88,7 @@ export default function SchedulePage() {
             <select
               value={stageFilter}
               onChange={(e) => setStageFilter(e.target.value)}
-              className="px-4 py-2.5 bg-black/80 border border-arc-cyan/30 rounded-xl focus:outline-none text-xs font-bold uppercase tracking-wider text-arc-cyan"
-              style={{ fontFamily: "var(--font-heading)" }}
+              className="px-3.5 sm:px-4 py-2 sm:py-2.5 bg-black/80 border border-arc-cyan/30 rounded-xl focus:outline-none text-[11px] sm:text-xs font-bold uppercase tracking-wider text-arc-cyan font-excon-bold"
             >
               <option value="all">All Sectors</option>
               <option value="Auditorium">Main Auditorium</option>
@@ -103,14 +100,14 @@ export default function SchedulePage() {
         </div>
 
         {/* Live Timeline Tracker */}
-        <div className="relative border-l-2 border-arc-cyan/30 ml-4 md:ml-6 pl-6 md:pl-8 space-y-8">
+        <div className="relative border-l-2 border-arc-cyan/30 ml-3 sm:ml-4 md:ml-6 pl-4 sm:pl-6 md:pl-8 space-y-6 sm:space-y-8">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeDay + stageFilter}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 10 }}
-              className="space-y-6"
+              className="space-y-4 sm:space-y-6"
             >
               {filteredTimeline.map((slot, idx) => (
                 <motion.div
@@ -121,46 +118,46 @@ export default function SchedulePage() {
                   transition={{ duration: 0.6, delay: idx * 0.08, ease: [0.16, 1, 0.3, 1] }}
                   className="relative group"
                 >
-                  <div className="absolute -left-[31px] md:-left-[39px] top-2 w-4 h-4 rounded-full border-2 border-arc-cyan bg-[#05050A] group-hover:bg-arc-cyan transition-colors shadow-[0_0_10px_#00D4FF]" />
+                  <div className="absolute -left-[23px] sm:-left-[31px] md:-left-[39px] top-2 w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full border-2 border-arc-cyan bg-[#05050A] group-hover:bg-arc-cyan transition-colors shadow-[0_0_10px_#00D4FF]" />
                   
-                  <div className="marvel-card p-6 rounded-2xl border border-white/10 group-hover:border-arc-cyan/40 transition-all duration-300 space-y-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                      <div className="flex items-center gap-2 text-arc-cyan text-xs font-bold tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
-                        <RiTimeLine />
+                  <div className="marvel-card p-4 sm:p-6 rounded-2xl border border-white/10 group-hover:border-arc-cyan/40 transition-all duration-300 space-y-3 sm:space-y-4">
+                    <div className="flex flex-row items-center justify-between gap-2 flex-wrap">
+                      <div className="flex items-center gap-1.5 sm:gap-2 text-arc-cyan text-xs font-bold tracking-wider font-excon-bold flex-wrap">
+                        <RiTimeLine className="shrink-0" />
                         <span>{slot.time}</span>
-                        <span className="px-2 py-0.5 rounded bg-white/5 text-[9px] uppercase tracking-widest text-metallic-gold border border-metallic-gold/30 ml-2">
+                        <span className="px-2 py-0.5 rounded bg-white/5 text-[9px] uppercase tracking-widest text-metallic-gold border border-metallic-gold/30 ml-1 sm:ml-2">
                           {slot.cat}
                         </span>
                       </div>
 
                       <button
                         onClick={() => alert(`J.A.R.V.I.S. alert set for ${slot.title}!`)}
-                        className="flex items-center gap-1.5 text-xs text-white/50 hover:text-arc-cyan transition-colors uppercase tracking-wider font-bold cursor-pointer"
+                        className="flex items-center gap-1.5 text-[10px] sm:text-xs text-white/50 hover:text-arc-cyan transition-colors uppercase tracking-wider font-bold cursor-pointer ml-auto sm:ml-0 font-excon-bold"
                       >
                         <RiNotification3Line />
-                        <span>Set Alert</span>
+                        <span className="hidden sm:inline">Set Alert</span>
                       </button>
                     </div>
 
-                    <div className="space-y-1">
-                      <h3 className="text-lg font-black text-white group-hover:text-metallic-gold transition-colors duration-300 uppercase" style={{ fontFamily: "var(--font-heading)" }}>
+                    <div>
+                      <h3 className="text-base sm:text-lg font-black text-white group-hover:text-metallic-gold transition-colors duration-300 uppercase tracking-tight font-excon-black">
                         {slot.title}
                       </h3>
-                      <p className="text-white/75 text-xs leading-relaxed">
+                      <p className="text-xs text-white/70 mt-1 leading-relaxed font-excon">
                         {slot.desc}
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2 text-xs font-bold text-arc-cyan uppercase tracking-widest">
-                      <RiMapPinLine className="text-arc-cyan" />
-                      <span>Sector: {slot.stage}</span>
+                    <div className="flex items-center gap-2 text-xs text-metallic-gold pt-2 border-t border-white/5 font-excon-bold">
+                      <RiMapPinLine className="text-arc-cyan shrink-0" />
+                      <span>{slot.stage}</span>
                     </div>
                   </div>
                 </motion.div>
               ))}
 
               {filteredTimeline.length === 0 && (
-                <div className="text-center py-12 text-white/40">
+                <div className="text-center py-12 text-white/40 font-excon">
                   No mission operations logged in selected sector.
                 </div>
               )}

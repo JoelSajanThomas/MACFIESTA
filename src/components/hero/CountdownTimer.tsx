@@ -52,19 +52,17 @@ export function CountdownTimer() {
       {units.map((unit, i) => (
         <div key={unit.label} className="flex items-center gap-1 sm:gap-1.5 md:gap-2">
           <div className="flex flex-col items-center">
-            <div className="glass relative overflow-hidden rounded-xl px-1.5 py-1.5 sm:px-2 sm:py-2 md:px-2.5 md:py-2.5 min-w-[40px] sm:min-w-[48px] md:min-w-[52px]">
+            <div className="glass relative overflow-hidden rounded-xl px-1.5 py-1.5 sm:px-2 sm:py-2 md:px-2.5 md:py-2.5 min-w-[38px] sm:min-w-[48px] md:min-w-[52px] border border-metallic-gold/20">
               {/* Shimmer overlay */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" style={{ backgroundSize: "200% 100%" }} />
               <span
-                className="relative z-10 block text-center text-sm sm:text-lg md:text-xl font-black text-festival-gold tabular-nums"
-                style={{ fontFamily: "var(--font-heading)" }}
+                className="relative z-10 block text-center text-sm sm:text-lg md:text-xl font-black text-metallic-gold tabular-nums font-excon-black"
               >
                 {String(unit.value).padStart(2, "0")}
               </span>
             </div>
             <span
-              className="mt-1.5 text-[6.5px] sm:text-[7px] md:text-[7.5px] text-white/40 tracking-[0.2em] mr-[-0.2em] uppercase"
-              style={{ fontFamily: "var(--font-heading)" }}
+              className="mt-1 text-[7px] sm:text-[8px] md:text-[9px] text-white/60 tracking-[0.16em] uppercase font-excon-bold"
             >
               {unit.label}
             </span>
@@ -72,8 +70,8 @@ export function CountdownTimer() {
           {/* Separator dots */}
           {i < units.length - 1 && (
             <div className="flex flex-col gap-1 pb-3">
-              <div className="w-[2.5px] h-[2.5px] sm:w-[3px] sm:h-[3px] rounded-full bg-festival-gold/50 animate-pulse" />
-              <div className="w-[2.5px] h-[2.5px] sm:w-[3px] sm:h-[3px] rounded-full bg-festival-gold/50 animate-pulse" style={{ animationDelay: "0.3s" }} />
+              <div className="w-[2.5px] h-[2.5px] sm:w-[3px] sm:h-[3px] rounded-full bg-metallic-gold/60 animate-pulse" />
+              <div className="w-[2.5px] h-[2.5px] sm:w-[3px] sm:h-[3px] rounded-full bg-metallic-gold/60 animate-pulse" style={{ animationDelay: "0.3s" }} />
             </div>
           )}
         </div>

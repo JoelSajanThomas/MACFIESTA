@@ -76,29 +76,29 @@ export function RegistrationCTA() {
 
             {/* CTAs */}
             <div
-              className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-2 w-full"
+              className="flex flex-row justify-center items-center gap-2.5 sm:gap-4 pt-2 w-full max-w-[340px] sm:max-w-md mx-auto px-1"
             >
               <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                className="w-full sm:w-auto"
+                className="flex-1 min-w-0"
               >
-                <Link href="/signup" className="btn-urgency w-full sm:w-auto px-8 sm:px-10 py-4 group font-space flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(237,29,36,0.5)] hover:shadow-[0_0_40px_rgba(237,29,36,0.8)] transition-shadow duration-300">
-                  <span className="relative z-10 font-bold tracking-[0.16em] uppercase">Register Pass Now</span>
-                  <RiPlayLine className="group-hover:translate-x-1 transition-transform text-lg relative z-10" />
+                <Link href="/signup" className="btn-urgency w-full px-2.5 sm:px-10 py-2.5 sm:py-4 group font-space flex items-center justify-center gap-1.5 sm:gap-2 shadow-[0_0_25px_rgba(237,29,36,0.5)] hover:shadow-[0_0_40px_rgba(237,29,36,0.8)] transition-shadow duration-300">
+                  <span className="relative z-10 font-bold tracking-[0.08em] sm:tracking-[0.16em] uppercase text-[10.5px] sm:text-sm truncate">Register Pass</span>
+                  <RiPlayLine className="group-hover:translate-x-1 transition-transform text-xs sm:text-lg relative z-10 shrink-0" />
                 </Link>
               </motion.div>
 
               <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                className="w-full sm:w-auto"
+                className="flex-1 min-w-0"
               >
-                <Link href="/events" className="btn-outline w-full sm:w-auto px-8 sm:px-10 py-4 border-arc-cyan text-white hover:bg-arc-cyan/20 font-space flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(0,212,255,0.25)] hover:shadow-[0_0_35px_rgba(0,212,255,0.6)] transition-shadow duration-300">
-                  <RiShieldFlashLine />
-                  <span className="font-bold tracking-[0.16em] uppercase">Explore Categories</span>
+                <Link href="/events" className="btn-outline w-full px-2.5 sm:px-10 py-2.5 sm:py-4 border-arc-cyan text-white hover:bg-arc-cyan/20 font-space flex items-center justify-center gap-1.5 sm:gap-2 shadow-[0_0_20px_rgba(0,212,255,0.25)] hover:shadow-[0_0_35px_rgba(0,212,255,0.6)] transition-shadow duration-300">
+                  <RiShieldFlashLine className="text-xs sm:text-base shrink-0" />
+                  <span className="font-bold tracking-[0.08em] sm:tracking-[0.16em] uppercase text-[10.5px] sm:text-sm truncate">Explore Events</span>
                 </Link>
               </motion.div>
             </div>

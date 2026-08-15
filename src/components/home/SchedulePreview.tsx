@@ -83,29 +83,29 @@ function ScheduleCard({ slot, idx }: { slot: typeof scheduleData.day1[0]; idx: n
           className="absolute top-0 left-0 right-0 h-px rounded-t-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-400"
           style={{ background: `linear-gradient(90deg, transparent, rgba(${tc.rgb},0.8), transparent)` }}
         />
-        <div className="space-y-1.5" style={{ transform: "translateZ(8px)" }}>
-          <div className="flex items-center gap-2 flex-wrap">
+        <div className="space-y-1.5 min-w-0 flex-1" style={{ transform: "translateZ(8px)" }}>
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
             <RiTimeLine className="text-arc-cyan text-sm shrink-0" />
             <span className="text-metallic-gold text-xs font-bold tracking-wider font-excon-bold">{slot.time}</span>
             <span
-              className={`px-2.5 py-0.5 rounded text-[9px] uppercase tracking-[0.14em] font-black border font-excon-black ${tc.bg} ${tc.text} ${tc.border}`}
+              className={`px-2 py-0.5 rounded text-[8px] sm:text-[9px] uppercase tracking-[0.12em] sm:tracking-[0.14em] font-black border font-excon-black ${tc.bg} ${tc.text} ${tc.border}`}
             >
               {slot.type}
             </span>
           </div>
           <h3
-            className="text-base sm:text-lg font-black text-white uppercase tracking-tight group-hover:text-metallic-gold transition-colors duration-300 font-excon-black"
+            className="text-sm sm:text-lg font-black text-white uppercase tracking-tight group-hover:text-metallic-gold transition-colors duration-300 font-excon-black truncate"
           >
             {slot.title}
           </h3>
         </div>
 
         <div
-          className="flex items-center gap-2 text-xs font-bold text-white/85 bg-white/5 px-3.5 py-2 rounded-xl border border-white/10 md:self-center shrink-0 font-excon-bold self-start md:self-auto"
+          className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-bold text-white/85 bg-white/5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl border border-white/10 shrink-0 font-excon-bold self-center"
           style={{ transform: "translateZ(8px)" }}
         >
-          <RiMapPinLine className="text-arc-cyan text-sm shrink-0" />
-          <span>{slot.venue}</span>
+          <RiMapPinLine className="text-arc-cyan text-xs sm:text-sm shrink-0" />
+          <span className="truncate">{slot.venue}</span>
         </div>
 
         {/* Hover glow shadow */}
@@ -157,21 +157,21 @@ export function SchedulePreview() {
             </h2>
 
             {/* Day toggle with 3D spring */}
-            <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-3 pt-2 w-full max-w-md mx-auto">
-              {(["day1", "day2"] as const).map((day, i) => (
+            <div className="flex flex-row justify-center gap-2 sm:gap-3 pt-2 w-full max-w-md mx-auto">
+              {(["day1", "day2"] as const).map((day) => (
                 <motion.button
                   key={day}
                   onClick={() => setActiveDay(day)}
                   whileHover={{ scale: 1.04, y: -2 }}
                   whileTap={{ scale: 0.96 }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  className={`w-full sm:w-auto px-4 sm:px-6 py-2.5 rounded-full border text-[11px] sm:text-xs font-bold uppercase tracking-[0.1em] sm:tracking-[0.16em] transition-colors duration-300 cursor-pointer font-space text-center ${
+                  className={`flex-1 px-3 sm:px-6 py-2 sm:py-2.5 rounded-full border text-[10px] sm:text-xs font-bold uppercase tracking-wider sm:tracking-[0.16em] transition-colors duration-300 cursor-pointer font-space text-center truncate ${
                     activeDay === day
                       ? "bg-marvel-red text-white border-marvel-red shadow-[0_0_20px_#ED1D24]"
                       : "bg-black/60 text-white/75 border-white/15 hover:border-white/40 hover:text-white"
                   }`}
                 >
-                  {day === "day1" ? "⚡ Day 1 — Technical & Gaming" : "🏆 Day 2 — Finals & Pro Show"}
+                  {day === "day1" ? "⚡ Day 1 — Tech" : "🏆 Day 2 — Finals"}
                 </motion.button>
               ))}
             </div>
