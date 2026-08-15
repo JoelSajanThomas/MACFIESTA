@@ -314,25 +314,6 @@ export function Marvel3DScrollCanvas({
           </button>
         </div>
       )}
-
-      {/* ─── Initial Stream Preloader Indicator (fades out once ready) ─── */}
-      <AnimatePresence>
-        {!isReady && (
-          <motion.div
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#05050A]"
-          >
-            <div className="relative flex flex-col items-center gap-4">
-              <div className="w-16 h-16 rounded-full border-2 border-marvel-red/20 border-t-marvel-red border-r-arc-cyan animate-spin" />
-              <div className="font-orbitron text-xs tracking-widest text-arc-cyan animate-pulse">
-                INITIALIZING 3D MARVEL TIMELINE...
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   );
 }

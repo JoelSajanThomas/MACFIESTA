@@ -26,7 +26,7 @@ export function RegistrationCTA() {
       <div className="max-w-5xl mx-auto text-center relative z-10 space-y-8 px-4">
         {/* Zoom-in glass container */}
         <Reveal y={60} duration={0.7} margin="-100px">
-          <div className="glass-aurora border border-white/15 p-8 sm:p-12 rounded-3xl shadow-[0_0_60px_rgba(0,0,0,0.9)] space-y-8 max-w-4xl mx-auto">
+          <div className="glass-aurora border border-white/15 p-6 sm:p-12 rounded-3xl shadow-[0_0_60px_rgba(0,0,0,0.9)] space-y-8 max-w-4xl mx-auto">
             {/* Limited slots badge */}
             <div
               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-metallic-gold/40 bg-metallic-gold/15 text-metallic-gold text-xs font-bold tracking-[0.2em] uppercase shadow-[0_0_15px_rgba(255,215,0,0.3)] font-space"
@@ -54,7 +54,7 @@ export function RegistrationCTA() {
 
             {/* S.H.I.E.L.D. stats bar */}
             <div
-              className="flex flex-wrap justify-center gap-8 py-4 border-y border-white/10"
+              className="flex flex-wrap justify-center gap-6 sm:gap-8 py-4 border-y border-white/10"
             >
               {[
                 { label: "26+", desc: "Missions" },
@@ -76,14 +76,15 @@ export function RegistrationCTA() {
 
             {/* CTAs */}
             <div
-              className="flex flex-wrap justify-center gap-4 pt-2"
+              className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-2 w-full"
             >
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                className="w-full sm:w-auto"
               >
-                <Link href="/signup" className="btn-urgency px-10 py-4 group font-space flex items-center gap-2 shadow-[0_0_25px_rgba(237,29,36,0.5)] hover:shadow-[0_0_40px_rgba(237,29,36,0.8)] transition-shadow duration-300">
+                <Link href="/signup" className="btn-urgency w-full sm:w-auto px-8 sm:px-10 py-4 group font-space flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(237,29,36,0.5)] hover:shadow-[0_0_40px_rgba(237,29,36,0.8)] transition-shadow duration-300">
                   <span className="relative z-10 font-bold tracking-[0.16em] uppercase">Register Pass Now</span>
                   <RiPlayLine className="group-hover:translate-x-1 transition-transform text-lg relative z-10" />
                 </Link>
@@ -93,8 +94,9 @@ export function RegistrationCTA() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                className="w-full sm:w-auto"
               >
-                <Link href="/events" className="btn-outline px-10 py-4 border-arc-cyan text-white hover:bg-arc-cyan/20 font-space flex items-center gap-2 shadow-[0_0_20px_rgba(0,212,255,0.25)] hover:shadow-[0_0_35px_rgba(0,212,255,0.6)] transition-shadow duration-300">
+                <Link href="/events" className="btn-outline w-full sm:w-auto px-8 sm:px-10 py-4 border-arc-cyan text-white hover:bg-arc-cyan/20 font-space flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(0,212,255,0.25)] hover:shadow-[0_0_35px_rgba(0,212,255,0.6)] transition-shadow duration-300">
                   <RiShieldFlashLine />
                   <span className="font-bold tracking-[0.16em] uppercase">Explore Categories</span>
                 </Link>
