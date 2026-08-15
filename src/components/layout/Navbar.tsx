@@ -250,90 +250,107 @@ export function Navbar() {
         </nav>
       </motion.header>
 
-      {/* Mobile Menu Drawer */}
+      {/* Mobile Menu Drawer — Stitch Tactical Command Center */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            className="fixed inset-0 z-[99] bg-festival-dark/98 backdrop-blur-2xl flex flex-col items-center justify-center p-6 xl:hidden"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
+            className="fixed inset-0 z-[99] bg-[#05050A]/98 backdrop-blur-2xl flex flex-col justify-between p-6 xl:hidden overflow-hidden"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
           >
-            {/* Decorative glow blobs */}
-            <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-marvel-red/10 blur-[80px] pointer-events-none" />
-            <div className="absolute bottom-1/4 right-1/4 w-64 h-64 rounded-full bg-arc-cyan/10 blur-[80px] pointer-events-none" />
+            {/* Ambient Lighting */}
+            <div className="absolute -top-20 -left-20 w-72 h-72 rounded-full bg-marvel-red/15 blur-[100px] pointer-events-none" />
+            <div className="absolute -bottom-20 -right-20 w-72 h-72 rounded-full bg-arc-cyan/15 blur-[100px] pointer-events-none" />
 
-            <nav className="flex flex-col items-center gap-5 max-h-[70vh] overflow-y-auto w-full py-4 select-scrollbar relative z-10">
+            {/* Mobile Header Banner */}
+            <div className="flex items-center justify-between pt-2 pb-4 border-b border-white/10 relative z-10">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-arc-cyan animate-pulse shadow-[0_0_8px_#00D4FF]" />
+                <span className="text-[10px] font-bold text-arc-cyan tracking-[0.25em] uppercase font-space">
+                  S.H.I.E.L.D. TACTICAL DIRECTIVE
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={closeMobile}
+                className="p-2 rounded-full bg-white/5 border border-white/15 text-white/80 hover:text-arc-cyan hover:border-arc-cyan transition-colors"
+                aria-label="Close menu"
+              >
+                <RiCloseLine size={24} />
+              </button>
+            </div>
+
+            {/* Nav Links Stack */}
+            <nav className="flex flex-col items-center justify-center gap-4 py-6 overflow-y-auto max-h-[60vh] select-scrollbar relative z-10">
               {mainNavItems.map((item, i) => (
                 <motion.div
                   key={item.href}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  transition={{ delay: i * 0.05, duration: 0.3 }}
+                  transition={{ delay: i * 0.04, duration: 0.25 }}
+                  className="w-full text-center"
                 >
                   <Link
                     href={item.href}
                     onClick={closeMobile}
-                    className={`text-xl font-bold tracking-widest uppercase transition-all duration-300 font-syne hover:text-arc-cyan ${pathname === item.href ? "text-marvel-red glow-text-red" : "text-white/80"
-                      }`}
+                    className={`block py-1.5 text-2xl font-black tracking-wider uppercase transition-all duration-300 font-anton ${
+                      pathname === item.href
+                        ? "text-marvel-red glow-text-red scale-105"
+                        : "text-white/85 hover:text-arc-cyan"
+                    }`}
                   >
                     {item.label}
                   </Link>
                 </motion.div>
               ))}
 
-              <div className="h-px w-16 bg-arc-cyan/30 my-2" />
-
-              {dropdownNavItems.map((item, i) => (
-                <motion.div
-                  key={item.href}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ delay: (mainNavItems.length + i) * 0.05, duration: 0.3 }}
-                >
+              {/* Sub-links row */}
+              <div className="flex flex-wrap justify-center gap-2 pt-3 w-full border-t border-white/10 font-space">
+                {dropdownNavItems.map((item) => (
                   <Link
+                    key={item.href}
                     href={item.href}
                     onClick={closeMobile}
-                    className="text-lg font-bold text-metallic-gold hover:text-white transition-colors tracking-widest uppercase font-syne"
+                    className="px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-metallic-gold hover:border-metallic-gold uppercase tracking-wider transition-colors"
                   >
                     {item.label}
                   </Link>
-                </motion.div>
-              ))}
+                ))}
+              </div>
+            </nav>
 
+            {/* Mobile Footer CTAs */}
+            <div className="pt-4 border-t border-white/10 flex flex-col gap-3 relative z-10 font-space pb-6">
               {user ? (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="pt-4"
+                <Link
+                  href={user.role === "admin" ? "/admin" : "/dashboard"}
+                  onClick={closeMobile}
+                  className="w-full py-3.5 text-center text-xs font-black bg-marvel-red text-white rounded-full tracking-[0.2em] uppercase shadow-[0_0_20px_#ED1D24]"
                 >
-                  <Link
-                    href={user.role === "admin" ? "/admin" : "/dashboard"}
-                    onClick={closeMobile}
-                    className="px-6 py-2.5 text-sm font-black bg-marvel-red text-white rounded-full tracking-widest uppercase shadow-[0_0_20px_#ED1D24] font-space"
-                  >
-                    {user.role === "admin" ? "Command Console" : "Agent HUD"}
-                  </Link>
-                </motion.div>
+                  {user.role === "admin" ? "Command Console" : "Agent HUD"}
+                </Link>
               ) : (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="pt-4"
-                >
+                <div className="grid grid-cols-2 gap-3">
                   <Link
                     href="/signin"
                     onClick={closeMobile}
-                    className="px-6 py-2.5 text-sm font-black bg-metallic-gold text-black rounded-full tracking-widest uppercase shadow-[0_0_20px_#FFD700] font-space"
+                    className="py-3 text-center text-xs font-bold bg-white/5 border border-white/20 text-white rounded-full tracking-[0.16em] uppercase hover:border-white"
                   >
                     Agent Login
                   </Link>
-                </motion.div>
+                  <Link
+                    href="/signup"
+                    onClick={closeMobile}
+                    className="py-3 text-center text-xs font-black bg-metallic-gold text-black rounded-full tracking-[0.16em] uppercase shadow-[0_0_20px_rgba(255,215,0,0.5)]"
+                  >
+                    Register Pass
+                  </Link>
+                </div>
               )}
-            </nav>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

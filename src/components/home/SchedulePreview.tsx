@@ -165,7 +165,7 @@ export function SchedulePreview() {
                   whileHover={{ scale: 1.06, y: -2 }}
                   whileTap={{ scale: 0.96 }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  className={`px-6 py-2.5 rounded-full border text-xs font-bold uppercase tracking-[0.16em] transition-colors duration-300 cursor-pointer font-space ${
+                  className={`px-3.5 sm:px-6 py-2 sm:py-2.5 rounded-full border text-[11px] sm:text-xs font-bold uppercase tracking-[0.12em] sm:tracking-[0.16em] transition-colors duration-300 cursor-pointer font-space ${
                     activeDay === day
                       ? "bg-marvel-red text-white border-marvel-red shadow-[0_0_20px_#ED1D24]"
                       : "bg-black/60 text-white/75 border-white/15 hover:border-white/40 hover:text-white"

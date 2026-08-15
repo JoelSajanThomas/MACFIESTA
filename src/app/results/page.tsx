@@ -28,21 +28,33 @@ export function HallOfHeroesPodium({ topTeams }: { topTeams?: Array<{ name: stri
         CONGRATULATIONS TO THE <span className="gradient-text-gold neon-gold">VICTORS</span>
       </h3>
 
-      {/* Holographic 3D Podium Display */}
+      {/* Holographic 3D Podium Display — Scroll-Triggered Rising Pillars */}
       <div className="flex justify-center items-end gap-4 pt-6 pb-2 font-mono">
         {/* 2nd Place */}
-        <div className="flex flex-col items-center space-y-2">
-          <div className="w-12 h-12 rounded-full bg-white/10 border border-white/30 flex items-center justify-center text-white text-lg font-bold">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-col items-center space-y-2"
+        >
+          <div className="w-12 h-12 rounded-full bg-white/10 border border-white/30 flex items-center justify-center text-white text-lg font-bold shadow-[0_0_15px_rgba(255,255,255,0.2)]">
             🥈
           </div>
           <div className="w-24 sm:w-32 h-28 bg-white/5 border border-white/20 rounded-t-2xl flex flex-col justify-center p-2 text-center">
             <span className="text-[10px] text-white/50 uppercase font-bold">2ND PLACE</span>
             <span className="text-xs font-bold text-white truncate">{runner}</span>
           </div>
-        </div>
+        </motion.div>
 
         {/* 1st Place */}
-        <div className="flex flex-col items-center space-y-2 -translate-y-4">
+        <motion.div
+          initial={{ opacity: 0, y: 80 }}
+          whileInView={{ opacity: 1, y: -16 }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{ duration: 0.7, delay: 0.28, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-col items-center space-y-2"
+        >
           <div className="w-16 h-16 rounded-full bg-metallic-gold/20 border-2 border-metallic-gold flex items-center justify-center text-metallic-gold text-2xl font-bold shadow-[0_0_25px_#FFD700]">
             🏆
           </div>
@@ -50,18 +62,24 @@ export function HallOfHeroesPodium({ topTeams }: { topTeams?: Array<{ name: stri
             <span className="text-[10px] text-metallic-gold uppercase font-black tracking-widest">GRAND CHAMPION</span>
             <span className="text-sm font-black text-white truncate">{champion}</span>
           </div>
-        </div>
+        </motion.div>
 
         {/* 3rd Place */}
-        <div className="flex flex-col items-center space-y-2">
-          <div className="w-12 h-12 rounded-full bg-marvel-red/20 border border-marvel-red/40 flex items-center justify-center text-marvel-red text-lg font-bold">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-col items-center space-y-2"
+        >
+          <div className="w-12 h-12 rounded-full bg-marvel-red/20 border border-marvel-red/40 flex items-center justify-center text-marvel-red text-lg font-bold shadow-[0_0_15px_rgba(237,29,36,0.3)]">
             🥉
           </div>
           <div className="w-24 sm:w-32 h-20 bg-marvel-red/5 border border-marvel-red/20 rounded-t-2xl flex flex-col justify-center p-2 text-center">
             <span className="text-[10px] text-marvel-red uppercase font-bold">3RD PLACE</span>
             <span className="text-xs font-bold text-white truncate">{third}</span>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

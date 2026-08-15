@@ -98,17 +98,24 @@ export default function AboutPage() {
 
           <div className="relative border-l border-white/10 max-w-3xl mx-auto pl-6 md:pl-8 space-y-6">
             {milestones.map((m, idx) => (
-              <div key={idx} className="relative group">
-                <div className="absolute -left-[31px] md:-left-[39px] top-1.5 w-4 h-4 rounded-full border-2 border-festival-gold bg-festival-dark group-hover:bg-festival-gold transition-colors" />
-                <div className="glass p-5 rounded-xl border border-white/5">
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.6, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                className="relative group"
+              >
+                <div className="absolute -left-[31px] md:-left-[39px] top-1.5 w-4 h-4 rounded-full border-2 border-festival-gold bg-festival-dark group-hover:bg-festival-gold transition-colors shadow-[0_0_10px_rgba(255,215,0,0.3)]" />
+                <div className="glass p-5 rounded-xl border border-white/10 hover:border-festival-gold/40 transition-colors">
                   <span className="block text-sm font-bold text-festival-gold" style={{ fontFamily: "var(--font-heading)" }}>
                     {m.year}
                   </span>
-                  <p className="text-white/60 text-sm mt-1">
+                  <p className="text-white/75 text-sm mt-1">
                     {m.event}
                   </p>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>

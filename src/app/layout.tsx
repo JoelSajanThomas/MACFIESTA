@@ -4,6 +4,7 @@ import { Anton, Space_Grotesk, Inter, Orbitron, Bebas_Neue, Rajdhani, Syne } fro
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { MobileBottomBar } from "@/components/layout/MobileBottomBar";
 import { LoadingScreen } from "@/components/layout/LoadingScreen";
 import { CursorGlow } from "@/components/ui/CursorGlow";
 import { SmoothScrollProvider } from "@/providers/SmoothScrollProvider";
@@ -176,8 +177,9 @@ export default function RootLayout({
             <SmoothScrollProvider>
               <PageGate>
                 <Navbar />
-                <main id="main-content">{children}</main>
+                <main id="main-content" className="pb-16 xl:pb-0">{children}</main>
                 <Footer />
+                <MobileBottomBar />
               </PageGate>
             </SmoothScrollProvider>
           </MaintenanceGuard>

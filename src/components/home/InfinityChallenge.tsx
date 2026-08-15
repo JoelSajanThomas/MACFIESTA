@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { RiShieldFlashLine, RiSparklingLine } from "react-icons/ri";
-import { Reveal } from "@/components/ui/Reveal";
+import { Reveal, RevealGroup, RevealItem } from "@/components/ui/Reveal";
 
 const INFINITY_STONES = [
   {
@@ -94,68 +94,71 @@ export function InfinityChallenge() {
           </div>
         </Reveal>
 
-        {/* Stone Selectors Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+        {/* Stone Selectors Grid — Staggered Scroll Reveal (3x2 on mobile, 6x1 on desktop) */}
+        <RevealGroup stagger={0.08} margin="-80px" className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4">
           {INFINITY_STONES.map((stone) => {
             const isSelected = activeStone.name === stone.name;
             return (
-              <motion.button
-                key={stone.name}
-                onClick={() => setActiveStone(stone)}
-                whileHover={{ y: -4, scale: 1.04 }}
-                whileTap={{ scale: 0.96 }}
-                className={`p-4 rounded-2xl border flex flex-col items-center gap-2.5 transition-all duration-300 cursor-pointer backdrop-blur-md ${isSelected
-                  ? "bg-white/15 border-white text-white scale-105 shadow-2xl"
-                  : "bg-black/70 border-white/15 text-white/70 hover:border-white/35 hover:text-white"
-                  }`}
-                style={{
-                  borderColor: isSelected ? stone.color : undefined,
-                  boxShadow: isSelected ? `0 0 25px ${stone.color}50` : undefined,
-                }}
-              >
-                <div
-                  className={`w-9 h-9 rounded-full border border-white/40 flex items-center justify-center transition-all ${isSelected ? "animate-pulse scale-110" : ""
+              <RevealItem key={stone.name}>
+                <motion.button
+                  onClick={() => setActiveStone(stone)}
+                  whileHover={{ y: -6, scale: 1.04 }}
+                  whileTap={{ scale: 0.96 }}
+                  className={`w-full p-2.5 sm:p-4 rounded-2xl border flex flex-col items-center gap-1.5 sm:gap-2.5 transition-all duration-300 cursor-pointer backdrop-blur-md ${isSelected
+                    ? "bg-white/15 border-white text-white scale-105 shadow-2xl"
+                    : "bg-black/70 border-white/15 text-white/70 hover:border-white/35 hover:text-white"
                     }`}
-                  style={{ background: stone.color, boxShadow: `0 0 18px ${stone.color}` }}
+                  style={{
+                    borderColor: isSelected ? stone.color : undefined,
+                    boxShadow: isSelected ? `0 0 25px ${stone.color}50` : undefined,
+                  }}
                 >
-                  <span className="text-[11px] font-black text-black font-excon-black">★</span>
-                </div>
-                <span className="text-xs font-bold font-excon-bold tracking-wider uppercase text-center">
-                  {stone.name}
-                </span>
-              </motion.button>
+                  <div
+                    className={`w-7 h-7 sm:w-9 sm:h-9 rounded-full border border-white/40 flex items-center justify-center transition-all ${isSelected ? "animate-pulse scale-110" : ""
+                      }`}
+                    style={{ background: stone.color, boxShadow: `0 0 18px ${stone.color}` }}
+                  >
+                    <span className="text-[9px] sm:text-[11px] font-black text-black font-excon-black">★</span>
+                  </div>
+                  <span className="text-[10px] sm:text-xs font-bold font-excon-bold tracking-wider uppercase text-center leading-tight">
+                    {stone.name}
+                  </span>
+                </motion.button>
+              </RevealItem>
             );
           })}
-        </div>
+        </RevealGroup>
 
         {/* Active Stone Detail Card */}
-        <motion.div
-          key={activeStone.name}
-          initial={{ opacity: 0, y: 20, scale: 0.96 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="glass-aurora p-6 sm:p-8 rounded-3xl border border-white/25 bg-black/80 backdrop-blur-md max-w-3xl mx-auto flex flex-col md:flex-row items-center gap-6 shadow-[0_0_50px_rgba(0,0,0,0.9)]"
-          style={{ borderColor: `${activeStone.color}70` }}
-        >
-          <div
-            className="w-20 h-20 rounded-2xl shrink-0 flex items-center justify-center border-2 border-white/60 shadow-2xl"
-            style={{ background: activeStone.color, boxShadow: `0 0 35px ${activeStone.color}` }}
+        <Reveal y={40} duration={0.6} margin="-60px">
+          <motion.div
+            key={activeStone.name}
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="glass-aurora p-6 sm:p-8 rounded-3xl border border-white/25 bg-black/80 backdrop-blur-md max-w-3xl mx-auto flex flex-col md:flex-row items-center gap-6 shadow-[0_0_50px_rgba(0,0,0,0.9)]"
+            style={{ borderColor: `${activeStone.color}70` }}
           >
-            <RiShieldFlashLine className="text-4xl text-black" />
-          </div>
-
-          <div className="space-y-2 text-center md:text-left">
-            <div className="text-xs font-bold uppercase tracking-[0.16em] font-excon-bold" style={{ color: activeStone.color }}>
-              {activeStone.name} • {activeStone.domain}
+            <div
+              className="w-20 h-20 rounded-2xl shrink-0 flex items-center justify-center border-2 border-white/60 shadow-2xl"
+              style={{ background: activeStone.color, boxShadow: `0 0 35px ${activeStone.color}` }}
+            >
+              <RiShieldFlashLine className="text-4xl text-black" />
             </div>
-            <h3 className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight font-excon-black">
-              {activeStone.domain}
-            </h3>
-            <p className="text-xs sm:text-sm text-white/85 font-excon leading-relaxed font-normal">
-              {activeStone.desc}
-            </p>
-          </div>
-        </motion.div>
+
+            <div className="space-y-2 text-center md:text-left">
+              <div className="text-xs font-bold uppercase tracking-[0.16em] font-excon-bold" style={{ color: activeStone.color }}>
+                {activeStone.name} • {activeStone.domain}
+              </div>
+              <h3 className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight font-excon-black">
+                {activeStone.domain}
+              </h3>
+              <p className="text-xs sm:text-sm text-white/85 font-excon leading-relaxed font-normal">
+                {activeStone.desc}
+              </p>
+            </div>
+          </motion.div>
+        </Reveal>
       </div>
     </section>
   );

@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { RiArrowRightLine, RiImageLine, RiFlashlightLine, RiZoomInLine } from "react-icons/ri";
@@ -14,8 +15,17 @@ const photos = [
 ];
 
 export function GalleryPreview() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+
+  const parallaxYOdd = useTransform(scrollYProgress, [0, 1], [-20, 20]);
+  const parallaxYEven = useTransform(scrollYProgress, [0, 1], [20, -20]);
+
   return (
-    <section className="relative bg-transparent section-padding border-t border-vibranium-purple/20 overflow-hidden">
+    <section ref={sectionRef} className="relative bg-transparent section-padding border-t border-vibranium-purple/20 overflow-hidden">
       {/* Ambient Color Blending */}
       <motion.div
         className="absolute top-1/2 left-1/4 w-96 h-96 rounded-full bg-vibranium-purple/10 blur-[130px] pointer-events-none"
@@ -60,12 +70,13 @@ export function GalleryPreview() {
           </div>
         </Reveal>
 
-        {/* Photo Grid — Staggered reveal & gallery image scale 1.1 on hover (0.5s ease-out) */}
+        {/* Photo Grid — Staggered reveal & dynamic 3D scroll parallax depth */}
         <RevealGroup stagger={0.12} margin="-100px" className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {photos.map((photo, idx) => (
             <RevealItem key={idx}>
               <motion.div
-                whileHover={{ y: -6, scale: 1.02 }}
+                style={{ y: idx % 2 === 0 ? parallaxYEven : parallaxYOdd }}
+                whileHover={{ scale: 1.03 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 className="relative aspect-square md:aspect-[3/4] overflow-hidden rounded-2xl border border-white/8 group shadow-lg cursor-pointer hover:border-arc-cyan/40 transition-colors duration-300"
               >

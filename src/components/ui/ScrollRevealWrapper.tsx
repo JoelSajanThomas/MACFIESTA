@@ -33,16 +33,16 @@ export function ScrollRevealWrapper({
     offset: ["start end", "end start"],
   });
 
-  const springConfig = { stiffness: 140, damping: 22, restDelta: 0.001 };
+  const springConfig = { stiffness: 120, damping: 20, restDelta: 0.001 };
 
-  // Scroll-driven smooth entrance transforms (anchored at 100% full width/height without detachment gaps)
-  const rawRotateX = useTransform(scrollYProgress, [0, 0.25], [4, 0]);
-  const rawScale = useTransform(scrollYProgress, [0, 0.25], [0.98, 1]);
-  const rawOpacity = useTransform(scrollYProgress, [0, 0.2], [0.6, 1]);
-  const rawY = useTransform(scrollYProgress, [0, 0.25], [30, 0]);
+  // Scroll-driven smooth 3D depth & scale transitions
+  const rawRotateX = useTransform(scrollYProgress, [0, 0.28], [3.5, 0]);
+  const rawScale = useTransform(scrollYProgress, [0, 0.28], [0.975, 1]);
+  const rawOpacity = useTransform(scrollYProgress, [0, 0.22], [0.65, 1]);
+  const rawY = useTransform(scrollYProgress, [0, 0.28], [32, 0]);
 
-  // Laser beam fill line progress (0 -> 1 when section enters viewport)
-  const laserProgress = useTransform(scrollYProgress, [0, 0.3], [0, 1]);
+  // Laser beam tracer progress (0 -> 1 as section enters viewport)
+  const laserProgress = useTransform(scrollYProgress, [0, 0.32], [0, 1]);
 
   const rotateX = useSpring(rawRotateX, springConfig);
   const scale = useSpring(rawScale, springConfig);
@@ -62,7 +62,7 @@ export function ScrollRevealWrapper({
       </div>
 
       {/* ─── 3D Perspective Section Container ─── */}
-      <div style={{ perspective: "1400px" }}>
+      <div style={{ perspective: "1200px" }}>
         <motion.div
           style={
             enable3DTilt
@@ -72,6 +72,7 @@ export function ScrollRevealWrapper({
                   opacity,
                   y,
                   transformStyle: "preserve-3d",
+                  backfaceVisibility: "hidden",
                   willChange: "transform, opacity",
                 }
               : { opacity }

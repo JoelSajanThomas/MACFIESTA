@@ -123,7 +123,7 @@ function TiltCard({ item, idx }: { item: typeof featured[0]; idx: number }) {
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         onMouseEnter={handleMouseEnter}
-        className={`group overflow-hidden rounded-2xl flex flex-col h-[480px] relative border bg-[#0A0D1A]/90 backdrop-blur-md ${item.border} ${item.glow} transition-[border-color,box-shadow] duration-300 cursor-pointer`}
+        className={`group overflow-hidden rounded-2xl flex flex-col min-h-[460px] h-full sm:h-[480px] relative border bg-[#0A0D1A]/90 backdrop-blur-md ${item.border} ${item.glow} transition-[border-color,box-shadow] duration-300 cursor-pointer`}
         style={{ transformStyle: "preserve-3d" }}
       >
         {/* Accent top line */}

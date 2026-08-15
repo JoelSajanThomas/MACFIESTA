@@ -113,7 +113,14 @@ export default function SchedulePage() {
               className="space-y-6"
             >
               {filteredTimeline.map((slot, idx) => (
-                <div key={idx} className="relative group">
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, x: -30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.6, delay: idx * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                  className="relative group"
+                >
                   <div className="absolute -left-[31px] md:-left-[39px] top-2 w-4 h-4 rounded-full border-2 border-arc-cyan bg-[#05050A] group-hover:bg-arc-cyan transition-colors shadow-[0_0_10px_#00D4FF]" />
                   
                   <div className="marvel-card p-6 rounded-2xl border border-white/10 group-hover:border-arc-cyan/40 transition-all duration-300 space-y-4">
@@ -128,7 +135,7 @@ export default function SchedulePage() {
 
                       <button
                         onClick={() => alert(`J.A.R.V.I.S. alert set for ${slot.title}!`)}
-                        className="flex items-center gap-1.5 text-xs text-white/50 hover:text-arc-cyan transition-colors uppercase tracking-wider font-bold"
+                        className="flex items-center gap-1.5 text-xs text-white/50 hover:text-arc-cyan transition-colors uppercase tracking-wider font-bold cursor-pointer"
                       >
                         <RiNotification3Line />
                         <span>Set Alert</span>
@@ -139,7 +146,7 @@ export default function SchedulePage() {
                       <h3 className="text-lg font-black text-white group-hover:text-metallic-gold transition-colors duration-300 uppercase" style={{ fontFamily: "var(--font-heading)" }}>
                         {slot.title}
                       </h3>
-                      <p className="text-white/60 text-xs leading-relaxed">
+                      <p className="text-white/75 text-xs leading-relaxed">
                         {slot.desc}
                       </p>
                     </div>
@@ -149,7 +156,7 @@ export default function SchedulePage() {
                       <span>Sector: {slot.stage}</span>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               ))}
 
               {filteredTimeline.length === 0 && (

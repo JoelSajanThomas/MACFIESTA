@@ -56,9 +56,11 @@ const TIMELINE_STEPS = [
 export function MarvelTimeline() {
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
+  const { scrollYProgress: sectionProgress } = useScroll({ target: sectionRef, offset: ["start 70%", "end 80%"] });
 
   // Parallax for background image
   const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
+  const laserBeamHeight = useTransform(sectionProgress, [0, 1], ["0%", "100%"]);
 
   return (
     <section ref={sectionRef} className="relative bg-transparent section-padding border-t border-arc-cyan/20 overflow-hidden min-h-[600px]">
@@ -98,13 +100,13 @@ export function MarvelTimeline() {
 
         {/* 3D Timeline Items */}
         <div className="relative ml-4 md:ml-32">
-          {/* Vertical line with animated glow */}
-          <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-arc-cyan/60 via-marvel-red/40 to-vibranium-purple/60" />
+          {/* Vertical base guide track */}
+          <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-white/10" />
+
+          {/* Scroll-driven active laser energy conduit beam */}
           <motion.div
-            className="absolute left-0 top-0 w-0.5 bg-gradient-to-b from-transparent via-arc-cyan to-transparent"
-            style={{ height: "80px" }}
-            animate={{ y: ["0%", "calc(100% - 80px)", "0%"] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute left-0 top-0 w-0.5 bg-gradient-to-b from-arc-cyan via-marvel-red to-metallic-gold shadow-[0_0_12px_#00D4FF]"
+            style={{ height: laserBeamHeight }}
           />
 
           <div className="space-y-8">

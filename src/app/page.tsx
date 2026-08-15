@@ -15,7 +15,7 @@ export default function Home() {
   return (
     <div className="relative w-full bg-transparent overflow-hidden min-h-screen">
       {/* ─── 3D Marvel Frame-by-Frame Scroll Engine Background ─── */}
-      <Marvel3DScrollCanvas initialSequence="frames" showHud={true} />
+      <Marvel3DScrollCanvas initialSequence="frames" showHud={false} />
 
       {/* ─── Ambient Marvelverse Atmospheric Accents ─── */}
       <div className="absolute top-0 left-0 right-0 h-[100vh] bg-gradient-to-b from-marvel-red/10 via-arc-cyan/5 to-transparent pointer-events-none z-[1]" />
