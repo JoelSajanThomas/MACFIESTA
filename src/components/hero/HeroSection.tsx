@@ -12,6 +12,10 @@ import {
   RiFlashlightLine,
   RiCompass3Line,
   RiArrowDownLine,
+  RiPlayFill,
+  RiPauseFill,
+  RiVolumeUpFill,
+  RiVolumeMuteFill,
 } from "react-icons/ri";
 import { useFestivalControl } from "@/lib/festivalStore";
 
@@ -74,6 +78,7 @@ export function HeroSection() {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const sectionRef = useRef<HTMLElement | null>(null);
+  const removeFallbackListenersRef = useRef<(() => void) | null>(null);
 
   const isPlayingRef = useRef(false);
   const userMutedRef = useRef(false);
@@ -136,6 +141,25 @@ export function HeroSection() {
       fadeRaf = requestAnimationFrame(updateVolumeOnScroll);
     };
 
+    const removeFallbackListeners = () => {
+      window.removeEventListener("click", handleInteraction);
+      window.removeEventListener("keydown", handleInteraction);
+      window.removeEventListener("touchstart", handleInteraction);
+      removeFallbackListenersRef.current = null;
+    };
+
+    const handleInteraction = () => {
+      removeFallbackListeners();
+      if (userMutedRef.current) return;
+
+      audio.play().then(() => {
+        setPlayState(true);
+        updateVolumeOnScroll();
+      }).catch(e => console.log("Playback blocked:", e));
+    };
+
+    removeFallbackListenersRef.current = removeFallbackListeners;
+
     const startPlayback = () => {
       if (userMutedRef.current) return;
 
@@ -143,18 +167,6 @@ export function HeroSection() {
         setPlayState(true);
         updateVolumeOnScroll();
       }).catch(() => {
-        const handleInteraction = () => {
-          if (userMutedRef.current) return;
-          audio.play().then(() => {
-            setPlayState(true);
-            updateVolumeOnScroll();
-          }).catch(e => console.log("Playback still blocked:", e));
-
-          window.removeEventListener("click", handleInteraction);
-          window.removeEventListener("keydown", handleInteraction);
-          window.removeEventListener("touchstart", handleInteraction);
-        };
-
         window.addEventListener("click", handleInteraction);
         window.addEventListener("keydown", handleInteraction);
         window.addEventListener("touchstart", handleInteraction);
@@ -171,13 +183,20 @@ export function HeroSection() {
       clearTimeout(mountDelay);
       cancelAnimationFrame(fadeRaf);
       window.removeEventListener("scroll", handleScroll);
+      if (removeFallbackListenersRef.current) {
+        removeFallbackListenersRef.current();
+      }
       if (audioRef.current) {
         audioRef.current.pause();
       }
     };
   }, []);
 
-  const togglePlay = () => {
+  const togglePlay = (e?: React.MouseEvent | React.TouchEvent) => {
+    e?.stopPropagation?.();
+    if (removeFallbackListenersRef.current) {
+      removeFallbackListenersRef.current();
+    }
     if (!audioRef.current) return;
 
     const audio = audioRef.current;
@@ -382,37 +401,42 @@ export function HeroSection() {
                 <CountdownTimer />
               </div>
 
-              <div className="w-full pt-2 sm:pt-3 border-t border-white/10 flex items-center justify-between gap-2">
+              <button
+                type="button"
+                onClick={togglePlay}
+                className="w-full pt-2 sm:pt-3 border-t border-white/10 flex items-center justify-between gap-2 group cursor-pointer text-left focus:outline-none select-none rounded-b-xl hover:bg-white/[0.03] transition-colors -mx-1 px-1"
+                aria-label={isPlaying ? "Pause theme music" : "Play theme music"}
+              >
                 <div className="flex items-center gap-2.5 sm:gap-3">
-                  <button
-                    onClick={togglePlay}
-                    className={`p-2 sm:p-2.5 rounded-full border transition-all duration-300 cursor-pointer shadow-lg flex items-center justify-center ${isPlaying
-                      ? "bg-marvel-red border-marvel-red text-white shadow-[0_0_15px_#ED1D24] hover:scale-105"
-                      : "bg-white/5 border-white/20 text-white hover:bg-white/10 hover:border-arc-cyan hover:scale-105"
-                      }`}
-                    aria-label={isPlaying ? "Pause music" : "Play music"}
+                  <div
+                    className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full border transition-all duration-300 shadow-lg flex items-center justify-center shrink-0 ${
+                      isPlaying
+                        ? "bg-marvel-red border-marvel-red text-white shadow-[0_0_15px_#ED1D24] group-hover:scale-110"
+                        : "bg-white/10 border-white/20 text-arc-cyan hover:border-arc-cyan group-hover:scale-110"
+                    }`}
                   >
                     {isPlaying ? (
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-                      </svg>
+                      <RiPauseFill className="text-sm sm:text-base text-white drop-shadow-[0_0_6px_#FFFFFF]" />
                     ) : (
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
+                      <RiPlayFill className="text-sm sm:text-base text-arc-cyan ml-0.5 drop-shadow-[0_0_6px_#00D4FF]" />
                     )}
-                  </button>
+                  </div>
                   <div className="text-left font-space">
-                    <p className="text-[8.5px] sm:text-[9px] text-white/40 tracking-widest uppercase">
-                      AVENGERS AUDIO HUD
+                    <p className="text-[8px] sm:text-[9px] text-white/45 tracking-widest uppercase flex items-center gap-1">
+                      {isPlaying ? <RiVolumeUpFill className="text-arc-cyan text-xs shrink-0" /> : <RiVolumeMuteFill className="text-white/40 text-xs shrink-0" />}
+                      <span>AVENGERS AUDIO HUD</span>
                     </p>
-                    <p className={`text-[11px] sm:text-xs font-bold transition-colors duration-300 ${isPlaying ? "text-arc-cyan animate-pulse" : "text-white/40"}`}>
-                      {isPlaying ? "BEATS ONLINE..." : "AUDIO MUTED"}
+                    <p
+                      className={`text-[10px] sm:text-xs font-bold transition-colors duration-300 font-excon-bold flex items-center gap-1.5 ${
+                        isPlaying ? "text-arc-cyan animate-pulse" : "text-white/45"
+                      }`}
+                    >
+                      {isPlaying ? "BEATS ONLINE • TAP TO PAUSE" : "AUDIO MUTED • TAP TO PLAY"}
                     </p>
                   </div>
                 </div>
                 <MusicVisualizer isPlaying={isPlaying} />
-              </div>
+              </button>
             </motion.div>
           </div>
 
