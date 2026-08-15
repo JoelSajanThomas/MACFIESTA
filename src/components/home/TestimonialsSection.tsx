@@ -62,19 +62,22 @@ export function TestimonialsSection() {
       <div className="max-w-7xl mx-auto relative z-10 space-y-12">
         {/* Header */}
         <Reveal y={60} duration={0.7} margin="-100px">
-          <div
-            className="text-center space-y-4 max-w-2xl mx-auto bg-black/75 backdrop-blur-md border border-white/15 p-6 rounded-3xl shadow-[0_0_40px_rgba(0,0,0,0.8)]"
-          >
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-metallic-gold/40 bg-metallic-gold/15 text-metallic-gold text-xs font-bold tracking-[0.2em] uppercase shadow-[0_0_15px_rgba(255,215,0,0.3)] font-space">
+          <div className="text-center space-y-4 max-w-2xl mx-auto mb-10 sm:mb-14">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-metallic-gold/30 bg-metallic-gold/10 text-metallic-gold text-xs font-bold tracking-[0.2em] uppercase shadow-[0_0_20px_rgba(255,215,0,0.25)] font-space">
               <RiChatQuoteLine className="animate-pulse" />
               <span>S.H.I.E.L.D. AGENT BUZZ &amp; REVIEWS</span>
             </div>
 
             <h2
-              className="section-title text-white uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.4)] font-anton"
+              className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight font-anton"
             >
               What They <span className="shimmer-text">Say</span> &amp; <span className="gradient-text-plasma">Reviews</span>
             </h2>
+
+            {/* Animated expanding divider */}
+            <div
+              className="h-px w-32 mx-auto bg-gradient-to-r from-transparent via-metallic-gold to-marvel-red to-transparent origin-center"
+            />
           </div>
         </Reveal>
 

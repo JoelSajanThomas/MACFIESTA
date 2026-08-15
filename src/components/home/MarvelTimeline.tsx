@@ -80,21 +80,25 @@ export function MarvelTimeline() {
 
         {/* Header */}
         <Reveal y={60} duration={0.7} margin="-100px">
-          <div className="text-center space-y-3 max-w-2xl mx-auto">
-            <div className="glass-aurora border border-white/15 p-6 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.8),0_0_20px_rgba(0,212,255,0.08)]">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-arc-cyan/40 bg-arc-cyan/15 text-arc-cyan text-xs font-bold tracking-[0.2em] uppercase shadow-[0_0_15px_rgba(0,212,255,0.3)] font-space mb-3">
-                <RiFlashlightLine className="animate-pulse" />
-                <span>S.H.I.E.L.D. TACTICAL CHRONOLOGY</span>
-              </div>
-
-              <h2 className="section-title text-white uppercase font-anton">
-                Marvel <span className="shimmer-text">Mission</span>{" "}
-                <span className="gradient-text-plasma">Timeline</span>
-              </h2>
-              <p className="text-sm text-white/85 font-space mt-2 leading-relaxed font-normal">
-                Chronological roadmap of all MACFIESTA festival phases from initialization to the finale.
-              </p>
+          <div className="text-center space-y-4 max-w-2xl mx-auto mb-10 sm:mb-14">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-arc-cyan/30 bg-arc-cyan/10 text-arc-cyan text-xs font-bold tracking-[0.2em] uppercase shadow-[0_0_20px_rgba(0,212,255,0.25)] font-space">
+              <RiFlashlightLine className="animate-pulse" />
+              <span>S.H.I.E.L.D. TACTICAL CHRONOLOGY</span>
             </div>
+
+            <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight font-anton">
+              Marvel <span className="shimmer-text">Mission</span>{" "}
+              <span className="gradient-text-plasma">Timeline</span>
+            </h2>
+
+            {/* Animated expanding divider */}
+            <div
+              className="h-px w-32 mx-auto bg-gradient-to-r from-transparent via-arc-cyan to-marvel-red to-transparent origin-center"
+            />
+
+            <p className="text-xs sm:text-sm text-white/85 font-space max-w-lg mx-auto leading-relaxed font-normal">
+              Chronological roadmap of all MACFIESTA festival phases from initialization to the finale.
+            </p>
           </div>
         </Reveal>
 

@@ -76,10 +76,10 @@ export function InfinityChallenge() {
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 relative z-10">
-        {/* Section Header Card */}
+        {/* Section Header */}
         <Reveal y={60} duration={0.7} margin="-100px">
-          <div className="text-center space-y-3 max-w-2xl mx-auto glass-aurora border border-white/15 p-6 sm:p-8 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.8)]">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-metallic-gold/40 bg-metallic-gold/15 text-metallic-gold text-xs font-bold tracking-[0.2em] uppercase shadow-[0_0_15px_rgba(255,215,0,0.3)] font-space">
+          <div className="text-center space-y-4 max-w-2xl mx-auto mb-10 sm:mb-14">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-metallic-gold/30 bg-metallic-gold/10 text-metallic-gold text-xs font-bold tracking-[0.2em] uppercase shadow-[0_0_20px_rgba(255,215,0,0.25)] font-space">
               <RiSparklingLine className="animate-spin-slow" />
               <span>THE SIX DOMAINS OF VICTORY</span>
             </div>
@@ -88,6 +88,12 @@ export function InfinityChallenge() {
               <span className="shimmer-text">Infinity Gauntlet</span>{" "}
               <span className="gradient-text-plasma">Challenge</span>
             </h2>
+
+            {/* Animated expanding divider */}
+            <div
+              className="h-px w-32 mx-auto bg-gradient-to-r from-transparent via-metallic-gold to-arc-cyan to-transparent origin-center"
+            />
+
             <p className="text-xs sm:text-sm text-white/85 font-space max-w-lg mx-auto leading-relaxed font-normal">
               Harness the power of all 6 Infinity Stones by competing across diverse mission categories at MACFIESTA.
             </p>

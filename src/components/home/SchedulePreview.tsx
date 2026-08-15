@@ -142,22 +142,24 @@ export function SchedulePreview() {
 
         {/* Header */}
         <Reveal y={60} duration={0.7} margin="-100px">
-          <div
-            className="text-center space-y-4 mb-8 sm:mb-10 glass-aurora border border-white/15 p-4 sm:p-6 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.8),0_0_20px_rgba(0,212,255,0.08)]"
-            style={{ perspective: "1000px" }}
-          >
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-arc-cyan/40 bg-arc-cyan/15 text-arc-cyan text-xs font-bold tracking-[0.2em] uppercase shadow-[0_0_15px_rgba(0,212,255,0.3)] font-space">
+          <div className="text-center space-y-4 mb-8 sm:mb-12 max-w-2xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-arc-cyan/30 bg-arc-cyan/10 text-arc-cyan text-xs font-bold tracking-[0.2em] uppercase shadow-[0_0_20px_rgba(0,212,255,0.25)] font-space">
               <RiFlashlightLine className="animate-pulse" />
               <span>SANCTUM TIME REALM CHRONOLOGY</span>
             </div>
 
-            <h2 className="section-title text-white uppercase font-anton">
+            <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight font-anton">
               <span className="shimmer-text">Schedule</span>{" "}
               <span className="gradient-text-plasma">Preview</span>
             </h2>
 
+            {/* Animated expanding divider */}
+            <div
+              className="h-px w-32 mx-auto bg-gradient-to-r from-transparent via-arc-cyan to-metallic-gold to-transparent origin-center"
+            />
+
             {/* Day toggle with 3D spring */}
-            <div className="flex flex-row justify-center gap-2 sm:gap-3 pt-2 w-full max-w-md mx-auto">
+            <div className="flex flex-row justify-center gap-2.5 sm:gap-3 pt-2 w-full max-w-md mx-auto">
               {(["day1", "day2"] as const).map((day) => (
                 <motion.button
                   key={day}
@@ -165,7 +167,7 @@ export function SchedulePreview() {
                   whileHover={{ scale: 1.04, y: -2 }}
                   whileTap={{ scale: 0.96 }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  className={`flex-1 px-3 sm:px-6 py-2 sm:py-2.5 rounded-full border text-[10px] sm:text-xs font-bold uppercase tracking-wider sm:tracking-[0.16em] transition-colors duration-300 cursor-pointer font-space text-center truncate ${
+                  className={`flex-1 px-4 sm:px-6 py-2 sm:py-2.5 rounded-full border text-[11px] sm:text-xs font-bold uppercase tracking-wider sm:tracking-[0.16em] transition-colors duration-300 cursor-pointer font-space text-center truncate ${
                     activeDay === day
                       ? "bg-marvel-red text-white border-marvel-red shadow-[0_0_20px_#ED1D24]"
                       : "bg-black/60 text-white/75 border-white/15 hover:border-white/40 hover:text-white"

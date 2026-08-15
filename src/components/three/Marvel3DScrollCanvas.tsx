@@ -180,6 +180,12 @@ export function Marvel3DScrollCanvas({
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
+  const showHudRef = useRef(showHud);
+  showHudRef.current = showHud;
+
+  const drawFrameRef = useRef(drawFrame);
+  drawFrameRef.current = drawFrame;
+
   // Scroll tracking & continuous smooth animation loop
   useEffect(() => {
     const handleScroll = () => {
@@ -187,7 +193,9 @@ export function Marvel3DScrollCanvas({
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
       const progress = docHeight > 0 ? Math.min(1, Math.max(0, scrollY / docHeight)) : 0;
 
-      setScrollProgress(progress);
+      if (showHudRef.current) {
+        setScrollProgress(progress);
+      }
 
       // Map progress [0, 1] across all 169 frames
       const targetIdx = Math.max(1, Math.min(TOTAL_FRAMES, Math.floor(progress * (TOTAL_FRAMES - 1)) + 1));
@@ -205,10 +213,12 @@ export function Marvel3DScrollCanvas({
       // Smooth frame scrubbing (responsive tracking)
       const diff = targetFrameRef.current - currentFrameRef.current;
       if (Math.abs(diff) > 0.005) {
-        currentFrameRef.current += diff * 0.22;
+        currentFrameRef.current += diff * 0.28;
         const frameToDraw = Math.max(1, Math.min(TOTAL_FRAMES, Math.round(currentFrameRef.current)));
-        setCurrentFrameIndex(frameToDraw);
-        drawFrame(frameToDraw);
+        if (showHudRef.current) {
+          setCurrentFrameIndex(frameToDraw);
+        }
+        drawFrameRef.current(frameToDraw);
       }
 
       // Smooth mouse tilt
@@ -230,7 +240,7 @@ export function Marvel3DScrollCanvas({
       window.removeEventListener("scroll", handleScroll);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [drawFrame]);
+  }, []);
 
   const toggleSequence = () => {
     setSequence((prev) => (prev === "frames" ? "frames2" : "frames"));

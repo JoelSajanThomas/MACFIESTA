@@ -4,7 +4,7 @@ import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { RiArrowRightLine, RiImageLine, RiFlashlightLine, RiZoomInLine } from "react-icons/ri";
+import { RiArrowRightLine, RiImageLine, RiShieldFlashLine, RiZoomInLine } from "react-icons/ri";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/Reveal";
 
 const photos = [
@@ -39,34 +39,33 @@ export function GalleryPreview() {
       />
 
       <div className="max-w-7xl mx-auto relative z-10">
+        {/* Header — Centered to match Sponsors and Partners */}
         <Reveal y={60} duration={0.7} margin="-100px">
-          <div className="flex flex-row items-end justify-between gap-3 sm:gap-6 mb-8 sm:mb-14">
-            <div className="space-y-2 sm:space-y-3 min-w-0">
-              <div className="text-arc-cyan text-[10px] sm:text-xs font-bold tracking-[0.16em] sm:tracking-[0.2em] uppercase flex items-center gap-1.5 font-space truncate">
-                <RiFlashlightLine className="animate-pulse shrink-0" /> <span className="truncate">S.H.I.E.L.D. VISUAL ARCHIVES</span>
-              </div>
-              <h2 className="section-title text-white uppercase font-anton">
-                <span className="shimmer-text">Festival</span>{" "}
-                <span className="gradient-text-plasma">Gallery</span>
-              </h2>
-              <div className="h-0.5 w-16 sm:w-20 bg-gradient-to-r from-vibranium-purple to-arc-cyan origin-left" />
+          <div className="text-center space-y-4 mb-10 sm:mb-16">
+            <div
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-arc-cyan/30 bg-arc-cyan/10 text-arc-cyan text-xs font-bold tracking-[0.2em] uppercase shadow-[0_0_20px_rgba(0,212,255,0.25)] font-space"
+            >
+              <RiShieldFlashLine className="animate-pulse" />
+              <span>S.H.I.E.L.D. VISUAL ARCHIVES</span>
             </div>
 
-            <div className="shrink-0">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 400, damping: 17 }}
-              >
-                <Link
-                  href="/gallery"
-                  className="btn-outline text-[10px] sm:text-xs px-3.5 sm:px-6 py-2 sm:py-3 flex items-center gap-1.5 sm:gap-2 tracking-wider sm:tracking-[0.16em] uppercase font-space text-white border-arc-cyan/40 shadow-[0_0_15px_rgba(0,212,255,0.2)] hover:shadow-[0_0_30px_rgba(0,212,255,0.5)] transition-shadow duration-300 whitespace-nowrap"
-                >
-                  <span className="truncate">Full Gallery</span>
-                  <RiArrowRightLine className="shrink-0" />
-                </Link>
-              </motion.div>
-            </div>
+            <h2
+              className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight font-anton"
+            >
+              <span className="shimmer-text">Festival</span>{" "}
+              <span className="gradient-text-plasma">Gallery</span>
+            </h2>
+
+            {/* Animated expanding divider */}
+            <div
+              className="h-px w-32 mx-auto bg-gradient-to-r from-transparent via-arc-cyan to-metallic-gold to-transparent origin-center"
+            />
+
+            <p
+              className="text-white/60 text-xs sm:text-sm font-space max-w-md mx-auto leading-relaxed font-normal"
+            >
+              Captured moments, stage performances, and high-voltage collegiate warfare.
+            </p>
           </div>
         </Reveal>
 
@@ -112,6 +111,25 @@ export function GalleryPreview() {
             </RevealItem>
           ))}
         </RevealGroup>
+
+        {/* Bottom Full Gallery CTA */}
+        <Reveal y={40} duration={0.6} margin="-50px">
+          <div className="flex justify-center mt-8 sm:mt-12">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
+            >
+              <Link
+                href="/gallery"
+                className="btn-outline text-xs sm:text-sm px-6 sm:px-8 py-3 sm:py-3.5 flex items-center gap-2 tracking-[0.16em] uppercase font-space text-white border-arc-cyan/40 shadow-[0_0_20px_rgba(0,212,255,0.25)] hover:shadow-[0_0_35px_rgba(0,212,255,0.6)] transition-shadow duration-300 whitespace-nowrap rounded-full"
+              >
+                <span>Explore Full Gallery</span>
+                <RiArrowRightLine className="text-arc-cyan shrink-0 text-base" />
+              </Link>
+            </motion.div>
+          </div>
+        </Reveal>
       </div>
     </section>
   );
