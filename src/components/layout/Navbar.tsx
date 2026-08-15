@@ -124,16 +124,11 @@ export function Navbar() {
                   priority
                 />
               </div>
-              <div className="flex flex-col">
-                <span
-                  className="text-white tracking-wide text-xl md:text-2xl uppercase flex items-center gap-1 group-hover:opacity-90 transition-opacity duration-300 font-anton"
-                >
-                  <span className="shimmer-text">MACFIESTA</span>
-                </span>
-                <span className="text-[9px] font-bold tracking-[0.28em] text-arc-cyan uppercase flex items-center gap-1 font-space">
-                  <RiShieldFlashLine className="animate-pulse" /> MARVELVERSE
-                </span>
-              </div>
+              <span
+                className="text-white tracking-wide text-xl md:text-2xl uppercase flex items-center gap-1 group-hover:opacity-90 transition-opacity duration-300 font-anton"
+              >
+                <span className="shimmer-text">MACFIESTA</span>
+              </span>
             </Link>
           </div>
 
