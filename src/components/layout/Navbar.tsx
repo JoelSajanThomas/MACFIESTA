@@ -254,7 +254,7 @@ export function Navbar() {
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            className="fixed inset-0 z-[99] bg-[#05050A]/98 backdrop-blur-2xl flex flex-col justify-between p-6 xl:hidden overflow-hidden"
+            className="fixed inset-0 z-[99] bg-[#05050A]/98 backdrop-blur-2xl flex flex-col justify-between p-4 sm:p-6 xl:hidden overflow-hidden w-full max-w-full"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
@@ -265,25 +265,25 @@ export function Navbar() {
             <div className="absolute -bottom-20 -right-20 w-72 h-72 rounded-full bg-arc-cyan/15 blur-[100px] pointer-events-none" />
 
             {/* Mobile Header Banner */}
-            <div className="flex items-center justify-between pt-2 pb-4 border-b border-white/10 relative z-10">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-arc-cyan animate-pulse shadow-[0_0_8px_#00D4FF]" />
-                <span className="text-[10px] font-bold text-arc-cyan tracking-[0.25em] uppercase font-space">
-                  S.H.I.E.L.D. TACTICAL DIRECTIVE
+            <div className="flex items-center justify-between pt-2 pb-3 sm:pb-4 border-b border-white/10 relative z-10 w-full">
+              <div className="flex items-center gap-2 truncate">
+                <span className="w-2 h-2 rounded-full bg-arc-cyan animate-pulse shadow-[0_0_8px_#00D4FF] shrink-0" />
+                <span className="text-[10px] font-bold text-arc-cyan tracking-[0.2em] uppercase font-space truncate">
+                  S.H.I.E.L.D. DIRECTIVE
                 </span>
               </div>
               <button
                 type="button"
                 onClick={closeMobile}
-                className="p-2 rounded-full bg-white/5 border border-white/15 text-white/80 hover:text-arc-cyan hover:border-arc-cyan transition-colors"
+                className="p-1.5 sm:p-2 rounded-full bg-white/5 border border-white/15 text-white/80 hover:text-arc-cyan hover:border-arc-cyan transition-colors shrink-0"
                 aria-label="Close menu"
               >
-                <RiCloseLine size={24} />
+                <RiCloseLine size={22} />
               </button>
             </div>
 
             {/* Nav Links Stack */}
-            <nav className="flex flex-col items-center justify-center gap-4 py-6 overflow-y-auto max-h-[60vh] select-scrollbar relative z-10">
+            <nav className="flex flex-col items-center justify-center gap-3 sm:gap-4 py-4 sm:py-6 overflow-y-auto max-h-[55vh] select-scrollbar relative z-10 w-full">
               {mainNavItems.map((item, i) => (
                 <motion.div
                   key={item.href}
@@ -296,7 +296,7 @@ export function Navbar() {
                   <Link
                     href={item.href}
                     onClick={closeMobile}
-                    className={`block py-1.5 text-2xl font-black tracking-wider uppercase transition-all duration-300 font-anton ${
+                    className={`block py-1 text-xl sm:text-2xl font-black tracking-wider uppercase transition-all duration-300 font-anton ${
                       pathname === item.href
                         ? "text-marvel-red glow-text-red scale-105"
                         : "text-white/85 hover:text-arc-cyan"
@@ -308,13 +308,13 @@ export function Navbar() {
               ))}
 
               {/* Sub-links row */}
-              <div className="flex flex-wrap justify-center gap-2 pt-3 w-full border-t border-white/10 font-space">
+              <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 pt-3 w-full border-t border-white/10 font-space">
                 {dropdownNavItems.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
                     onClick={closeMobile}
-                    className="px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-metallic-gold hover:border-metallic-gold uppercase tracking-wider transition-colors"
+                    className="px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] sm:text-xs font-bold text-metallic-gold hover:border-metallic-gold uppercase tracking-wider transition-colors"
                   >
                     {item.label}
                   </Link>
@@ -323,28 +323,28 @@ export function Navbar() {
             </nav>
 
             {/* Mobile Footer CTAs */}
-            <div className="pt-4 border-t border-white/10 flex flex-col gap-3 relative z-10 font-space pb-6">
+            <div className="pt-3 sm:pt-4 border-t border-white/10 flex flex-col gap-2.5 sm:gap-3 relative z-10 font-space pb-4 sm:pb-6 w-full">
               {user ? (
                 <Link
                   href={user.role === "admin" ? "/admin" : "/dashboard"}
                   onClick={closeMobile}
-                  className="w-full py-3.5 text-center text-xs font-black bg-marvel-red text-white rounded-full tracking-[0.2em] uppercase shadow-[0_0_20px_#ED1D24]"
+                  className="w-full py-3 text-center text-xs font-black bg-marvel-red text-white rounded-full tracking-[0.2em] uppercase shadow-[0_0_20px_#ED1D24]"
                 >
                   {user.role === "admin" ? "Command Console" : "Agent HUD"}
                 </Link>
               ) : (
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-2 sm:gap-3 w-full">
                   <Link
                     href="/signin"
                     onClick={closeMobile}
-                    className="py-3 text-center text-xs font-bold bg-white/5 border border-white/20 text-white rounded-full tracking-[0.16em] uppercase hover:border-white"
+                    className="py-2.5 sm:py-3 text-center text-[11px] sm:text-xs font-bold bg-white/5 border border-white/20 text-white rounded-full tracking-[0.12em] sm:tracking-[0.16em] uppercase hover:border-white truncate px-2"
                   >
                     Agent Login
                   </Link>
                   <Link
                     href="/signup"
                     onClick={closeMobile}
-                    className="py-3 text-center text-xs font-black bg-metallic-gold text-black rounded-full tracking-[0.16em] uppercase shadow-[0_0_20px_rgba(255,215,0,0.5)]"
+                    className="py-2.5 sm:py-3 text-center text-[11px] sm:text-xs font-black bg-metallic-gold text-black rounded-full tracking-[0.12em] sm:tracking-[0.16em] uppercase shadow-[0_0_20px_rgba(255,215,0,0.5)] truncate px-2"
                   >
                     Register Pass
                   </Link>

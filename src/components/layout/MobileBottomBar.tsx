@@ -38,10 +38,10 @@ export function MobileBottomBar() {
   if (isStandalone) return null;
 
   return (
-    <div className="fixed bottom-3 left-0 right-0 z-[90] xl:hidden pointer-events-none pb-[env(safe-area-inset-bottom)] px-4">
+    <div className="fixed bottom-3 left-0 right-0 z-[90] xl:hidden pointer-events-none pb-[env(safe-area-inset-bottom)] px-2 sm:px-4">
       <nav
         aria-label="Mobile Navigation Dock"
-        className="max-w-md mx-auto pointer-events-auto bg-transparent border-0 shadow-none flex items-center justify-around font-space py-1"
+        className="max-w-[380px] sm:max-w-md mx-auto pointer-events-auto bg-[#05050A]/92 backdrop-blur-xl border border-white/15 rounded-2xl shadow-[0_4px_30px_rgba(0,0,0,0.85),0_0_20px_rgba(0,212,255,0.15)] flex items-center justify-between font-space py-1.5 px-1 sm:px-2"
       >
         {MOBILE_TABS.map((tab) => {
           const isActive =
@@ -54,7 +54,7 @@ export function MobileBottomBar() {
             <Link
               key={tab.href}
               href={tab.href}
-              className={`relative flex flex-col items-center justify-center py-1.5 px-3 rounded-xl transition-all duration-300 ${
+              className={`relative flex-1 flex flex-col items-center justify-center py-1 px-1 sm:px-2 rounded-xl transition-all duration-300 ${
                 isActive
                   ? "text-arc-cyan font-bold scale-105"
                   : "text-white/70 hover:text-white"
@@ -69,13 +69,13 @@ export function MobileBottomBar() {
                 />
               )}
 
-              <div className="relative z-10 flex flex-col items-center gap-0.5">
+              <div className="relative z-10 flex flex-col items-center gap-0.5 w-full text-center">
                 <Icon
-                  className={`text-lg transition-transform duration-200 ${
+                  className={`text-base sm:text-lg transition-transform duration-200 ${
                     isActive ? "scale-110 drop-shadow-[0_0_8px_#00D4FF]" : ""
                   }`}
                 />
-                <span className="text-[9px] uppercase tracking-wider font-semibold">
+                <span className="text-[8px] sm:text-[9px] uppercase tracking-wider font-semibold truncate max-w-full">
                   {tab.label}
                 </span>
               </div>

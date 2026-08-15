@@ -209,7 +209,7 @@ export function Footer() {
         </div>
 
         {/* Compact Bottom Bar */}
-        <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-white/45 font-mono">
+        <div className="pt-4 pb-16 xl:pb-0 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-white/45 font-mono text-center sm:text-left">
           <div>
             © {new Date().getFullYear()} {settings.name.toUpperCase()} MARVELVERSE.
           </div>

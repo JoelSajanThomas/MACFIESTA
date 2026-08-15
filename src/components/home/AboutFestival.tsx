@@ -56,21 +56,21 @@ function StatCard({
       whileHover={{ scale: 1.04, y: -8 }}
       viewport={{ once: true }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      className="glass-aurora p-6 md:p-8 rounded-2xl border border-white/10 text-center flex flex-col items-center justify-center space-y-4 shadow-2xl cursor-default hover:border-arc-cyan/40 transition-colors duration-300"
+      className="glass-aurora p-3.5 sm:p-6 md:p-8 rounded-2xl border border-white/10 text-center flex flex-col items-center justify-center space-y-2.5 sm:space-y-4 shadow-2xl cursor-default hover:border-arc-cyan/40 transition-colors duration-300"
     >
       <div
-        className={`p-4 rounded-full bg-white/5 ${color} text-2xl md:text-3xl border border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)]`}
+        className={`p-2.5 sm:p-4 rounded-full bg-white/5 ${color} text-xl sm:text-2xl md:text-3xl border border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)]`}
       >
         <Icon className="" />
       </div>
       <div className="space-y-1">
         <span
-          className="block text-3xl md:text-5xl font-black text-white uppercase font-anton tracking-tight"
+          className="block text-2xl sm:text-4xl md:text-5xl font-black text-white uppercase font-anton tracking-tight"
         >
           {count}
           {suffix}
         </span>
-        <span className="block text-xs text-arc-cyan font-bold uppercase tracking-[0.16em] font-space">
+        <span className="block text-[10px] sm:text-xs text-arc-cyan font-bold uppercase tracking-[0.12em] sm:tracking-[0.16em] font-space">
           {label}
         </span>
       </div>
@@ -110,7 +110,7 @@ export function AboutFestival() {
       <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-arc-cyan/10 blur-[140px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
 
           {/* Left Text content — slides in from left */}
           <motion.div
@@ -153,7 +153,7 @@ export function AboutFestival() {
           {/* Right Stats grid — slides in from right */}
           <motion.div
             ref={ref}
-            className="lg:col-span-6 grid grid-cols-2 gap-4 md:gap-6"
+            className="lg:col-span-6 grid grid-cols-2 gap-3 sm:gap-4 md:gap-6"
             initial={{ opacity: 0, x: 60 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-80px" }}

@@ -157,9 +157,9 @@ function TiltCard({ item, idx }: { item: typeof featured[0]; idx: number }) {
         </div>
 
         {/* Mission Details */}
-        <div className="p-6 flex-grow flex flex-col justify-between bg-[#0A0D1A] relative z-20">
+        <div className="p-4 sm:p-6 flex-grow flex flex-col justify-between bg-[#0A0D1A] relative z-20">
           {/* Floating Avatar */}
-          <div className="absolute -top-10 right-4 z-30 w-20 h-20 rounded-2xl border-2 border-white/20 overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.8)] bg-black/80 group-hover:scale-110 group-hover:border-arc-cyan transition-all duration-300">
+          <div className="absolute -top-10 right-4 z-30 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border-2 border-white/20 overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.8)] bg-black/80 group-hover:scale-110 group-hover:border-arc-cyan transition-all duration-300">
             <Image
               src={item.heroAvatar}
               alt={`${item.hero} Character`}
@@ -169,44 +169,44 @@ function TiltCard({ item, idx }: { item: typeof featured[0]; idx: number }) {
           </div>
 
           <div className="space-y-3 pt-2">
-            <div className="flex items-center justify-between text-[10px] text-white/50 pr-20">
+            <div className="flex items-center justify-between text-[10px] text-white/50 pr-16 sm:pr-20">
               <span className="text-metallic-gold uppercase font-bold font-excon-bold tracking-wider">{item.category}</span>
               <span className="text-arc-cyan font-bold font-excon-bold tracking-wider">{item.level}</span>
             </div>
 
             <h3
-              className="text-lg font-black text-white group-hover:text-metallic-gold transition-colors duration-300 tracking-wide uppercase leading-tight font-excon-black"
+              className="text-base sm:text-lg font-black text-white group-hover:text-metallic-gold transition-colors duration-300 tracking-wide uppercase leading-tight font-excon-black"
             >
               {item.title}
             </h3>
 
             <div className="space-y-1.5 text-xs text-white/70 font-excon">
               <div className="flex items-center gap-2">
-                <RiTrophyLine className="text-metallic-gold text-base" />
+                <RiTrophyLine className="text-metallic-gold text-base shrink-0" />
                 <span>Reward Pool: <strong className="text-white font-black font-excon-black">{item.prize}</strong></span>
               </div>
               <div className="flex items-center gap-2">
-                <RiMapPinLine className="text-arc-cyan text-base" />
+                <RiMapPinLine className="text-arc-cyan text-base shrink-0" />
                 <span className="truncate font-medium">{item.venue}</span>
               </div>
               <div className="flex items-center gap-2">
-                <RiTimeLine className="text-marvel-red text-base" />
+                <RiTimeLine className="text-marvel-red text-base shrink-0" />
                 <span className="font-medium">{item.time}</span>
               </div>
             </div>
           </div>
 
-          <div className="pt-4 border-t border-white/10 flex items-center justify-between">
+          <div className="pt-4 border-t border-white/10 flex items-center justify-between gap-2">
             <Link
               href={item.link}
-              className="text-xs font-bold text-arc-cyan hover:text-white transition-colors tracking-[0.14em] uppercase flex items-center gap-1 font-excon-bold"
+              className="text-[11px] sm:text-xs font-bold text-arc-cyan hover:text-white transition-colors tracking-[0.12em] sm:tracking-[0.14em] uppercase flex items-center gap-1 font-excon-bold shrink-0"
             >
               Mission Briefing
               <RiArrowRightLine className="group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
               href="/signup"
-              className="text-xs font-black text-white bg-marvel-red hover:bg-white hover:text-black px-4 py-2 rounded-full transition-all uppercase tracking-[0.15em] shadow-[0_0_12px_#ED1D24] font-excon-black"
+              className="text-[11px] sm:text-xs font-black text-white bg-marvel-red hover:bg-white hover:text-black px-3.5 sm:px-4 py-2 rounded-full transition-all uppercase tracking-[0.12em] sm:tracking-[0.15em] shadow-[0_0_12px_#ED1D24] font-excon-black shrink-0 text-center"
             >
               Join Mission
             </Link>

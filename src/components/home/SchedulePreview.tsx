@@ -63,7 +63,7 @@ function ScheduleCard({ slot, idx }: { slot: typeof scheduleData.day1[0]; idx: n
     >
       {/* Timeline point */}
       <div
-        className="absolute -left-[31px] md:-left-[39px] top-5 w-4 h-4 rounded-full border-2 bg-black group-hover:scale-150 transition-all duration-300 z-10"
+        className="absolute -left-[27px] sm:-left-[31px] md:-left-[39px] top-5 w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full border-2 bg-black group-hover:scale-150 transition-all duration-300 z-10"
         style={{
           borderColor: `rgba(${tc.rgb},0.8)`,
           boxShadow: `0 0 10px rgba(${tc.rgb},0.6)`,
@@ -76,7 +76,7 @@ function ScheduleCard({ slot, idx }: { slot: typeof scheduleData.day1[0]; idx: n
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-        className="glass-aurora p-5 rounded-2xl border border-white/10 group-hover:border-white/20 transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-default"
+        className="glass-aurora p-4 sm:p-5 rounded-2xl border border-white/10 group-hover:border-white/20 transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 cursor-default"
       >
         {/* Accent top border on hover */}
         <div
@@ -101,7 +101,7 @@ function ScheduleCard({ slot, idx }: { slot: typeof scheduleData.day1[0]; idx: n
         </div>
 
         <div
-          className="flex items-center gap-2 text-xs font-bold text-white/85 bg-white/5 px-3.5 py-2 rounded-xl border border-white/10 md:self-center shrink-0 font-excon-bold"
+          className="flex items-center gap-2 text-xs font-bold text-white/85 bg-white/5 px-3.5 py-2 rounded-xl border border-white/10 md:self-center shrink-0 font-excon-bold self-start md:self-auto"
           style={{ transform: "translateZ(8px)" }}
         >
           <RiMapPinLine className="text-arc-cyan text-sm shrink-0" />
@@ -143,7 +143,7 @@ export function SchedulePreview() {
         {/* Header */}
         <Reveal y={60} duration={0.7} margin="-100px">
           <div
-            className="text-center space-y-4 mb-10 glass-aurora border border-white/15 p-6 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.8),0_0_20px_rgba(0,212,255,0.08)]"
+            className="text-center space-y-4 mb-8 sm:mb-10 glass-aurora border border-white/15 p-4 sm:p-6 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.8),0_0_20px_rgba(0,212,255,0.08)]"
             style={{ perspective: "1000px" }}
           >
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-arc-cyan/40 bg-arc-cyan/15 text-arc-cyan text-xs font-bold tracking-[0.2em] uppercase shadow-[0_0_15px_rgba(0,212,255,0.3)] font-space">
@@ -157,15 +157,15 @@ export function SchedulePreview() {
             </h2>
 
             {/* Day toggle with 3D spring */}
-            <div className="flex justify-center gap-3 pt-2">
+            <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-3 pt-2 w-full max-w-md mx-auto">
               {(["day1", "day2"] as const).map((day, i) => (
                 <motion.button
                   key={day}
                   onClick={() => setActiveDay(day)}
-                  whileHover={{ scale: 1.06, y: -2 }}
+                  whileHover={{ scale: 1.04, y: -2 }}
                   whileTap={{ scale: 0.96 }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  className={`px-3.5 sm:px-6 py-2 sm:py-2.5 rounded-full border text-[11px] sm:text-xs font-bold uppercase tracking-[0.12em] sm:tracking-[0.16em] transition-colors duration-300 cursor-pointer font-space ${
+                  className={`w-full sm:w-auto px-4 sm:px-6 py-2.5 rounded-full border text-[11px] sm:text-xs font-bold uppercase tracking-[0.1em] sm:tracking-[0.16em] transition-colors duration-300 cursor-pointer font-space text-center ${
                     activeDay === day
                       ? "bg-marvel-red text-white border-marvel-red shadow-[0_0_20px_#ED1D24]"
                       : "bg-black/60 text-white/75 border-white/15 hover:border-white/40 hover:text-white"
@@ -179,7 +179,7 @@ export function SchedulePreview() {
         </Reveal>
 
         {/* Schedule List */}
-        <div className="relative border-l-2 border-arc-cyan/30 ml-4 md:ml-6 pl-6 md:pl-8 space-y-5">
+        <div className="relative border-l-2 border-arc-cyan/30 ml-3 sm:ml-4 md:ml-6 pl-5 sm:pl-6 md:pl-8 space-y-4 sm:space-y-5">
           {/* Animated scan line */}
           <motion.div
             className="absolute left-0 w-0.5 h-16 bg-gradient-to-b from-transparent via-arc-cyan to-transparent"

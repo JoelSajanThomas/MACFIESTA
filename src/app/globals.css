@@ -2430,10 +2430,51 @@ textarea {
   touch-action: manipulation;
 }
 
+/* Hide scrollbar for clean horizontal swiping */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
 /* Ensure smooth native momentum scroll on mobile */
 .select-scrollbar {
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
+}
+
+/* Shared section utilities */
+.section-padding {
+  padding-top: 4.5rem;
+  padding-bottom: 4.5rem;
+}
+
+@media (min-width: 768px) {
+  .section-padding {
+    padding-top: 6rem;
+    padding-bottom: 6rem;
+  }
+}
+
+.section-title {
+  font-size: clamp(2rem, 5.5vw, 3.75rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  font-weight: 900;
+}
+
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
 }
 
 @media (max-width: 768px) {
@@ -2442,5 +2483,10 @@ textarea {
     font-size: clamp(2.4rem, 11vw, 4.5rem) !important;
     word-break: break-word;
     overflow-wrap: break-word;
+  }
+
+  .section-padding {
+    padding-top: 3.5rem;
+    padding-bottom: 3.5rem;
   }
 }

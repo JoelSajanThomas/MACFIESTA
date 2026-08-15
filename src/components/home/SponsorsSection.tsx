@@ -99,7 +99,7 @@ function SponsorCard({ partner, index }: { partner: typeof partners[0]; index: n
         style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
         whileHover={{ scale: 1.05, z: 30 }}
         transition={{ type: "spring", stiffness: 300, damping: 25 }}
-        className={`relative group flex flex-col items-center justify-between gap-4 p-5 sm:p-6 rounded-2xl border bg-gradient-to-br ${cfg.gradient} ${cfg.border} backdrop-blur-md cursor-default h-full min-h-[200px] overflow-hidden`}
+        className={`relative group flex flex-col items-center justify-between gap-3 sm:gap-4 p-3.5 sm:p-5 md:p-6 rounded-2xl border bg-gradient-to-br ${cfg.gradient} ${cfg.border} backdrop-blur-md cursor-default h-full min-h-[170px] sm:min-h-[200px] overflow-hidden`}
       >
         {/* Dynamic glow that follows mouse */}
         <motion.div
@@ -148,7 +148,7 @@ function SponsorCard({ partner, index }: { partner: typeof partners[0]; index: n
 
         {/* Logo — floats in 3D space */}
         <motion.div
-          className="text-5xl drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]"
+          className="text-4xl sm:text-5xl drop-shadow-[0_0_20px_rgba(255,255,255,0.3)] pt-2"
           style={{ transform: "translateZ(25px)" }}
           animate={{ y: [-2, 2, -2] }}
           transition={{ duration: 3 + index * 0.4, repeat: Infinity, ease: "easeInOut" }}
@@ -157,13 +157,13 @@ function SponsorCard({ partner, index }: { partner: typeof partners[0]; index: n
         </motion.div>
 
         {/* Name & Tagline */}
-        <div className="text-center space-y-1" style={{ transform: "translateZ(10px)" }}>
+        <div className="text-center space-y-0.5 sm:space-y-1 w-full" style={{ transform: "translateZ(10px)" }}>
           <span
-            className="block text-sm font-black text-white uppercase tracking-tight leading-tight font-excon-black"
+            className="block text-xs sm:text-sm font-black text-white uppercase tracking-tight leading-tight font-excon-black truncate"
           >
             {partner.name}
           </span>
-          <span className={`block text-[9px] uppercase tracking-wider font-excon-bold ${cfg.labelColor}`}>
+          <span className={`block text-[8px] sm:text-[9px] uppercase tracking-wider font-excon-bold truncate ${cfg.labelColor}`}>
             {partner.tagline}
           </span>
         </div>
@@ -213,9 +213,9 @@ export function SponsorsSection() {
 
         {/* ─── Section Header ─── */}
         <Reveal y={60} duration={0.7} margin="-100px">
-          <div className="text-center space-y-5 mb-16">
+          <div className="text-center space-y-4 mb-10 sm:mb-16">
             <div
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-arc-cyan/30 bg-arc-cyan/10 text-arc-cyan text-xs font-bold tracking-[0.2em] uppercase shadow-[0_0_20px_rgba(0,212,255,0.25)] font-space"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-arc-cyan/30 bg-arc-cyan/10 text-arc-cyan text-xs font-bold tracking-[0.2em] uppercase shadow-[0_0_20px_rgba(0,212,255,0.25)] font-space"
             >
               <RiShieldFlashLine className="animate-pulse" />
               <span>Valued Alliances &amp; Strategic Partners</span>
@@ -236,7 +236,7 @@ export function SponsorsSection() {
             />
 
             <p
-              className="text-white/60 text-sm font-space max-w-md mx-auto leading-relaxed font-normal"
+              className="text-white/60 text-xs sm:text-sm font-space max-w-md mx-auto leading-relaxed font-normal"
             >
               Powering Earth&apos;s mightiest college festival alongside our incredible partners
             </p>
@@ -246,7 +246,7 @@ export function SponsorsSection() {
         {/* ─── Tier filter badges ─── */}
         <motion.div
           ref={ref}
-          className="flex flex-wrap justify-center gap-4 mb-12"
+          className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-8 sm:mb-12"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -262,7 +262,7 @@ export function SponsorsSection() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.2 + i * 0.08 }}
                 whileHover={{ scale: 1.08, y: -2 }}
-                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full border text-[10px] font-bold uppercase tracking-widest cursor-default transition-all duration-300 ${cfg.badge} font-space`}
+                className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full border text-[9px] sm:text-[10px] font-bold uppercase tracking-widest cursor-default transition-all duration-300 ${cfg.badge} font-space`}
               >
                 <RiFlashlightLine />
                 {tier} tier
@@ -272,7 +272,7 @@ export function SponsorsSection() {
         </motion.div>
 
         {/* ─── 3D Cards Grid with Staggered Scroll Reveal ─── */}
-        <RevealGroup stagger={0.1} margin="-80px" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5 mb-16">
+        <RevealGroup stagger={0.1} margin="-80px" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-5 mb-12 sm:mb-16">
           {partners.map((partner, idx) => (
             <RevealItem key={partner.name}>
               <SponsorCard partner={partner} index={idx} />

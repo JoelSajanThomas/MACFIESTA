@@ -177,7 +177,7 @@ export default function RootLayout({
             <SmoothScrollProvider>
               <PageGate>
                 <Navbar />
-                <main id="main-content" className="pb-16 xl:pb-0">{children}</main>
+                <main id="main-content" className="pb-24 xl:pb-0 overflow-x-hidden">{children}</main>
                 <Footer />
                 <MobileBottomBar />
               </PageGate>

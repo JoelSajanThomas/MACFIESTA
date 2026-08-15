@@ -99,7 +99,7 @@ export function MarvelTimeline() {
         </Reveal>
 
         {/* 3D Timeline Items */}
-        <div className="relative ml-4 md:ml-32">
+        <div className="relative ml-3 sm:ml-6 md:ml-32">
           {/* Vertical base guide track */}
           <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-white/10" />
 
@@ -109,7 +109,7 @@ export function MarvelTimeline() {
             style={{ height: laserBeamHeight }}
           />
 
-          <div className="space-y-8">
+          <div className="space-y-6 sm:space-y-8">
             {TIMELINE_STEPS.map((step, idx) => {
               const Icon = step.icon;
               return (
@@ -119,22 +119,22 @@ export function MarvelTimeline() {
                   whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
                   viewport={{ once: true, margin: "-40px" }}
                   transition={{ duration: 0.7, delay: idx * 0.12, ease: [0.25, 0.46, 0.45, 0.94] }}
-                  className="relative pl-8 md:pl-12 group"
+                  className="relative pl-6 sm:pl-8 md:pl-12 group"
                   style={{ perspective: "1000px" }}
                 >
                   {/* Animated Dot */}
                   <motion.div
-                    className={`absolute -left-[17px] top-4 w-8 h-8 rounded-full bg-black border-2 border-arc-cyan flex items-center justify-center ${step.color} ${step.glowClass} z-10`}
+                    className={`absolute -left-[15px] sm:-left-[17px] top-4 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black border-2 border-arc-cyan flex items-center justify-center ${step.color} ${step.glowClass} z-10`}
                     whileHover={{ scale: 1.3, rotate: 360 }}
                     transition={{ type: "spring", stiffness: 300, damping: 15 }}
                     style={{ borderColor: `rgba(${step.accentRgb},0.8)` }}
                   >
-                    <Icon className="text-sm" />
+                    <Icon className="text-xs sm:text-sm" />
                   </motion.div>
 
                   {/* Phase connector line */}
                   <div
-                    className="absolute -left-[13px] top-8 h-full w-px opacity-20 group-hover:opacity-60 transition-opacity duration-500"
+                    className="absolute -left-[12px] sm:-left-[13px] top-8 h-full w-px opacity-20 group-hover:opacity-60 transition-opacity duration-500"
                     style={{ background: `rgba(${step.accentRgb},1)` }}
                   />
 
@@ -142,7 +142,7 @@ export function MarvelTimeline() {
                   <motion.div
                     whileHover={{ x: 6, rotateY: 2, scale: 1.01 }}
                     transition={{ type: "spring", stiffness: 250, damping: 20 }}
-                    className={`glass-aurora p-6 rounded-2xl border border-white/12 space-y-2 max-w-2xl ${step.borderHover} transition-all duration-400`}
+                    className={`glass-aurora p-4 sm:p-6 rounded-2xl border border-white/12 space-y-2 max-w-2xl ${step.borderHover} transition-all duration-400`}
                     style={{ transformStyle: "preserve-3d" }}
                   >
                     {/* Top accent */}

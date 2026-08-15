@@ -117,7 +117,7 @@ export default function EventsPage() {
             </div>
 
             {/* Type selector */}
-            <div className="flex gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+            <div className="flex gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 scrollbar-none select-scrollbar">
               <button
                 type="button"
                 suppressHydrationWarning={true}
@@ -145,12 +145,12 @@ export default function EventsPage() {
           </div>
 
           {/* Category Tabs */}
-          <div className="flex gap-2 overflow-x-auto pb-2 border-t border-white/10 pt-4">
+          <div className="flex gap-2 overflow-x-auto pb-2 border-t border-white/10 pt-4 scrollbar-none select-scrollbar">
             <button
               type="button"
               suppressHydrationWarning={true}
               onClick={() => setSelectedCat("all")}
-              className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-all ${selectedCat === "all"
+              className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-all ${selectedCat === "all"
                   ? "bg-metallic-gold text-black shadow-[0_0_15px_#FFD700]"
                   : "bg-white/5 text-white/60 hover:text-white border border-white/10"
                 }`}
@@ -164,7 +164,7 @@ export default function EventsPage() {
                 type="button"
                 suppressHydrationWarning={true}
                 onClick={() => setSelectedCat(cat.id)}
-                className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-all ${selectedCat === cat.id
+                className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-all ${selectedCat === cat.id
                     ? "bg-metallic-gold text-black shadow-[0_0_15px_#FFD700]"
                     : "bg-white/5 text-white/60 hover:text-white border border-white/10"
                   }`}
@@ -230,8 +230,8 @@ export default function EventsPage() {
                   </div>
 
                   {/* Mission Details & Floating Character Image */}
-                  <div className="p-6 flex-grow flex flex-col justify-between bg-[#0A0D1A] relative z-20 font-mono">
-                    <div className="absolute -top-10 right-4 z-30 w-20 h-20 rounded-2xl border-2 border-white/20 overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.8)] bg-black/80 group-hover:scale-110 group-hover:border-arc-cyan transition-all duration-300">
+                  <div className="p-4 sm:p-6 flex-grow flex flex-col justify-between bg-[#0A0D1A] relative z-20 font-mono">
+                    <div className="absolute -top-10 right-4 z-30 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border-2 border-white/20 overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.8)] bg-black/80 group-hover:scale-110 group-hover:border-arc-cyan transition-all duration-300">
                       <Image
                         src={heroData.avatar}
                         alt={`${heroData.hero} Character Avatar`}
@@ -241,37 +241,37 @@ export default function EventsPage() {
                     </div>
 
                     <div className="space-y-3 pt-2">
-                      <div className="flex items-center justify-between text-[10px] text-white/60 pr-20">
+                      <div className="flex items-center justify-between text-[10px] text-white/60 pr-16 sm:pr-20">
                         <span className="text-metallic-gold uppercase font-bold font-excon-bold tracking-wider">{item.category}</span>
                         <span className="text-arc-cyan font-bold font-excon-bold tracking-wider">{heroData.level}</span>
                       </div>
 
-                      <h3 className="text-lg font-black text-white group-hover:text-metallic-gold transition-colors duration-300 truncate tracking-tight uppercase font-excon-black">
+                      <h3 className="text-base sm:text-lg font-black text-white group-hover:text-metallic-gold transition-colors duration-300 truncate tracking-tight uppercase font-excon-black">
                         {item.title}
                       </h3>
 
                       <div className="space-y-1.5 text-xs text-white/70 font-excon">
                         <div className="flex items-center gap-2">
-                          <RiTrophyLine className="text-metallic-gold text-base" />
+                          <RiTrophyLine className="text-metallic-gold text-base shrink-0" />
                           <span>Prize Pool: <strong className="text-white font-black font-excon-black">₹{item.prizePool.toLocaleString("en-IN")}</strong></span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <RiMapPinLine className="text-arc-cyan text-base" />
+                          <RiMapPinLine className="text-arc-cyan text-base shrink-0" />
                           <span className="truncate font-medium">{item.venue}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <RiTimeLine className="text-marvel-red text-base" />
+                          <RiTimeLine className="text-marvel-red text-base shrink-0" />
                           <span className="font-medium">{item.time}</span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="pt-4 border-t border-white/10 flex items-center justify-between">
-                      <Link href={`/events/${item.slug}`} className="text-xs font-bold text-arc-cyan hover:text-white transition-colors tracking-[0.14em] uppercase flex items-center gap-1 font-excon-bold">
+                    <div className="pt-4 border-t border-white/10 flex items-center justify-between gap-2">
+                      <Link href={`/events/${item.slug}`} className="text-[11px] sm:text-xs font-bold text-arc-cyan hover:text-white transition-colors tracking-[0.12em] sm:tracking-[0.14em] uppercase flex items-center gap-1 font-excon-bold shrink-0">
                         Rules & Briefing
                         <RiArrowRightLine />
                       </Link>
-                      <Link href={`/events/${item.slug}`} className="text-xs font-black text-black bg-arc-cyan px-4 py-2 rounded-full hover:bg-white transition-all uppercase tracking-[0.15em] shadow-[0_0_12px_#00D4FF] font-excon-black">
+                      <Link href={`/events/${item.slug}`} className="text-[11px] sm:text-xs font-black text-black bg-arc-cyan px-3.5 sm:px-4 py-2 rounded-full hover:bg-white transition-all uppercase tracking-[0.12em] sm:tracking-[0.15em] shadow-[0_0_12px_#00D4FF] font-excon-black shrink-0 text-center">
                         Join Mission
                       </Link>
                     </div>

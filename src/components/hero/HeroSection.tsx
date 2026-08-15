@@ -294,21 +294,22 @@ export function HeroSection() {
               variants={heroCtaVariants}
               initial="hidden"
               animate="visible"
-              className="flex flex-wrap justify-center lg:justify-start gap-4 pt-2 w-full"
+              className="flex flex-col sm:flex-row justify-center lg:justify-start items-stretch sm:items-center gap-3 sm:gap-4 pt-2 w-full max-w-md sm:max-w-none"
             >
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                className="w-full sm:w-auto"
               >
                 <Link
                   href="/signup"
-                  className="btn-urgency group font-space flex items-center gap-2 px-8 py-3.5 rounded-full shadow-[0_0_25px_rgba(237,29,36,0.5)] hover:shadow-[0_0_40px_rgba(237,29,36,0.8)] transition-shadow duration-300"
+                  className="btn-urgency group font-space flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 rounded-full shadow-[0_0_25px_rgba(237,29,36,0.5)] hover:shadow-[0_0_40px_rgba(237,29,36,0.8)] transition-shadow duration-300 w-full sm:w-auto text-center"
                 >
-                  <span className="relative z-10 font-bold tracking-[0.16em] uppercase">
+                  <span className="relative z-10 font-bold tracking-[0.14em] sm:tracking-[0.16em] uppercase text-xs sm:text-sm">
                     {settings.registrationOpen ? "Register Now" : "Registration Closed"}
                   </span>
-                  <RiPlayLine className="group-hover:translate-x-1 transition-transform relative z-10" />
+                  <RiPlayLine className="group-hover:translate-x-1 transition-transform relative z-10 shrink-0" />
                 </Link>
               </motion.div>
 
@@ -316,25 +317,26 @@ export function HeroSection() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                className="w-full sm:w-auto"
               >
                 <Link
                   href="/events"
-                  className="btn-outline border-arc-cyan text-white hover:bg-arc-cyan/20 font-space flex items-center gap-2 px-7 py-3.5 rounded-full shadow-[0_0_20px_rgba(0,212,255,0.25)] hover:shadow-[0_0_35px_rgba(0,212,255,0.6)] transition-shadow duration-300"
+                  className="btn-outline border-arc-cyan text-white hover:bg-arc-cyan/20 font-space flex items-center justify-center gap-2 px-6 sm:px-7 py-3.5 rounded-full shadow-[0_0_20px_rgba(0,212,255,0.25)] hover:shadow-[0_0_35px_rgba(0,212,255,0.6)] transition-shadow duration-300 w-full sm:w-auto text-center"
                 >
-                  <RiCompass3Line className="text-arc-cyan text-lg" />
-                  <span className="font-bold tracking-[0.16em] uppercase">View Events</span>
+                  <RiCompass3Line className="text-arc-cyan text-base sm:text-lg shrink-0" />
+                  <span className="font-bold tracking-[0.14em] sm:tracking-[0.16em] uppercase text-xs sm:text-sm">View Events</span>
                 </Link>
               </motion.div>
             </motion.div>
           </div>
 
           {/* Countdown & Music Visualizer — Stark HUD */}
-          <div className="lg:col-span-4 flex flex-col items-center lg:items-end justify-center">
+          <div className="lg:col-span-4 flex flex-col items-center lg:items-end justify-center w-full">
             <motion.div
               initial={{ opacity: 0, scale: 0.92, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className="stark-panel p-5 md:p-6 rounded-2xl w-[92%] sm:w-full max-w-[340px] space-y-5 flex flex-col items-center justify-center shadow-[0_0_40px_rgba(0,0,0,0.8),0_0_20px_rgba(0,212,255,0.15)] relative border-glow-flow"
+              className="stark-panel p-4 sm:p-5 md:p-6 rounded-2xl w-full max-w-[340px] space-y-4 sm:space-y-5 flex flex-col items-center justify-center shadow-[0_0_40px_rgba(0,0,0,0.8),0_0_20px_rgba(0,212,255,0.15)] relative border-glow-flow mx-auto lg:mx-0"
             >
               {/* Corner HUD Markers */}
               <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-arc-cyan/70 rounded-tl" />
